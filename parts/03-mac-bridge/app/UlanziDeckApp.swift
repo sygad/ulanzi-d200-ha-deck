@@ -39,6 +39,53 @@ struct MainView: View {
     @State private var typedAddress = ""
 
     var body: some View {
+        if setupTime { setUp } else { everyday }
+    }
+
+    // ---------------------------------------------------------- the one decision
+    //
+    // This is the only moment the app asks for anything, and it is asked of
+    // somebody who has just been told by macOS that we might be malware. So it
+    // says what is true and nothing else: both ends are there, do you want to go
+    // ahead. No explanation they did not ask for, no settings, no second colour.
+
+    private var setupTime: Bool {
+        if case .deckNeedsSettingUp = service.step { return service.haConnected && service.deckPluggedIn }
+        if case .settingUpDeck = service.step { return true }
+        return false
+    }
+
+    private var working: String? {
+        if case .settingUpDeck(let line) = service.step { return line }
+        return nil
+    }
+
+    private var setUp: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            Text(working == nil ? "Ready to set up your deck" : "Setting up your deck")
+                .font(.title3.weight(.medium))
+
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 9) {
+                row("Home Assistant", colour: .green, text: "connected")
+                row("Deck", colour: .green, text: "connected")
+            }
+
+            if let working = working {
+                Text(working).font(.callout).foregroundStyle(.secondary)
+            } else {
+                HStack(spacing: 10) {
+                    Spacer()
+                    Button("Cancel") { NSApplication.shared.keyWindow?.close() }
+                    Button("Proceed") { service.setUpDeck() }.buttonStyle(.borderedProminent)
+                }
+            }
+        }
+        .padding(26)
+    }
+
+    // ---------------------------------------------------------- every other time
+
+    private var everyday: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 12) {
                 Image(systemName: "square.grid.3x3.fill")
