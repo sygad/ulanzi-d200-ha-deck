@@ -18,8 +18,6 @@ nothing of yours is touched. Press **PREVIEW** and the keys answer.
 
 <a href="images/deck.png"><img src="images/deck.png" alt="The deck: fourteen keys showing lights, a temperature graph, a power dial and a wide CO2 reading" width="100%"></a>
 
-<p align="center"><sub>A screen as the deck draws it. Everything pictured anywhere in here is the invented house in <a href="tools/demo_house.py">tools/demo_house.py</a>.</sub></p>
-
 <br>
 
 ---
@@ -29,11 +27,6 @@ nothing of yours is touched. Press **PREVIEW** and the keys answer.
 ## What you need, and how it joins up
 
 <img src="images/guide/fig-what-you-need.png" alt="Home Assistant, where it already runs, joined over the network to your Mac, which the deck plugs into over USB" width="100%">
-
-<br>
-
-The deck has no network connection of any kind. Everything it shows arrives down the
-USB cable, which is why the Mac it is plugged into has a part to play.
 
 <br>
 
