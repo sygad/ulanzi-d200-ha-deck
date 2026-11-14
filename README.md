@@ -177,12 +177,6 @@ device**. **Preview** lets you try a key in the browser before it ever reaches t
 
 <br>
 
-<sub>
+**Licence** — [MIT](LICENSE). Fonts and icons keep their own licences, listed in [NOTICE.md](NOTICE.md).
 
-[MIT](LICENSE). Fonts and icons keep their own licences, listed in [NOTICE.md](NOTICE.md).
-**Roboto** by Google, Apache 2.0. **Material Design Icons** by
-[Pictogrammers](https://pictogrammers.com/library/mdi/). `adb`, carried inside the
-companion app, Apache 2.0. Ulanzi's own software is not included here. Not affiliated
-with Ulanzi or with Home Assistant.
-
-</sub>
+**Credits** — **Roboto** by Google, Apache 2.0. **Material Design Icons** by [Pictogrammers](https://pictogrammers.com/library/mdi/). `adb`, carried inside the companion app, Apache 2.0. Ulanzi's own software is not included here. Not affiliated with Ulanzi or with Home Assistant.
