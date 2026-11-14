@@ -166,6 +166,20 @@ with it.
 
 ## 5 &nbsp; Open the companion app
 
+Open the zip. There are two things inside it: the app, and a small file beside it.
+
+**Double-click Ulanzi Deck.** Leave `ulanzi-deck-pairing.json` where it is — the app
+reads it the first time it runs. That file is what tells the app where your Home
+Assistant is and lets it straight in, which is why there is nothing to type and nothing
+to allow. Once the app has opened, you can throw it away and move the app into
+Applications if you want it there.
+
+<br>
+
+<p align="center"><img src="images/guide/fig-step5-unzip.png" alt="The unzipped folder: the Ulanzi Deck app, and the pairing file beside it" width="560"></p>
+
+<br>
+
 One window, and it finds Home Assistant by itself. **Plug the deck in whenever you
 like** — before or after opening the app makes no difference. A deck already plugged in
 is picked up the moment it starts.

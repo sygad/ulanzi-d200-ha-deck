@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="1.3"
+VERSION="1.4"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -35,6 +35,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$TMP/UlanziDeck" "$APP/Contents/MacOS/UlanziDeck"
 
 # what it needs to set a deck up
+cp app/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp "$ROOT/parts/02-deck-app/deckd" "$APP/Contents/Resources/deckd"
 cp "$ROOT/parts/02-deck-app/default-layout.bin" "$APP/Contents/Resources/default-layout.bin"
 
@@ -64,6 +65,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleDisplayName</key><string>Ulanzi Deck</string>
   <key>CFBundleIdentifier</key><string>com.ulanzideck.app</string>
   <key>CFBundleExecutable</key><string>UlanziDeck</string>
+  <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>
