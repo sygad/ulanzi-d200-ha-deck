@@ -37,9 +37,7 @@ nothing of yours is touched. Press **PREVIEW** and the keys answer.
 ## 1 &nbsp; Download from the Marketplace
 
 In **Settings → Marketplace**, press the three dots at the top right and choose
-**Custom repositories**.
-
-Press **Add from link** at the bottom right, paste
+**Custom repositories**. Press **Add from link** at the bottom right, paste
 `https://github.com/sygad/ulanzi-d200-ha-deck` and press **Add**. Nothing else is asked;
 it works out what it is.
 
@@ -48,13 +46,22 @@ it works out what it is.
 <img src="images/guide/fig-step1-add.png" alt="The Add from a GitHub link dialog, with the repository address typed in" width="100%">
 
 <br>
+<br>
 
-The list then has **Ulanzi Deck** in it. Click that row — its own page opens — and press
-**Download**. You are not searching for it; it is already there because you just added it.
+**Ulanzi Deck** is then in the list, as an Integration. Click that row.
 
 <br>
 
-<img src="images/guide/fig-step1.png" alt="The Marketplace in Home Assistant, with Ulanzi Deck listed and a Download button" width="100%">
+<img src="images/guide/fig-step1-list.png" alt="The Custom repositories list with Ulanzi Deck in it" width="100%">
+
+<br>
+<br>
+
+Its own page opens. Press **Install**.
+
+<br>
+
+<img src="images/guide/fig-step1-install.png" alt="The Ulanzi Deck page in the Marketplace, with an Install button" width="100%">
 
 <br>
 
