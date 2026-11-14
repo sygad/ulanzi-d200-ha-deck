@@ -80,10 +80,10 @@ struct MainView: View {
             Divider()
 
             Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 7) {
-                row("Home Assistant", ok: service.haConnected,
-                    yes: service.address, no: "not connected")
-                row("Deck", ok: service.deckAnswering,
-                    yes: "connected", no: service.deckPluggedIn ? "plugged in, not answering" : "not plugged in")
+                row("Home Assistant",
+                    colour: service.haConnected ? .green : .secondary.opacity(0.4),
+                    text: service.haConnected ? service.address : "not connected")
+                row("Deck", colour: deckColour, text: deckText)
             }
 
             HStack {
@@ -103,15 +103,29 @@ struct MainView: View {
         .padding(22)
     }
 
-    private func row(_ name: String, ok: Bool, yes: String, no: String) -> some View {
+    private func row(_ name: String, colour: Color, text: String) -> some View {
         GridRow {
-            Circle()
-                .fill(ok ? Color.green : Color.secondary.opacity(0.4))
-                .frame(width: 8, height: 8)
+            Circle().fill(colour).frame(width: 8, height: 8)
             Text(name).foregroundStyle(.secondary)
-            Text(ok ? yes : no).lineLimit(1).truncationMode(.middle)
+            Text(text).lineLimit(1).truncationMode(.middle)
         }
         .font(.callout)
+    }
+
+    /// A deck waiting to be set up is not a fault, so it is not drawn as one:
+    /// amber and "ready to set up", beside the button that does it.
+    private var deckColour: Color {
+        if service.deckAnswering { return .green }
+        if service.deckPluggedIn { return .orange }
+        return .secondary.opacity(0.4)
+    }
+
+    private var deckText: String {
+        if service.deckAnswering { return "connected" }
+        guard service.deckPluggedIn else { return "not plugged in" }
+        if case .deckNeedsSettingUp = service.step { return "ready to set up" }
+        if case .settingUpDeck = service.step { return "setting up…" }
+        return "starting up…"
     }
 
     private var busy: Bool {
@@ -126,7 +140,7 @@ struct MainView: View {
         case .noHomeAssistant: return "Where is Home Assistant?"
         case .waitingToBeAllowed: return "Waiting for Home Assistant"
         case .noDeck: return "Plug in your deck"
-        case .deckNeedsSettingUp: return "Your deck needs setting up"
+        case .deckNeedsSettingUp: return "Your deck is ready to set up"
         case .settingUpDeck: return "Setting up your deck"
         case .ready: return "Everything is working"
         }
@@ -144,8 +158,9 @@ struct MainView: View {
         case .noDeck:
             return "Plug the deck into this Mac with the cable it came with."
         case .deckNeedsSettingUp:
-            return "It is still running the software it came with. Setting it up takes a few "
-                 + "seconds and keeps a copy of that software, so it can be put back."
+            return "Nothing is wrong: it is still running Ulanzi's own software. Press the "
+                 + "button and it takes a few seconds. Ulanzi's copy is kept, so you can put "
+                 + "it back whenever you like."
         case .settingUpDeck(let line):
             return line
         case .ready:
