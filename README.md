@@ -145,21 +145,6 @@ it, change it, or build the app yourself rather than download it.
 
 <br>
 
-### macOS will stop you the first time. Here is how to get past it.
-
-<img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="320">
-
-1. Press **Done**. **Not** Move to Bin, however blue that button is.
-2. Open **System Settings → Privacy & Security**.
-3. Scroll down to Security. There is a line about Ulanzi Deck being blocked.
-4. Press **Open Anyway**.
-
-That is it, once, forever. Every Mac shows this for software not sold through Apple's
-own store — it means nobody has paid Apple to vouch for it, not that anything is wrong
-with it.
-
-<br>
-
 ---
 
 <br>
@@ -177,6 +162,21 @@ Applications if you want it there.
 <br>
 
 <p align="center"><img src="images/guide/fig-step5-unzip.png" alt="The unzipped folder: the Ulanzi Deck app, and the pairing file beside it" width="560"></p>
+
+<br>
+
+### macOS will stop you the first time. Here is how to get past it.
+
+<img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="320">
+
+1. Press **Done**. **Not** Move to Bin, however blue that button is.
+2. Open **System Settings → Privacy & Security**.
+3. Scroll down to Security. There is a line about Ulanzi Deck being blocked.
+4. Press **Open Anyway**.
+
+That is it, once, forever. Every Mac shows this for software not sold through Apple's
+own store — it means nobody has paid Apple to vouch for it, not that anything is wrong
+with it.
 
 <br>
 

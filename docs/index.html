@@ -119,19 +119,25 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
 /* the macOS dialog */
 .gate{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
 .gate h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
-.gate .pair{display:grid;grid-template-columns:230px 1fr;gap:20px;align-items:start}
+.gate .pair{display:grid;grid-template-columns:262px 1fr;gap:24px;align-items:start}
 @media (max-width:560px){.gate .pair{grid-template-columns:1fr}}
-.mac-dialog{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 16px 14px;
-  display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center}
-.mac-dialog .mk{width:42px;height:42px;border-radius:9px;background:var(--screen);display:grid;
-  grid-template-columns:repeat(3,6px);gap:2px;place-content:center}
-.mac-dialog .mk s{display:block;width:6px;height:5px;background:var(--key);border-radius:1px;text-decoration:none}
-.mac-dialog b{font-size:13px;line-height:1.35}
-.mac-dialog span{font-size:11.5px;color:var(--ink-soft);line-height:1.45}
-.mac-dialog .btns{display:flex;gap:7px;margin-top:3px}
-.mac-dialog .btns i{font-style:normal;font-size:11.5px;padding:5px 12px;border-radius:6px;
-  border:1px solid var(--line);color:var(--ink-soft)}
-.mac-dialog .btns i.p{background:var(--accent);border-color:var(--accent);color:#fff}
+/* macOS's own refusal, drawn the shape it really is: left aligned, a help
+   button in the corner, and the dangerous button the blue one */
+.mac-dialog{position:relative;background:#fff;border:1px solid #e3e3e3;border-radius:18px;
+  padding:22px 22px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;
+  box-shadow:0 14px 34px rgba(0,0,0,.14);color:#111}
+.mac-dialog .help{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;
+  background:#eceaea;color:#555;font-size:13px;display:flex;align-items:center;justify-content:center}
+.mac-dialog .mk{position:relative;width:62px;height:62px;border-radius:13px;
+  background:linear-gradient(160deg,#cfd2d6,#a9adb3);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.mac-dialog .mk::after{content:"";position:absolute;right:-5px;bottom:-3px;width:0;height:0;
+  border-left:13px solid transparent;border-right:13px solid transparent;border-bottom:23px solid #f5c21b}
+.mac-dialog b{font-size:15px;font-weight:700;line-height:1.3}
+.mac-dialog span{font-size:13.5px;color:#111;line-height:1.45}
+.mac-dialog .btns{display:flex;gap:10px;margin-top:6px;width:100%}
+.mac-dialog .btns i{flex:1;text-align:center;font-style:normal;font-size:13.5px;padding:9px 10px;
+  border-radius:9px;background:#e9e7e7;color:#111;border:0;white-space:nowrap}
+.mac-dialog .btns i.p{background:#1f7ae0;color:#fff}
 .fix{display:flex;flex-direction:column;gap:10px}
 .fix ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:14px;font-size:16px;line-height:1.55;color:var(--ink-soft)}
 .fix ol strong{color:var(--ink);font-weight:600}
@@ -344,26 +350,6 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
 
     <p>Every line of it is published, the program that runs on the deck included. You can read it, change it, or build the app yourself rather than download it.</p>
 
-    <div class="gate">
-      <h3>macOS will stop you the first time. Here is how to get past it.</h3>
-      <div class="pair">
-        <div class="mac-dialog">
-          <span class="mk"><s></s><s></s><s></s><s></s><s></s><s></s></span>
-          <b>“Ulanzi Deck” Not Opened</b>
-          <span>Apple could not verify “Ulanzi Deck” is free of malware that may harm your Mac or compromise your privacy.</span>
-          <span class="btns"><i>Done</i><i class="p">Move to Bin</i></span>
-        </div>
-        <div class="fix">
-          <ol>
-            <li>Press <strong>Done</strong>. <strong>Not</strong> Move to Bin, however blue it is.</li>
-            <li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li>
-            <li>Scroll down to Security. There is a line about Ulanzi Deck being blocked.</li>
-            <li>Press <strong>Open Anyway</strong>.</li>
-          </ol>
-          <p class="after">That is it, once, forever. Every Mac shows this for software not sold through Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is wrong with it.</p>
-        </div>
-      </div>
-    </div>
   </section>
 
   <article class="step">
@@ -381,6 +367,27 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
       <img src="unzip.png" alt="The unzipped folder: the Ulanzi Deck app, and the pairing file beside it"
            style="display:block;width:100%;max-width:560px;margin:0 auto">
     </figure>
+    <div class="gate">
+      <h3>macOS will stop you the first time. Here is how to get past it.</h3>
+      <div class="pair">
+        <div class="mac-dialog">
+          <span class="help">?</span>
+          <span class="mk"></span>
+          <b>“Ulanzi Deck” Not Opened</b>
+          <span>Apple could not verify “Ulanzi Deck” is free of malware that may harm your Mac or compromise your privacy.</span>
+          <span class="btns"><i>Done</i><i class="p">Move to Bin</i></span>
+        </div>
+        <div class="fix">
+          <ol>
+            <li>Press <strong>Done</strong>. <strong>Not</strong> Move to Bin, however blue it is.</li>
+            <li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li>
+            <li>Scroll down to Security. There is a line about Ulanzi Deck being blocked.</li>
+            <li>Press <strong>Open Anyway</strong>.</li>
+          </ol>
+          <p class="after">That is it, once, forever. Every Mac shows this for software not sold through Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is wrong with it.</p>
+        </div>
+      </div>
+    </div>
     <figure>
       <img src="app-window.png" alt="The Ulanzi Deck companion app: Everything is working, with Home Assistant and Deck both showing a green dot" style="display:block;width:100%;max-width:440px;margin:0 auto">
     </figure>
