@@ -1,6 +1,6 @@
 # Setting up your Ulanzi deck
 
-Five steps, and three of them happen inside Home Assistant. Nothing is typed into a
+Six steps, and four of them happen inside Home Assistant. Nothing is typed into a
 terminal and no files are copied by hand.
 
 <br>
@@ -70,7 +70,19 @@ If you miss the prompt: **Settings → System**, the power icon in the top right
 
 <br>
 
-## 3 &nbsp; Open Ulanzi Deck in the sidebar
+## 3 &nbsp; Add it under Devices & services
+
+Downloading put the files in place; this switches it on. Go to **Settings → Devices &
+services**, press **Add integration** at the bottom right, search for **Ulanzi Deck**
+and pick it. It asks nothing — press Submit and it is done.
+
+<br>
+
+---
+
+<br>
+
+## 4 &nbsp; Open Ulanzi Deck in the sidebar
 
 A new item appears down the left. Open it and press the one button on the page.
 
@@ -135,7 +147,7 @@ with it.
 
 <br>
 
-## 4 &nbsp; Open the companion app
+## 5 &nbsp; Open the companion app
 
 One window, and it finds Home Assistant by itself. **Plug the deck in whenever you
 like** — before or after opening the app makes no difference. A deck already plugged in
@@ -155,7 +167,7 @@ never anything to press.
 
 <br>
 
-## 5 &nbsp; Customise your deck
+## 6 &nbsp; Customise your deck
 
 Back in the same sidebar page. Pick a key, give it something to do, and press **Send to
 device**. **Preview** lets you try a key in the browser before it ever reaches the deck.
