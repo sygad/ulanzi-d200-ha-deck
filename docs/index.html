@@ -1,0 +1,408 @@
+<title>Ulanzi Deck Setup Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column. Kit strip, then a card per step. One accent, used only on the button you press. */
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --sunk:#f2f1ee;
+  --ink:#1b1b19; --ink-soft:#5e5d58; --ink-faint:#908f88;
+  --line:#e2e0da; --hair:#edebe5;
+  --accent:#1668b8; --accent-soft:#e8f0f9;
+  --key:#efa52a; --screen:#0f0f11; --ok:#2f8f5b; --no:#a85040;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#161618; --panel:#1f1f22; --sunk:#1a1a1d;
+  --ink:#edebe5; --ink-soft:#a6a49c; --ink-faint:#76746d;
+  --line:#32323799; --line:#323237; --hair:#2a2a2e;
+  --accent:#74b3ec; --accent-soft:#17283a;
+  --ok:#6fc395; --no:#d98e7e; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#161618; --panel:#1f1f22; --sunk:#1a1a1d;
+  --ink:#edebe5; --ink-soft:#a6a49c; --ink-faint:#76746d;
+  --line:#323237; --hair:#2a2a2e;
+  --accent:#74b3ec; --accent-soft:#17283a;
+  --ok:#6fc395; --no:#d98e7e; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;margin:0}
+.wrap{max-width:720px;margin:0 auto;padding-block:40px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:30px}
+h1{font-size:clamp(27px,5vw,35px);font-weight:600;letter-spacing:-.022em;margin:0;text-wrap:balance}
+.lede{color:var(--ink-soft);margin:0;max-width:62ch;font-size:16px;line-height:1.55}
+.mono-note{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.01em}
+
+/* kit strip */
+.kit{display:flex;flex-direction:column;gap:18px;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);margin-top:10px;padding-block:40px}
+.kit h2{font-size:14px;font-weight:600;margin:0;letter-spacing:.01em}
+.chain{display:flex;align-items:flex-start;gap:4px;flex-wrap:nowrap}
+.thing{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.thing b{font-size:13.5px;font-weight:600;letter-spacing:-.005em}
+.thing span{font-size:12px;color:var(--ink-soft);line-height:1.45}
+.join{flex:0 0 46px;display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:34px}
+.join i{display:block;width:100%;height:0;border-top:1px dashed var(--ink-faint);opacity:.7}
+.join em{font-family:var(--mono);font-size:10px;font-style:normal;color:var(--ink-faint);letter-spacing:.03em}
+
+/* steps */
+/* the wrap's own 30px gap sits above the line, so 10px of margin makes it 40 either side */
+.step{display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--hair);
+  margin-top:10px;padding-top:40px}
+.step:first-of-type{border-top:none;margin-top:0;padding-top:10px}
+.step-head{display:flex;gap:14px;align-items:baseline}
+.num{flex:0 0 auto;font-size:19px;font-weight:600;letter-spacing:-.015em;color:var(--ink);width:18px}
+.step-head .txt{min-width:0;display:flex;flex-direction:column;gap:16px}
+.where{font-size:11.5px;color:var(--ink-faint);letter-spacing:.03em;text-transform:uppercase;font-weight:500}
+.step h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.015em;text-wrap:balance}
+.step p{margin:0;color:var(--ink-soft);font-size:16px;line-height:1.55}
+.step p strong{color:var(--ink);font-weight:600}
+figure{margin:0;display:flex;flex-direction:column;gap:9px}
+.step figure{margin-left:32px}   /* line up with the title: number (18px) + gap (14px) */
+figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding-left:2px}
+
+/* a home assistant window: one frame, sidebar, content. No nested cards. */
+.ha{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel);display:flex}
+.ha-rail{flex:0 0 156px;background:var(--sunk);border-right:1px solid var(--hair);
+  padding:10px 0;display:flex;flex-direction:column;gap:1px}
+.ha-rail .brand{display:flex;align-items:center;gap:8px;padding:4px 14px 12px;font-size:13px;font-weight:600}
+.ha-rail .brand s{width:16px;height:16px;border-radius:4px;background:var(--accent);text-decoration:none;flex:0 0 auto}
+.ha-rail a{display:flex;align-items:center;gap:10px;padding:7px 14px;font-size:12.5px;color:var(--ink-soft);
+  text-decoration:none}
+.ha-rail a u{flex:0 0 auto;width:14px;height:14px;border-radius:3px;background:currentColor;opacity:.4;
+  text-decoration:none}
+.ha-rail a.on{color:var(--accent);background:var(--accent-soft);font-weight:500;box-shadow:inset 3px 0 0 var(--accent)}
+.ha-rail a.on u{opacity:1;background:var(--screen);display:grid;grid-template-columns:repeat(3,3px);
+  gap:1.5px;place-content:center}
+.ha-rail a.on u s{display:block;width:3px;height:3px;background:var(--key);text-decoration:none}
+.ha-view{flex:1;min-width:0;display:flex;flex-direction:column}
+.ha-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 16px;
+  border-bottom:1px solid var(--hair);font-size:13.5px;font-weight:600}
+.ha-top em{font-style:normal;font-size:11.5px;font-weight:400;color:var(--ink-faint)}
+.ha-pane{padding:16px;display:flex;flex-direction:column;gap:14px;min-height:92px;justify-content:center}
+.line{display:flex;align-items:center;gap:13px;min-width:0}
+.line .meta{min-width:0;flex:1}
+.line .meta b{display:block;font-size:13.5px;font-weight:600}
+.line .meta span{display:block;font-size:12px;color:var(--ink-soft)}
+.deckmark{flex:0 0 auto;width:36px;height:28px;border-radius:5px;background:var(--screen);
+  display:grid;grid-template-columns:repeat(4,5px);gap:2px;place-content:center}
+.deckmark s{display:block;width:5px;height:4px;background:var(--key);border-radius:1px;text-decoration:none}
+.deckmark s.dim{opacity:.4}
+.go{flex:0 0 auto;border:0;border-radius:7px;background:var(--accent);color:#fff;font-family:var(--sans);
+  font-size:13px;font-weight:500;padding:9px 16px;cursor:default;white-space:nowrap}
+.quiet{border:1px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:7px;
+  font-family:var(--sans);font-size:12.5px;padding:7px 13px;cursor:default}
+.ha-shot{padding:10px;background:var(--sunk)}
+.ha-shot img{display:block;width:100%;border-radius:5px;border:1px solid var(--hair)}
+
+/* the companion app explainer */
+.about{display:flex;flex-direction:column;gap:20px;margin-left:32px;border:1px solid var(--line);border-radius:12px;
+  padding:26px 22px;background:var(--panel)}
+.about h2{font-size:21px;font-weight:600;margin:0;letter-spacing:-.018em;text-wrap:balance}
+.about p{margin:0;color:var(--ink-soft);font-size:16px;line-height:1.55}
+.about p strong{color:var(--ink);font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.cols h4{margin:0 0 10px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.cols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.cols li{font-size:16px;line-height:1.55;padding-left:24px;position:relative;color:var(--ink-soft)}
+.cols li::before{position:absolute;left:0;top:0;font-weight:600;font-size:14px;line-height:1.77}
+.does h4{color:var(--ok)}
+.does li::before{content:"\2713";color:var(--ok)}
+.doesnt h4{color:var(--no)}
+.doesnt li::before{content:"\2715";color:var(--no)}
+@media (max-width:520px){.cols{grid-template-columns:1fr;gap:18px}}
+
+/* the macOS dialog */
+.gate{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.gate h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.gate .pair{display:grid;grid-template-columns:230px 1fr;gap:20px;align-items:start}
+@media (max-width:560px){.gate .pair{grid-template-columns:1fr}}
+.mac-dialog{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 16px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center}
+.mac-dialog .mk{width:42px;height:42px;border-radius:9px;background:var(--screen);display:grid;
+  grid-template-columns:repeat(3,6px);gap:2px;place-content:center}
+.mac-dialog .mk s{display:block;width:6px;height:5px;background:var(--key);border-radius:1px;text-decoration:none}
+.mac-dialog b{font-size:13px;line-height:1.35}
+.mac-dialog span{font-size:11.5px;color:var(--ink-soft);line-height:1.45}
+.mac-dialog .btns{display:flex;gap:7px;margin-top:3px}
+.mac-dialog .btns i{font-style:normal;font-size:11.5px;padding:5px 12px;border-radius:6px;
+  border:1px solid var(--line);color:var(--ink-soft)}
+.mac-dialog .btns i.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.fix{display:flex;flex-direction:column;gap:10px}
+.fix ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:14px;font-size:16px;line-height:1.55;color:var(--ink-soft)}
+.fix ol strong{color:var(--ink);font-weight:600}
+.fix .after{font-size:16px;line-height:1.55;color:var(--ink-soft);margin:0}
+</style>
+
+<div class="wrap">
+
+  <header style="display:flex;flex-direction:column;gap:11px">
+    <h1>Setting up your Ulanzi deck</h1>
+    <p class="lede">Four steps, and three of them happen inside Home Assistant. Nothing is typed into a terminal and no files are copied by hand.</p>
+  </header>
+
+  <section class="kit">
+    <h2>What you need, and how it joins up</h2>
+    <div class="chain">
+      <div class="thing">
+        <svg viewBox="0 0 120 92" width="100%" style="max-width:120px" role="img" aria-label="A desktop computer showing Home Assistant">
+          <rect x="6" y="6" width="108" height="66" rx="5" fill="none" stroke="currentColor" stroke-width="2.2" opacity=".5"/>
+          <rect x="12" y="12" width="96" height="54" rx="2" fill="var(--sunk)"/>
+          <rect x="12" y="12" width="26" height="54" fill="var(--accent)" opacity=".12"/>
+          <rect x="16" y="17" width="18" height="3" rx="1.5" fill="var(--accent)" opacity=".85"/>
+          <g fill="currentColor" opacity=".32">
+            <rect x="16" y="25" width="18" height="3" rx="1.5"/><rect x="16" y="32" width="18" height="3" rx="1.5"/>
+            <rect x="16" y="39" width="18" height="3" rx="1.5"/><rect x="16" y="46" width="18" height="3" rx="1.5"/>
+          </g>
+          <rect x="43" y="17" width="60" height="12" rx="2" fill="currentColor" opacity=".16"/>
+          <rect x="43" y="33" width="28" height="28" rx="2" fill="currentColor" opacity=".16"/>
+          <rect x="75" y="33" width="28" height="28" rx="2" fill="currentColor" opacity=".16"/>
+          <rect x="52" y="72" width="16" height="10" fill="currentColor" opacity=".4"/>
+          <rect x="36" y="82" width="48" height="4" rx="2" fill="currentColor" opacity=".5"/>
+        </svg>
+        <b>Home Assistant</b>
+        <span>Runs where it already runs</span>
+      </div>
+      <div class="join"><i></i><em>network</em></div>
+      <div class="thing">
+        <svg viewBox="0 0 120 92" width="100%" style="max-width:120px" role="img" aria-label="A laptop showing the Home Assistant panel">
+          <rect x="16" y="14" width="88" height="56" rx="4" fill="none" stroke="currentColor" stroke-width="2.2" opacity=".5"/>
+          <rect x="21" y="19" width="78" height="46" rx="1.5" fill="var(--sunk)"/>
+          <rect x="21" y="19" width="19" height="46" fill="var(--accent)" opacity=".12"/>
+          <rect x="24" y="23" width="13" height="2.5" rx="1.25" fill="var(--accent)" opacity=".85"/>
+          <g fill="currentColor" opacity=".3">
+            <rect x="24" y="29" width="13" height="2.5" rx="1.25"/><rect x="24" y="35" width="13" height="2.5" rx="1.25"/>
+            <rect x="24" y="41" width="13" height="2.5" rx="1.25"/>
+          </g>
+          <rect x="45" y="24" width="49" height="8" rx="1.5" fill="currentColor" opacity=".16"/>
+          <rect x="45" y="36" width="49" height="24" rx="2" fill="var(--screen)"/>
+          <g fill="var(--key)">
+            <rect x="48" y="39" width="8" height="6" rx="1"/><rect x="59" y="39" width="8" height="6" rx="1" opacity=".4"/>
+            <rect x="70" y="39" width="8" height="6" rx="1"/><rect x="81" y="39" width="10" height="6" rx="1" opacity=".4"/>
+            <rect x="48" y="48" width="8" height="6" rx="1" opacity=".4"/><rect x="59" y="48" width="8" height="6" rx="1"/>
+            <rect x="70" y="48" width="21" height="6" rx="1" opacity=".4"/>
+          </g>
+          <path d="M8 74h104l-6-4H14z" fill="currentColor" opacity=".45"/>
+          <rect x="50" y="71" width="20" height="1.6" rx=".8" fill="var(--bg)" opacity=".7"/>
+        </svg>
+        <b>Your Mac</b>
+        <span>The deck plugs into this</span>
+      </div>
+      <div class="join"><i></i><em>USB</em></div>
+      <div class="thing">
+        <svg viewBox="0 0 120 92" width="100%" style="max-width:120px" role="img" aria-label="The Ulanzi deck, fourteen keys">
+          <rect x="8" y="18" width="104" height="60" rx="9" fill="currentColor" opacity=".22"/>
+          <rect x="11" y="21" width="98" height="54" rx="7" fill="var(--screen)"/>
+          <g fill="var(--key)">
+            <rect x="16" y="26" width="16" height="12" rx="2.5"/>
+            <rect x="35" y="26" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="54" y="26" width="16" height="12" rx="2.5"/>
+            <rect x="73" y="26" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="92" y="26" width="12" height="12" rx="2.5" opacity=".35"/>
+            <rect x="16" y="41" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="35" y="41" width="16" height="12" rx="2.5"/>
+            <rect x="54" y="41" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="73" y="41" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="92" y="41" width="12" height="12" rx="2.5"/>
+            <rect x="16" y="56" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="35" y="56" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="54" y="56" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="73" y="56" width="31" height="12" rx="2.5"/>
+          </g>
+          <path d="M60 18v-6" stroke="currentColor" stroke-width="2.4" opacity=".45" stroke-linecap="round"/>
+          <rect x="54" y="4" width="12" height="8" rx="2" fill="currentColor" opacity=".45"/>
+        </svg>
+        <b>Ulanzi D200</b>
+        <span>No wifi, no network of its own</span>
+      </div>
+    </div>
+    <p class="lede">The deck has no network connection of any kind. Everything it shows arrives down the USB cable, which is why the Mac it is plugged into has a part to play.</p>
+  </section>
+
+  <article class="step">
+    <div class="step-head">
+      <div class="num">1</div>
+      <div class="txt">
+        <h3>Download from the Marketplace</h3>
+        <p>In <strong>Settings → Marketplace</strong>, search for Ulanzi Deck and press Download, the same as any other integration.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="ha">
+        <nav class="ha-rail" aria-label="Sidebar">
+          <div class="brand"><s></s>Home Assistant</div>
+          <a href="#1"><u></u>Overview</a>
+          <a href="#1"><u></u>History</a>
+          <a href="#1"><u></u>Developer tools</a>
+          <a class="on" href="#1"><u></u>Settings</a>
+        </nav>
+        <div class="ha-view">
+          <div class="ha-top"><span>Marketplace</span><em>search: ulanzi</em></div>
+          <div class="ha-pane">
+            <div class="line">
+              <span class="deckmark"><s></s><s class="dim"></s><s></s><s class="dim"></s><s class="dim"></s><s></s><s class="dim"></s><s></s></span>
+              <span class="meta"><b>Ulanzi Deck</b><span>Turn an Ulanzi D200 into a Home Assistant control deck</span></span>
+              <span class="go">Download</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div class="step-head">
+      <div class="num">2</div>
+      <div class="txt">
+        <h3>Restart Home Assistant</h3>
+        <p>Home Assistant raises this itself after any new download. Nothing you have just installed is running until it has restarted once.</p>
+        <p>If you miss the prompt: <strong>Settings → System</strong>, the power icon in the top right, then <strong>Restart Home Assistant</strong>.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="ha">
+        <nav class="ha-rail" aria-label="Sidebar">
+          <div class="brand"><s></s>Home Assistant</div>
+          <a href="#2"><u></u>Overview</a>
+          <a href="#2"><u></u>History</a>
+          <a href="#2"><u></u>Developer tools</a>
+          <a class="on" href="#2"><u></u>Settings</a>
+        </nav>
+        <div class="ha-view">
+          <div class="ha-top"><span>System</span><em>1 repair</em></div>
+          <div class="ha-pane">
+            <div class="line">
+              <span class="meta"><b>Restart required</b><span>Ulanzi Deck has been downloaded</span></span>
+              <span class="go">Restart</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </article>
+
+  <article class="step">
+    <div class="step-head">
+      <div class="num">3</div>
+      <div class="txt">
+        <h3>Open Ulanzi Deck in the sidebar</h3>
+        <p>A new item appears down the left. Open it and press the one button on the page.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="ha">
+        <nav class="ha-rail" aria-label="Sidebar">
+          <div class="brand"><s></s>Home Assistant</div>
+          <a href="#3"><u></u>Overview</a>
+          <a href="#3"><u></u>History</a>
+          <a class="on" href="#3"><u><s></s><s></s><s></s><s></s><s></s><s></s></u>Ulanzi Deck</a>
+          <a href="#3"><u></u>Developer tools</a>
+          <a href="#3"><u></u>Settings</a>
+        </nav>
+        <div class="ha-view">
+          <div class="ha-top"><span>Ulanzi Deck</span><em>no Mac connected</em></div>
+          <div class="ha-pane">
+            <div class="line">
+              <span class="meta"><b>Connect a Mac</b><span>Your deck plugs into a Mac, which carries it to Home Assistant</span></span>
+              <span class="go">Get the companion app</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </article>
+
+  <section class="about">
+    <h2>What the companion app is, before you run it</h2>
+    <p>Downloading a program from someone you have never met is a fair thing to be wary of. So here is exactly what it is, and why it has to exist at all.</p>
+    <p><strong>Your deck has no network.</strong> No wifi, no ethernet, no address of its own. Everything it shows arrives down the USB cable. Home Assistant runs somewhere else on your network and cannot see a USB device plugged into a different computer. Something has to sit on the computer the cable goes into and pass messages along. That is the whole job.</p>
+
+    <div class="cols">
+      <div class="does">
+        <h4>What it does</h4>
+        <ul>
+          <li>Holds the USB connection and passes messages between the deck and your Home Assistant.</li>
+          <li>Tells the deck the time, because the deck has no clock of its own.</li>
+          <li>Copies the deck software across. Once, at the start, keeping Ulanzi's own copy so you can go back.</li>
+        </ul>
+      </div>
+      <div class="doesnt">
+        <h4>What it never does</h4>
+        <ul>
+          <li>No account, no sign-in, no cloud service. Nothing of yours leaves your network.</li>
+          <li>Talks to one address only: the Home Assistant you pointed it at.</li>
+          <li>No analytics, no telemetry, no automatic updates, nothing else running in the background.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>Every line of it is published, the program that runs on the deck included. You can read it, change it, or build the app yourself rather than download it.</p>
+
+    <div class="gate">
+      <h3>macOS will stop you the first time. Here is how to get past it.</h3>
+      <div class="pair">
+        <div class="mac-dialog">
+          <span class="mk"><s></s><s></s><s></s><s></s><s></s><s></s></span>
+          <b>“Ulanzi Deck” can’t be opened because Apple cannot check it for malicious software.</b>
+          <span>This software needs to be updated. Contact the developer for more information.</span>
+          <span class="btns"><i>Move to Bin</i><i class="p">OK</i></span>
+        </div>
+        <div class="fix">
+          <ol>
+            <li>Press <strong>OK</strong>. Do not move it to the bin.</li>
+            <li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li>
+            <li>Scroll down to Security. There is a line about Ulanzi Deck being blocked.</li>
+            <li>Press <strong>Open Anyway</strong>.</li>
+          </ol>
+          <p class="after">That is it, once, forever. Every Mac shows this for software not sold through Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is wrong with it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <article class="step">
+    <div class="step-head">
+      <div class="num">4</div>
+      <div class="txt">
+        <h3>Open the companion app</h3>
+        <p>One window, and it finds Home Assistant by itself. <strong>Plug the deck in whenever you like</strong> — before or after opening the app makes no difference. A deck already plugged in is picked up the moment it starts.</p>
+        <p>If your deck is still running the software it came with, the app says so and offers one button, <em>Set up my deck</em>. Press it once and it takes a few seconds. After that there is never anything to press.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="app-window.png" alt="The Ulanzi Deck companion app: Everything is working, with Home Assistant and Deck both showing a green dot" style="display:block;width:100%;max-width:440px;margin:0 auto">
+    </figure>
+  </article>
+
+  <article class="step">
+    <div class="step-head">
+      <div class="num">5</div>
+      <div class="txt">
+        <h3>Customise your deck</h3>
+        <p>Back in the same sidebar page. Pick a key, give it something to do, and press Send to device. Preview lets you try a key in the browser before it ever reaches the deck.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="ha">
+        <nav class="ha-rail" aria-label="Sidebar">
+          <div class="brand"><s></s>Home Assistant</div>
+          <a href="#5"><u></u>Overview</a>
+          <a href="#5"><u></u>History</a>
+          <a class="on" href="#5"><u><s></s><s></s><s></s><s></s><s></s><s></s></u>Ulanzi Deck</a>
+          <a href="#5"><u></u>Developer tools</a>
+          <a href="#5"><u></u>Settings</a>
+        </nav>
+        <div class="ha-view">
+          <div class="ha-top"><span>Ulanzi Deck</span><em>deck connected</em></div>
+          <div class="ha-shot">
+            <img src="panel.jpg" alt="The Ulanzi Deck panel: key settings on the left, a live preview of the fourteen keys on the right">
+          </div>
+        </div>
+      </div>
+    </figure>
+  </article>
+
+</div>

@@ -1,0 +1,97 @@
+{
+  "placed" : 18,
+  "of" : 18,
+  "replacing" : false,
+  "lines" : [
+    {
+      "name" : "column 1 left",
+      "at" : 14,
+      "placed" : true
+    },
+    {
+      "at" : 210,
+      "placed" : true,
+      "name" : "column 1 right"
+    },
+    {
+      "name" : "column 2 left",
+      "placed" : true,
+      "at" : 274
+    },
+    {
+      "at" : 470,
+      "name" : "column 2 right",
+      "placed" : true
+    },
+    {
+      "name" : "column 3 left",
+      "at" : 533,
+      "placed" : true
+    },
+    {
+      "placed" : true,
+      "name" : "column 3 right",
+      "at" : 729
+    },
+    {
+      "name" : "column 4 left",
+      "at" : 793,
+      "placed" : true
+    },
+    {
+      "at" : 989,
+      "placed" : true,
+      "name" : "column 4 right"
+    },
+    {
+      "placed" : true,
+      "name" : "column 5 left",
+      "at" : 1053
+    },
+    {
+      "at" : 1249,
+      "name" : "column 5 right",
+      "placed" : true
+    },
+    {
+      "name" : "wide key left",
+      "placed" : true,
+      "at" : 791
+    },
+    {
+      "name" : "wide key right",
+      "placed" : true,
+      "at" : 1247
+    },
+    {
+      "placed" : true,
+      "at" : 5,
+      "name" : "row 1 top"
+    },
+    {
+      "name" : "row 1 bottom",
+      "at" : 196,
+      "placed" : true
+    },
+    {
+      "name" : "row 2 top",
+      "at" : 261,
+      "placed" : true
+    },
+    {
+      "name" : "row 2 bottom",
+      "at" : 455,
+      "placed" : true
+    },
+    {
+      "at" : 523,
+      "placed" : true,
+      "name" : "row 3 top"
+    },
+    {
+      "placed" : true,
+      "at" : 715,
+      "name" : "row 3 bottom"
+    }
+  ]
+}

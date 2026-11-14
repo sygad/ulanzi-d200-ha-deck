@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 360" font-family="Helvetica, Arial, sans-serif">
+  <title>How the six parts fit together</title>
+  <rect width="1100" height="360" fill="#ffffff"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5f6368"/>
+    </marker>
+  </defs>
+
+  <!-- the deck -->
+  <rect x="30" y="60" width="300" height="240" rx="14" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="180" y="92" text-anchor="middle" font-size="20" font-weight="700" fill="#202124">The deck</text>
+  <g>
+    <circle cx="62" cy="140" r="17" fill="#1a73e8"/><text x="62" y="147" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">1</text>
+    <text x="90" y="136" font-size="16" font-weight="700" fill="#202124">The hardware</text>
+    <text x="90" y="156" font-size="13" fill="#3c4043">one screen behind fourteen keys</text>
+  </g>
+  <g>
+    <circle cx="62" cy="206" r="17" fill="#1a73e8"/><text x="62" y="213" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">2</text>
+    <text x="90" y="202" font-size="16" font-weight="700" fill="#202124">Deck app</text>
+    <text x="90" y="222" font-size="13" fill="#3c4043">draws keys, reads presses,</text>
+    <text x="90" y="239" font-size="13" fill="#3c4043">remembers the layout</text>
+  </g>
+  <g>
+    <circle cx="62" cy="272" r="17" fill="#1a73e8"/><text x="62" y="279" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">6</text>
+    <text x="90" y="268" font-size="16" font-weight="700" fill="#202124">Lining up the keys</text>
+    <text x="90" y="288" font-size="13" fill="#3c4043">done once, on the deck itself</text>
+  </g>
+
+  <!-- the Mac -->
+  <rect x="420" y="100" width="260" height="160" rx="14" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="550" y="132" text-anchor="middle" font-size="20" font-weight="700" fill="#202124">The Mac</text>
+  <g>
+    <circle cx="452" cy="186" r="17" fill="#1a73e8"/><text x="452" y="193" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">3</text>
+    <text x="480" y="182" font-size="16" font-weight="700" fill="#202124">Mac bridge</text>
+    <text x="480" y="202" font-size="13" fill="#3c4043">carries messages,</text>
+    <text x="480" y="219" font-size="13" fill="#3c4043">tells the deck the time</text>
+  </g>
+
+  <!-- Home Assistant -->
+  <rect x="770" y="60" width="300" height="240" rx="14" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="920" y="92" text-anchor="middle" font-size="20" font-weight="700" fill="#202124">Home Assistant</text>
+  <g>
+    <circle cx="802" cy="150" r="17" fill="#1a73e8"/><text x="802" y="157" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">4</text>
+    <text x="830" y="146" font-size="16" font-weight="700" fill="#202124">The integration</text>
+    <text x="830" y="166" font-size="13" fill="#3c4043">draws every key,</text>
+    <text x="830" y="183" font-size="13" fill="#3c4043">acts on presses</text>
+  </g>
+  <g>
+    <circle cx="802" cy="240" r="17" fill="#1a73e8"/><text x="802" y="247" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">5</text>
+    <text x="830" y="236" font-size="16" font-weight="700" fill="#202124">The panel</text>
+    <text x="830" y="256" font-size="13" fill="#3c4043">where you set up keys</text>
+  </g>
+
+  <!-- links -->
+  <line x1="336" y1="180" x2="414" y2="180" stroke="#5f6368" stroke-width="2.5" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="375" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#202124">USB</text>
+  <text x="375" y="202" text-anchor="middle" font-size="12" fill="#3c4043">power too</text>
+  <line x1="686" y1="180" x2="764" y2="180" stroke="#5f6368" stroke-width="2.5" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="725" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#202124">network</text>
+
+  <text x="550" y="335" text-anchor="middle" font-size="14" fill="#3c4043">The deck has no network of its own, so the Mac it is plugged into carries everything.</text>
+</svg>

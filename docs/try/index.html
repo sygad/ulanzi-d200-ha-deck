@@ -1,0 +1,70 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Try the Ulanzi Deck panel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+<style>
+body{margin:0;font-family:Roboto,system-ui,sans-serif}
+#try{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:12px 18px;
+  background:#0b1d2a;color:#cfe3f2;font-size:15px;line-height:1.5}
+#try b{color:#fff;font-weight:500}
+#try a{color:#7fc4ff}
+</style></head><body>
+<div id="try">
+  <b>This is the real panel, running on made-up data.</b>
+  <span>Press <b>PREVIEW</b> on the right to press the keys and watch them respond. Nothing here touches a real home.</span>
+  <a href="../">How to set up your own →</a>
+</div>
+<script type="module">
+// A pretend Home Assistant: enough of `hass` for the panel to run on a desk.
+import "../../custom_components/ulanzi_deck/frontend/panel.js";
+const data = await (await fetch("../../tools/panel-harness/data.json")).json();
+const blank = new URLSearchParams(location.search).has("blank");
+let draft = blank ? [{name: "Screen 1", icon: "", keys: Array(14).fill(null)}] : data.pages, published = null;
+let settings = {sleep: 20}, publishedSettings = null;
+let status = {bridge: "connected", bridge_name: "Demo Mac", pending: null, deck: true, screen: 0};
+let statusCb = null;
+window.calls = [];
+const hass = {
+  states: data.states, entities: data.entities, devices: {}, areas: data.areas, dockedSidebar: "docked",
+  async callWS(m) {
+    window.calls.push(m.type);
+    if (m.type === "ulanzi_deck/get") return {pages: structuredClone(draft), published,
+      settings: structuredClone(settings), published_settings: publishedSettings, status};
+    if (m.type === "ulanzi_deck/save") { draft = structuredClone(m.pages); if (m.settings) settings = structuredClone(m.settings); return null; }
+    if (m.type === "ulanzi_deck/publish") { draft = structuredClone(m.pages); published = structuredClone(m.pages);
+      if (m.settings) settings = structuredClone(m.settings);
+      publishedSettings = structuredClone(settings);
+      return {published, published_settings: publishedSettings, status}; }
+    if (m.type === "ulanzi_deck/press") { return press(m); }
+    if (m.type === "ulanzi_deck/allow") { status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true}; statusCb && statusCb(status); return {allowed: true}; }
+    if (m.type === "history/history_during_period") {
+      const id = m.entity_ids[0], h = data.hist[id] || [], t0 = Date.now() / 1000 - 24 * 3600;
+      return {[id]: h.map((v, i) => ({s: String(v), lu: t0 + (i + 0.5) * 3600}))};
+    }
+    throw new Error("unknown command " + m.type);
+  },
+  connection: {async subscribeMessage(cb) { statusCb = cb; cb(status); return () => { statusCb = null; }; }},
+};
+// Preview mode: do to the pretend states what the real service call would do, so a
+// key pressed in the preview visibly changes, as it does against a real server.
+const OFF = new Set(["off", "closed", "unavailable", "unknown"]);
+function press(m) {
+  const key = (draft[m.screen] || {keys: []}).keys[m.key];
+  if (!key || key.type !== "button") return null;
+  const slot = key[m.gesture || "tap"] || {}, action = slot.a || "none", target = slot.t || "";
+  const st = target && hass.states[target];
+  if (!st) return null;
+  const now = new Date().toISOString();
+  const set = v => { hass.states[target] = {...st, state: v, last_changed: now, last_updated: now}; };
+  if (action === "light.toggle" || action === "switch.toggle" || action === "cover.toggle")
+    set(OFF.has(st.state) ? (action === "cover.toggle" ? "open" : "on") : (action === "cover.toggle" ? "closed" : "off"));
+  else if (action.endsWith(".turn_on") || action === "cover.open_cover") set(action === "cover.open_cover" ? "open" : "on");
+  else if (action.endsWith(".turn_off") || action === "cover.close_cover") set(action === "cover.close_cover" ? "closed" : "off");
+  el.hass = {...hass, states: {...hass.states}};      // the panel repaints when hass changes
+  return null;
+}
+
+const el = document.createElement("ulanzi-deck-panel");
+el.hass = hass; el.narrow = false;
+document.body.appendChild(el);
+window.panel = el; window.hass = hass;
+</script></body></html>

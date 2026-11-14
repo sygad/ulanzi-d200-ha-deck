@@ -1,0 +1,8 @@
+# working notes, the original design mock-up and the vendor's firmware: not for publishing
+notes/
+# build output (the ready-made deck binary lives beside its source as parts/02-deck-app/deckd)
+parts/02-deck-app/build/
+parts/03-mac-bridge/build/
+__pycache__/
+*.pyc
+.DS_Store

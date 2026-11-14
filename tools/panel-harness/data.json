@@ -1,0 +1,1301 @@
+{
+ "states": {
+  "light.living_room_ceiling": {
+   "entity_id": "light.living_room_ceiling",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Ceiling"
+   }
+  },
+  "light.living_room_lamp": {
+   "entity_id": "light.living_room_lamp",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Standard Lamp"
+   }
+  },
+  "light.living_room_shelf_strip": {
+   "entity_id": "light.living_room_shelf_strip",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Shelf Strip"
+   }
+  },
+  "light.kitchen_ceiling": {
+   "entity_id": "light.kitchen_ceiling",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Ceiling"
+   }
+  },
+  "light.kitchen_counter": {
+   "entity_id": "light.kitchen_counter",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Counter"
+   }
+  },
+  "light.hallway_ceiling": {
+   "entity_id": "light.hallway_ceiling",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Ceiling"
+   }
+  },
+  "light.porch_lantern": {
+   "entity_id": "light.porch_lantern",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Lantern"
+   }
+  },
+  "light.studio_desk": {
+   "entity_id": "light.studio_desk",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Desk"
+   }
+  },
+  "light.studio_shelves": {
+   "entity_id": "light.studio_shelves",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Shelves"
+   }
+  },
+  "light.workshop_bench": {
+   "entity_id": "light.workshop_bench",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Bench"
+   }
+  },
+  "light.guest_room_ceiling": {
+   "entity_id": "light.guest_room_ceiling",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Ceiling"
+   }
+  },
+  "light.greenhouse_grow_lamp": {
+   "entity_id": "light.greenhouse_grow_lamp",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Grow Lamp"
+   }
+  },
+  "switch.kitchen_coffee_machine": {
+   "entity_id": "switch.kitchen_coffee_machine",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Coffee Machine"
+   }
+  },
+  "switch.studio_monitor_riser": {
+   "entity_id": "switch.studio_monitor_riser",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Monitor Riser"
+   }
+  },
+  "switch.workshop_extractor": {
+   "entity_id": "switch.workshop_extractor",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Extractor"
+   }
+  },
+  "switch.greenhouse_heater": {
+   "entity_id": "switch.greenhouse_heater",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Heater"
+   }
+  },
+  "switch.porch_christmas_lights": {
+   "entity_id": "switch.porch_christmas_lights",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Christmas Lights"
+   }
+  },
+  "cover.living_room_blind": {
+   "entity_id": "cover.living_room_blind",
+   "state": "open",
+   "attributes": {
+    "friendly_name": "Blind"
+   }
+  },
+  "cover.kitchen_blind": {
+   "entity_id": "cover.kitchen_blind",
+   "state": "open",
+   "attributes": {
+    "friendly_name": "Blind"
+   }
+  },
+  "cover.studio_blind": {
+   "entity_id": "cover.studio_blind",
+   "state": "closed",
+   "attributes": {
+    "friendly_name": "Blind"
+   }
+  },
+  "cover.guest_room_blind": {
+   "entity_id": "cover.guest_room_blind",
+   "state": "closed",
+   "attributes": {
+    "friendly_name": "Blind"
+   }
+  },
+  "cover.porch_awning": {
+   "entity_id": "cover.porch_awning",
+   "state": "closed",
+   "attributes": {
+    "friendly_name": "Awning"
+   }
+  },
+  "scene.living_room_evening": {
+   "entity_id": "scene.living_room_evening",
+   "state": "scening",
+   "attributes": {
+    "friendly_name": "Evening"
+   }
+  },
+  "scene.living_room_film": {
+   "entity_id": "scene.living_room_film",
+   "state": "scening",
+   "attributes": {
+    "friendly_name": "Film"
+   }
+  },
+  "scene.living_room_bright": {
+   "entity_id": "scene.living_room_bright",
+   "state": "scening",
+   "attributes": {
+    "friendly_name": "Bright"
+   }
+  },
+  "scene.studio_focus": {
+   "entity_id": "scene.studio_focus",
+   "state": "scening",
+   "attributes": {
+    "friendly_name": "Focus"
+   }
+  },
+  "script.goodnight": {
+   "entity_id": "script.goodnight",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Goodnight"
+   }
+  },
+  "script.water_the_greenhouse": {
+   "entity_id": "script.water_the_greenhouse",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Water the Greenhouse"
+   }
+  },
+  "button.studio_printer_restart": {
+   "entity_id": "button.studio_printer_restart",
+   "state": "unknown",
+   "attributes": {
+    "friendly_name": "Printer Restart"
+   }
+  },
+  "button.porch_doorbell_chime": {
+   "entity_id": "button.porch_doorbell_chime",
+   "state": "unknown",
+   "attributes": {
+    "friendly_name": "Doorbell Chime"
+   }
+  },
+  "media_player.living_room_speaker": {
+   "entity_id": "media_player.living_room_speaker",
+   "state": "playing",
+   "attributes": {
+    "friendly_name": "Speaker"
+   }
+  },
+  "media_player.kitchen_radio": {
+   "entity_id": "media_player.kitchen_radio",
+   "state": "idle",
+   "attributes": {
+    "friendly_name": "Radio"
+   }
+  },
+  "sensor.living_room_temperature": {
+   "entity_id": "sensor.living_room_temperature",
+   "state": "20.4",
+   "attributes": {
+    "friendly_name": "Temperature",
+    "unit_of_measurement": "°C"
+   }
+  },
+  "sensor.living_room_humidity": {
+   "entity_id": "sensor.living_room_humidity",
+   "state": "47.2",
+   "attributes": {
+    "friendly_name": "Humidity",
+    "unit_of_measurement": "%"
+   }
+  },
+  "sensor.studio_carbon_dioxide": {
+   "entity_id": "sensor.studio_carbon_dioxide",
+   "state": "812",
+   "attributes": {
+    "friendly_name": "Carbon Dioxide",
+    "unit_of_measurement": "ppm"
+   }
+  },
+  "sensor.studio_temperature": {
+   "entity_id": "sensor.studio_temperature",
+   "state": "21.8",
+   "attributes": {
+    "friendly_name": "Temperature",
+    "unit_of_measurement": "°C"
+   }
+  },
+  "sensor.greenhouse_temperature": {
+   "entity_id": "sensor.greenhouse_temperature",
+   "state": "16.9",
+   "attributes": {
+    "friendly_name": "Temperature",
+    "unit_of_measurement": "°C"
+   }
+  },
+  "sensor.greenhouse_humidity": {
+   "entity_id": "sensor.greenhouse_humidity",
+   "state": "68.5",
+   "attributes": {
+    "friendly_name": "Humidity",
+    "unit_of_measurement": "%"
+   }
+  },
+  "sensor.house_power": {
+   "entity_id": "sensor.house_power",
+   "state": "317",
+   "attributes": {
+    "friendly_name": "Power",
+    "unit_of_measurement": "W"
+   }
+  },
+  "sensor.house_energy_today": {
+   "entity_id": "sensor.house_energy_today",
+   "state": "6.4",
+   "attributes": {
+    "friendly_name": "Energy Today",
+    "unit_of_measurement": "kWh"
+   }
+  },
+  "sensor.solar_power": {
+   "entity_id": "sensor.solar_power",
+   "state": "1240",
+   "attributes": {
+    "friendly_name": "Solar Power",
+    "unit_of_measurement": "W"
+   }
+  },
+  "sensor.porch_light_level": {
+   "entity_id": "sensor.porch_light_level",
+   "state": "184",
+   "attributes": {
+    "friendly_name": "Light Level",
+    "unit_of_measurement": "lx"
+   }
+  },
+  "sensor.water_butt_level": {
+   "entity_id": "sensor.water_butt_level",
+   "state": "72",
+   "attributes": {
+    "friendly_name": "Water Butt Level",
+    "unit_of_measurement": "%"
+   }
+  },
+  "sensor.workshop_particulates": {
+   "entity_id": "sensor.workshop_particulates",
+   "state": "11.4",
+   "attributes": {
+    "friendly_name": "Particulates",
+    "unit_of_measurement": "µg/m³"
+   }
+  },
+  "binary_sensor.porch_front_door": {
+   "entity_id": "binary_sensor.porch_front_door",
+   "state": "off",
+   "attributes": {
+    "friendly_name": "Front Door"
+   }
+  },
+  "binary_sensor.workshop_window": {
+   "entity_id": "binary_sensor.workshop_window",
+   "state": "on",
+   "attributes": {
+    "friendly_name": "Window"
+   }
+  }
+ },
+ "areas": {
+  "living_room": {
+   "area_id": "living_room",
+   "name": "Living Room"
+  },
+  "kitchen": {
+   "area_id": "kitchen",
+   "name": "Kitchen"
+  },
+  "studio": {
+   "area_id": "studio",
+   "name": "Studio"
+  },
+  "hallway": {
+   "area_id": "hallway",
+   "name": "Hallway"
+  },
+  "porch": {
+   "area_id": "porch",
+   "name": "Porch"
+  },
+  "greenhouse": {
+   "area_id": "greenhouse",
+   "name": "Greenhouse"
+  },
+  "workshop": {
+   "area_id": "workshop",
+   "name": "Workshop"
+  },
+  "guest_room": {
+   "area_id": "guest_room",
+   "name": "Guest Room"
+  }
+ },
+ "entities": {
+  "light.living_room_ceiling": {
+   "entity_id": "light.living_room_ceiling",
+   "area_id": "living_room"
+  },
+  "light.living_room_lamp": {
+   "entity_id": "light.living_room_lamp",
+   "area_id": "living_room"
+  },
+  "light.living_room_shelf_strip": {
+   "entity_id": "light.living_room_shelf_strip",
+   "area_id": "living_room"
+  },
+  "light.kitchen_ceiling": {
+   "entity_id": "light.kitchen_ceiling",
+   "area_id": "kitchen"
+  },
+  "light.kitchen_counter": {
+   "entity_id": "light.kitchen_counter",
+   "area_id": "kitchen"
+  },
+  "light.hallway_ceiling": {
+   "entity_id": "light.hallway_ceiling",
+   "area_id": "hallway"
+  },
+  "light.porch_lantern": {
+   "entity_id": "light.porch_lantern",
+   "area_id": "porch"
+  },
+  "light.studio_desk": {
+   "entity_id": "light.studio_desk",
+   "area_id": "studio"
+  },
+  "light.studio_shelves": {
+   "entity_id": "light.studio_shelves",
+   "area_id": "studio"
+  },
+  "light.workshop_bench": {
+   "entity_id": "light.workshop_bench",
+   "area_id": "workshop"
+  },
+  "light.guest_room_ceiling": {
+   "entity_id": "light.guest_room_ceiling",
+   "area_id": "guest_room"
+  },
+  "light.greenhouse_grow_lamp": {
+   "entity_id": "light.greenhouse_grow_lamp",
+   "area_id": "greenhouse"
+  },
+  "switch.kitchen_coffee_machine": {
+   "entity_id": "switch.kitchen_coffee_machine",
+   "area_id": "kitchen"
+  },
+  "switch.studio_monitor_riser": {
+   "entity_id": "switch.studio_monitor_riser",
+   "area_id": "studio"
+  },
+  "switch.workshop_extractor": {
+   "entity_id": "switch.workshop_extractor",
+   "area_id": "workshop"
+  },
+  "switch.greenhouse_heater": {
+   "entity_id": "switch.greenhouse_heater",
+   "area_id": "greenhouse"
+  },
+  "switch.porch_christmas_lights": {
+   "entity_id": "switch.porch_christmas_lights",
+   "area_id": "porch"
+  },
+  "cover.living_room_blind": {
+   "entity_id": "cover.living_room_blind",
+   "area_id": "living_room"
+  },
+  "cover.kitchen_blind": {
+   "entity_id": "cover.kitchen_blind",
+   "area_id": "kitchen"
+  },
+  "cover.studio_blind": {
+   "entity_id": "cover.studio_blind",
+   "area_id": "studio"
+  },
+  "cover.guest_room_blind": {
+   "entity_id": "cover.guest_room_blind",
+   "area_id": "guest_room"
+  },
+  "cover.porch_awning": {
+   "entity_id": "cover.porch_awning",
+   "area_id": "porch"
+  },
+  "scene.living_room_evening": {
+   "entity_id": "scene.living_room_evening",
+   "area_id": "living_room"
+  },
+  "scene.living_room_film": {
+   "entity_id": "scene.living_room_film",
+   "area_id": "living_room"
+  },
+  "scene.living_room_bright": {
+   "entity_id": "scene.living_room_bright",
+   "area_id": "living_room"
+  },
+  "scene.studio_focus": {
+   "entity_id": "scene.studio_focus",
+   "area_id": "studio"
+  },
+  "script.goodnight": {
+   "entity_id": "script.goodnight",
+   "area_id": null
+  },
+  "script.water_the_greenhouse": {
+   "entity_id": "script.water_the_greenhouse",
+   "area_id": "greenhouse"
+  },
+  "button.studio_printer_restart": {
+   "entity_id": "button.studio_printer_restart",
+   "area_id": "studio"
+  },
+  "button.porch_doorbell_chime": {
+   "entity_id": "button.porch_doorbell_chime",
+   "area_id": "porch"
+  },
+  "media_player.living_room_speaker": {
+   "entity_id": "media_player.living_room_speaker",
+   "area_id": "living_room"
+  },
+  "media_player.kitchen_radio": {
+   "entity_id": "media_player.kitchen_radio",
+   "area_id": "kitchen"
+  },
+  "sensor.living_room_temperature": {
+   "entity_id": "sensor.living_room_temperature",
+   "area_id": "living_room"
+  },
+  "sensor.living_room_humidity": {
+   "entity_id": "sensor.living_room_humidity",
+   "area_id": "living_room"
+  },
+  "sensor.studio_carbon_dioxide": {
+   "entity_id": "sensor.studio_carbon_dioxide",
+   "area_id": "studio"
+  },
+  "sensor.studio_temperature": {
+   "entity_id": "sensor.studio_temperature",
+   "area_id": "studio"
+  },
+  "sensor.greenhouse_temperature": {
+   "entity_id": "sensor.greenhouse_temperature",
+   "area_id": "greenhouse"
+  },
+  "sensor.greenhouse_humidity": {
+   "entity_id": "sensor.greenhouse_humidity",
+   "area_id": "greenhouse"
+  },
+  "sensor.house_power": {
+   "entity_id": "sensor.house_power",
+   "area_id": null
+  },
+  "sensor.house_energy_today": {
+   "entity_id": "sensor.house_energy_today",
+   "area_id": null
+  },
+  "sensor.solar_power": {
+   "entity_id": "sensor.solar_power",
+   "area_id": null
+  },
+  "sensor.porch_light_level": {
+   "entity_id": "sensor.porch_light_level",
+   "area_id": "porch"
+  },
+  "sensor.water_butt_level": {
+   "entity_id": "sensor.water_butt_level",
+   "area_id": "greenhouse"
+  },
+  "sensor.workshop_particulates": {
+   "entity_id": "sensor.workshop_particulates",
+   "area_id": "workshop"
+  },
+  "binary_sensor.porch_front_door": {
+   "entity_id": "binary_sensor.porch_front_door",
+   "area_id": "porch"
+  },
+  "binary_sensor.workshop_window": {
+   "entity_id": "binary_sensor.workshop_window",
+   "area_id": "workshop"
+  }
+ },
+ "hist": {
+  "sensor.living_room_temperature": [
+   18.1,
+   17.9,
+   17.6,
+   17.4,
+   17.2,
+   17.1,
+   17.3,
+   18.4,
+   19.2,
+   19.6,
+   19.8,
+   20.1,
+   20.3,
+   20.6,
+   20.9,
+   21.2,
+   21.0,
+   20.7,
+   20.5,
+   20.4,
+   20.6,
+   20.5,
+   20.4
+  ],
+  "sensor.studio_carbon_dioxide": [
+   471,
+   462,
+   455,
+   449,
+   447,
+   452,
+   486,
+   604,
+   712,
+   788,
+   836,
+   870,
+   902,
+   861,
+   795,
+   742,
+   706,
+   688,
+   742,
+   806,
+   848,
+   830,
+   812
+  ],
+  "sensor.greenhouse_humidity": [
+   74.1,
+   75.0,
+   75.6,
+   76.1,
+   76.4,
+   76.0,
+   74.8,
+   72.6,
+   70.9,
+   69.4,
+   68.2,
+   67.5,
+   66.8,
+   66.2,
+   66.0,
+   66.4,
+   67.1,
+   67.9,
+   68.6,
+   69.2,
+   69.0,
+   68.8,
+   68.5
+  ],
+  "sensor.house_power": [
+   212,
+   198,
+   186,
+   181,
+   178,
+   180,
+   244,
+   612,
+   735,
+   498,
+   402,
+   376,
+   355,
+   348,
+   362,
+   390,
+   441,
+   688,
+   812,
+   640,
+   470,
+   358,
+   317
+  ]
+ },
+ "pages": [
+  {
+   "name": "Home",
+   "icon": "home",
+   "keys": [
+    {
+     "type": "button",
+     "l": "Ceiling",
+     "i": "ceiling-light",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.living_room_ceiling"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "entity",
+     "l": "Living Room",
+     "i": "thermometer",
+     "c": "#4dd0e1",
+     "ent": "sensor.living_room_temperature",
+     "show": "full",
+     "style": "graph",
+     "min": 0,
+     "max": 30,
+     "band": false,
+     "warn": 15.0,
+     "alert": 22.5,
+     "layout": "v"
+    },
+    {
+     "type": "button",
+     "l": "Lamp",
+     "i": "floor-lamp",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.living_room_lamp"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Counter",
+     "i": "countertop",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.kitchen_counter"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Coffee",
+     "i": "coffee-maker",
+     "c": "#ff7043",
+     "layout": "v",
+     "tap": {
+      "a": "switch.toggle",
+      "t": "switch.kitchen_coffee_machine"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Hallway",
+     "i": "coat-rack",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.hallway_ceiling"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Porch",
+     "i": "outdoor-lamp",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.porch_lantern"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Desk",
+     "i": "desk-lamp",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.studio_desk"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Bench",
+     "i": "tools",
+     "c": "#ffc107",
+     "layout": "v",
+     "tap": {
+      "a": "light.toggle",
+      "t": "light.workshop_bench"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "entity",
+     "l": "House",
+     "i": "flash",
+     "c": "#8bc34a",
+     "ent": "sensor.house_power",
+     "show": "full",
+     "style": "gauge",
+     "min": 0,
+     "max": 2000,
+     "band": false,
+     "warn": 1000.0,
+     "alert": 1500.0,
+     "layout": "v"
+    },
+    {
+     "type": "button",
+     "l": "Scenes",
+     "i": "palette",
+     "c": "#03a9f4",
+     "layout": "v",
+     "tap": {
+      "a": "deck.go_to_page",
+      "t": "1"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Blinds",
+     "i": "window-shutter",
+     "c": "#03a9f4",
+     "layout": "v",
+     "tap": {
+      "a": "deck.go_to_page",
+      "t": "2"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Next screen",
+     "i": "arrow-right-bold",
+     "c": "#ffffff",
+     "layout": "v",
+     "tap": {
+      "a": "deck.next_page",
+      "t": ""
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "entity",
+     "l": "Studio CO₂",
+     "i": "molecule-co2",
+     "c": "#8bc34a",
+     "ent": "sensor.studio_carbon_dioxide",
+     "show": "full",
+     "style": "graph",
+     "min": 400,
+     "max": 2000,
+     "band": true,
+     "warn": 1200.0,
+     "alert": 1600.0,
+     "layout": "h"
+    }
+   ]
+  },
+  {
+   "name": "Scenes",
+   "icon": "palette",
+   "keys": [
+    {
+     "type": "button",
+     "l": "Evening",
+     "i": "weather-night",
+     "c": "#ba68c8",
+     "layout": "v",
+     "tap": {
+      "a": "scene.turn_on",
+      "t": "scene.living_room_evening"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Film",
+     "i": "television-play",
+     "c": "#ba68c8",
+     "layout": "v",
+     "tap": {
+      "a": "scene.turn_on",
+      "t": "scene.living_room_film"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Bright",
+     "i": "white-balance-sunny",
+     "c": "#ba68c8",
+     "layout": "v",
+     "tap": {
+      "a": "scene.turn_on",
+      "t": "scene.living_room_bright"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Focus",
+     "i": "lightbulb-on",
+     "c": "#ba68c8",
+     "layout": "v",
+     "tap": {
+      "a": "scene.turn_on",
+      "t": "scene.studio_focus"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "entity",
+     "l": "Greenhouse",
+     "i": "thermometer",
+     "c": "#4dd0e1",
+     "ent": "sensor.greenhouse_temperature",
+     "show": "full",
+     "style": "icon",
+     "min": 0,
+     "max": 30,
+     "band": false,
+     "warn": 15.0,
+     "alert": 22.5,
+     "layout": "v"
+    },
+    {
+     "type": "clock",
+     "l": "",
+     "i": "clock-outline",
+     "c": "#ffffff",
+     "layout": "v",
+     "fmt": "24",
+     "secs": true,
+     "date": true,
+     "showIcon": false
+    },
+    {
+     "type": "entity",
+     "l": "Solar",
+     "i": "solar-power",
+     "c": "#8bc34a",
+     "ent": "sensor.solar_power",
+     "show": "value",
+     "style": "bar",
+     "min": 0,
+     "max": 3000,
+     "band": false,
+     "warn": 1500.0,
+     "alert": 2250.0,
+     "layout": "v"
+    },
+    {
+     "type": "entity",
+     "l": "Water Butt",
+     "i": "water-percent",
+     "c": "#4dd0e1",
+     "ent": "sensor.water_butt_level",
+     "show": "value",
+     "style": "number",
+     "min": 0,
+     "max": 100,
+     "band": false,
+     "warn": 50.0,
+     "alert": 75.0,
+     "layout": "v"
+    },
+    {
+     "type": "entity",
+     "l": "Today",
+     "i": "lightning-bolt",
+     "c": "#8bc34a",
+     "ent": "sensor.house_energy_today",
+     "show": "value",
+     "style": "gauge",
+     "min": 0,
+     "max": 20,
+     "band": false,
+     "warn": 10.0,
+     "alert": 15.0,
+     "layout": "v"
+    },
+    {
+     "type": "entity",
+     "l": "Greenhouse",
+     "i": "water-percent",
+     "c": "#4dd0e1",
+     "ent": "sensor.greenhouse_humidity",
+     "show": "full",
+     "style": "graph",
+     "min": 0,
+     "max": 100,
+     "band": false,
+     "warn": 50.0,
+     "alert": 75.0,
+     "layout": "v"
+    },
+    {
+     "type": "button",
+     "l": "Printer",
+     "i": "printer-3d",
+     "c": "#ff7043",
+     "layout": "v",
+     "tap": {
+      "a": "button.press",
+      "t": "button.studio_printer_restart"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Water",
+     "i": "watering-can",
+     "c": "#ff7043",
+     "layout": "v",
+     "tap": {
+      "a": "script.turn_on",
+      "t": "script.water_the_greenhouse"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Back",
+     "i": "keyboard-backspace",
+     "c": "#ffffff",
+     "layout": "v",
+     "tap": {
+      "a": "deck.back",
+      "t": ""
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "clock",
+     "l": "Studio",
+     "i": "clock-outline",
+     "c": "#03a9f4",
+     "layout": "h",
+     "fmt": "12",
+     "secs": false,
+     "date": true
+    }
+   ]
+  },
+  {
+   "name": "Blinds",
+   "icon": "window-shutter",
+   "keys": [
+    {
+     "type": "button",
+     "l": "Living Room",
+     "i": "window-shutter",
+     "c": "#4dd0e1",
+     "layout": "v",
+     "tap": {
+      "a": "cover.toggle",
+      "t": "cover.living_room_blind"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Kitchen",
+     "i": "window-shutter",
+     "c": "#4dd0e1",
+     "layout": "v",
+     "tap": {
+      "a": "cover.toggle",
+      "t": "cover.kitchen_blind"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Studio",
+     "i": "window-shutter",
+     "c": "#4dd0e1",
+     "layout": "v",
+     "tap": {
+      "a": "cover.toggle",
+      "t": "cover.studio_blind"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Guest Room",
+     "i": "window-shutter",
+     "c": "#4dd0e1",
+     "layout": "v",
+     "tap": {
+      "a": "cover.toggle",
+      "t": "cover.guest_room_blind"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Awning",
+     "i": "awning-outline",
+     "c": "#4dd0e1",
+     "layout": "v",
+     "tap": {
+      "a": "cover.toggle",
+      "t": "cover.porch_awning"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Speaker",
+     "i": "speaker",
+     "c": "#f06292",
+     "layout": "v",
+     "tap": {
+      "a": "media_player.media_play_pause",
+      "t": "media_player.living_room_speaker"
+     },
+     "hold": {
+      "a": "media_player.volume_up",
+      "t": "media_player.living_room_speaker"
+     }
+    },
+    {
+     "type": "button",
+     "l": "Radio",
+     "i": "radio",
+     "c": "#f06292",
+     "layout": "v",
+     "tap": {
+      "a": "media_player.media_play_pause",
+      "t": "media_player.kitchen_radio"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Extractor",
+     "i": "fan",
+     "c": "#ff7043",
+     "layout": "v",
+     "tap": {
+      "a": "switch.toggle",
+      "t": "switch.workshop_extractor"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "entity",
+     "l": "Workshop",
+     "i": "air-filter",
+     "c": "#8bc34a",
+     "ent": "sensor.workshop_particulates",
+     "show": "full",
+     "style": "bar",
+     "min": 0,
+     "max": 50,
+     "band": false,
+     "warn": 25.0,
+     "alert": 37.5,
+     "layout": "v"
+    },
+    {
+     "type": "entity",
+     "l": "Porch",
+     "i": "brightness-5",
+     "c": "#ffc107",
+     "ent": "sensor.porch_light_level",
+     "show": "full",
+     "style": "icon",
+     "min": 0,
+     "max": 1000,
+     "band": false,
+     "warn": 500.0,
+     "alert": 750.0,
+     "layout": "v"
+    },
+    {
+     "type": "button",
+     "l": "Goodnight",
+     "i": "weather-night",
+     "c": "#ba68c8",
+     "layout": "v",
+     "tap": {
+      "a": "script.turn_on",
+      "t": "script.goodnight"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Chime",
+     "i": "bell-ring",
+     "c": "#ff7043",
+     "layout": "v",
+     "tap": {
+      "a": "button.press",
+      "t": "button.porch_doorbell_chime"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Back",
+     "i": "keyboard-backspace",
+     "c": "#ffffff",
+     "layout": "v",
+     "tap": {
+      "a": "deck.back",
+      "t": ""
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    },
+    {
+     "type": "button",
+     "l": "Home",
+     "i": "home",
+     "c": "#ffffff",
+     "layout": "v",
+     "tap": {
+      "a": "deck.go_to_page",
+      "t": "0"
+     },
+     "hold": {
+      "a": "none",
+      "t": ""
+     }
+    }
+   ]
+  }
+ ]
+}

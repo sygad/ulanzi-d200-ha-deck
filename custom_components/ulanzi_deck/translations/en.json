@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ulanzi Deck",
+        "description": "Adds the Ulanzi Deck panel to the sidebar. The deck itself connects through the bridge on the Mac it is plugged into; the first time, the panel asks you to allow it."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Already set up."
+    }
+  },
+  "entity": {
+    "binary_sensor": { "connection": { "name": "Connection" } },
+    "sensor": { "screen": { "name": "Screen" } }
+  }
+}

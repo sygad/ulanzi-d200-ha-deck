@@ -1,0 +1,15 @@
+{
+  "domain": "ulanzi_deck",
+  "name": "Ulanzi Deck",
+  "after_dependencies": ["recorder"],
+  "codeowners": ["@sygad"],
+  "config_flow": true,
+  "dependencies": ["http", "websocket_api", "frontend", "panel_custom"],
+  "documentation": "https://github.com/sygad/ulanzi-d200-ha-deck",
+  "issue_tracker": "https://github.com/sygad/ulanzi-d200-ha-deck/issues",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "1.0.0"
+}
