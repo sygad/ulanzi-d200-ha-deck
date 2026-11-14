@@ -52,12 +52,14 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .bar h1{font-size:20px;font-weight:400;flex:1;min-width:0}
 .dots{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:10px 6px;margin-left:-6px;border-radius:50%;display:flex;flex-direction:column;gap:4px;opacity:.9}.dots i{width:18px;height:2px;background:currentColor;border-radius:2px}
 .dots:focus-visible{outline:2px solid currentColor}
-.getapp .card-b{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:22px}
-.getapp h2{margin:0;font-size:19px;font-weight:500}
-.getapp p{margin:0;max-width:60ch;line-height:1.55;color:var(--secondary-text-color)}
+.getapp{grid-column:1/-1;max-width:620px;margin:6vh auto 0}
+.getapp .card-b{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:32px 30px}
+.getapp h2{margin:0;font-size:22px;font-weight:500}
+.getapp p{margin:0;line-height:1.6;color:var(--fg2);font-size:14.5px}
+.getapp #btn-getapp{margin-top:6px;padding:13px 22px;font-size:14px}
 .getapp .getapp-note{font-size:13px}
-.getapp #btn-getapp{margin-top:4px}
-.getapp .getapp-err{color:var(--error-color,#c62828);font-size:13px}
+.getapp .getapp-note a{color:var(--fg2)}
+.getapp .getapp-err{color:#c62828;font-size:13px}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
   background:rgba(255,255,255,.16);white-space:nowrap}
 .gear{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:8px;border-radius:50%;
@@ -366,10 +368,11 @@ const MARKUP=`
       <h2>Connect a Mac</h2>
       <p>Your deck has no network of its own. It plugs into a Mac over USB, and a small
          companion app on that Mac carries it to Home Assistant.</p>
-      <p class="getapp-note">The app arrives knowing this server, so there is nothing to
-         type and nothing to allow. <a href="https://github.com/sygad/ulanzi-d200-ha-deck#what-the-companion-app-is-before-you-run-it" target="_blank" rel="noreferrer">What it does, and what it never does</a>.</p>
-      <button class="btn pub" id="btn-getapp">Get the companion app</button>
+      <p>The app arrives knowing this server, so there is nothing to type and nothing to
+         allow. Set it up once and your keys appear here.</p>
+      <button class="btn" id="btn-getapp">Get the companion app</button>
       <p class="getapp-err" id="getAppErr" hidden></p>
+      <p class="getapp-note"><a href="https://github.com/sygad/ulanzi-d200-ha-deck#what-the-companion-app-is-before-you-run-it" target="_blank" rel="noreferrer">What it does, and what it never does</a></p>
     </div>
   </div>
   <div class="card" id="configCard">
@@ -522,7 +525,7 @@ const MARKUP=`
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="deckCard">
     <div class="tabrow">
       <div class="tabs" role="tablist" id="tabs"></div>
       <button class="livebtn" id="btn-live" aria-pressed="false"
@@ -1436,7 +1439,14 @@ function showStatus(st){
     :st.pending?"\u201c"+st.pending.name+"\u201d wants to connect"
     :st.bridge==="connected"?"Bridge connected, no deck":"Bridge not connected";
   allow.hidden=!st.pending;
-  $("#getApp").hidden=!(st.bridge==="none");
+  // Until a Mac is connected there is nothing worth configuring, so the setup
+  // card is the whole page rather than one card beside the editor.
+  const setup=st.bridge==="none";
+  $("#getApp").hidden=!setup;
+  $("#configCard").hidden=setup;
+  $("#deckCard").hidden=setup;
+  $("#btn-publish").hidden=setup;
+  $("#btn-settings").hidden=setup;
 }
 $("#btn-getapp").addEventListener("click",async()=>{
   const b=$("#btn-getapp"), err=$("#getAppErr");
