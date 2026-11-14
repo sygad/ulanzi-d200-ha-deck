@@ -6,6 +6,15 @@ MAX_SCREENS = 32
 PANEL_URL = "ulanzi-deck"
 STATIC_URL = "/ulanzi_deck_static"
 BRIDGE_URL = "/api/ulanzi_deck/bridge"
+APP_URL = "/api/ulanzi_deck/companion-app"
+
+# Where the companion app is published. Home Assistant fetches this when somebody
+# presses the download button, puts a pairing file beside the app, and hands the
+# pair over as one zip — so the app arrives already knowing this server.
+APP_RELEASE_URL = (
+    "https://github.com/sygad/ulanzi-d200-ha-deck/releases/latest/download/Ulanzi-Deck.zip"
+)
+PAIRING_FILE = "ulanzi-deck-pairing.json"
 EVENT_KEY = "ulanzi_deck_key"
 
 # What a button key may ask Home Assistant to do. The panel offers exactly these.

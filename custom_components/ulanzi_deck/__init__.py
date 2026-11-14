@@ -7,19 +7,33 @@ deck itself is reached through a small bridge on the Mac it is plugged into.
 
 from __future__ import annotations
 
+import asyncio
 import importlib
+import io
+import json
 from pathlib import Path
+import zipfile
 
-from aiohttp import web
+from aiohttp import ClientError, web
 
 from homeassistant.components import frontend, panel_custom
 from homeassistant.components.http import KEY_HASS, HomeAssistantView, StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.network import NoURLAvailableError, get_url
 
 from . import api, const as const_module, hub as hub_module, render
-from .const import BRIDGE_URL, DOMAIN, PANEL_URL, STATIC_URL
+from .const import (
+    APP_RELEASE_URL,
+    APP_URL,
+    BRIDGE_URL,
+    DOMAIN,
+    PAIRING_FILE,
+    PANEL_URL,
+    STATIC_URL,
+)
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
 _ONCE = f"{DOMAIN}_registered"
@@ -52,6 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await hass.http.async_register_static_paths(
             [StaticPathConfig(STATIC_URL, str(_FRONTEND), cache_headers=False)])
         hass.http.register_view(BridgeView())
+        hass.http.register_view(CompanionAppView())
 
     stamp = await hass.async_add_executor_job(lambda: int((_FRONTEND / "panel.js").stat().st_mtime))
     await panel_custom.async_register_panel(
@@ -97,3 +112,81 @@ class BridgeView(HomeAssistantView):
         await ws.prepare(request)
         await hub.async_handle_bridge(ws)
         return ws
+
+
+class CompanionAppView(HomeAssistantView):
+    """Hands over the companion app with this server's details already inside it.
+
+    The app is not kept here — it is fetched from where it is published and a
+    small pairing file is put beside it in the same zip. That file says which
+    Home Assistant to talk to and carries a key written down a moment earlier,
+    so the app connects and is let in with nothing typed and no Allow pressed.
+
+    Only an admin can ask for one, because asking for one creates a key that
+    opens the door.
+    """
+
+    url = APP_URL
+    name = "api:ulanzi_deck:companion-app"
+
+    async def get(self, request: web.Request) -> web.StreamResponse:
+        hass = request.app[KEY_HASS]
+        user = request.get("hass_user")
+        if user is None or not user.is_admin:
+            return web.Response(status=403, text="Administrators only.")
+        hub = hass.data.get(DOMAIN)
+        if hub is None:
+            return web.Response(status=503, text="Ulanzi Deck is not running.")
+
+        try:
+            url = get_url(hass, prefer_external=False, allow_ip=True)
+        except NoURLAvailableError:
+            return web.Response(
+                status=503,
+                text="Home Assistant does not know its own address, so the app "
+                     "cannot be told where to find it. Set one under Settings, "
+                     "System, Network.",
+            )
+
+        session = async_get_clientsession(hass)
+        try:
+            async with asyncio.timeout(120):
+                response = await session.get(APP_RELEASE_URL)
+                if response.status != 200:
+                    return web.Response(
+                        status=502,
+                        text="The companion app could not be downloaded "
+                             f"({response.status}). Try again in a moment.",
+                    )
+                app_zip = await response.read()
+        except (ClientError, TimeoutError):
+            return web.Response(
+                status=502,
+                text="Home Assistant could not reach the internet to fetch the "
+                     "companion app. Check its connection and try again.",
+            )
+
+        pairing = await hub.async_new_pairing()
+        pairing["url"] = url
+        body = await hass.async_add_executor_job(_with_pairing, app_zip, pairing)
+        return web.Response(
+            body=body,
+            content_type="application/zip",
+            headers={"Content-Disposition": 'attachment; filename="Ulanzi Deck.zip"'},
+        )
+
+
+def _with_pairing(app_zip: bytes, pairing: dict) -> bytes:
+    """Copy the published zip and drop the pairing file in beside the app.
+
+    Everything is copied entry by entry, permissions included, because the app
+    will not run if the executable bit is lost. Nothing inside the app bundle
+    is touched: changing a signed bundle is what stops macOS opening it.
+    """
+    out = io.BytesIO()
+    with zipfile.ZipFile(io.BytesIO(app_zip)) as src, \
+            zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as dst:
+        for item in src.infolist():
+            dst.writestr(item, src.read(item.filename))
+        dst.writestr(PAIRING_FILE, json.dumps(pairing, indent=2, sort_keys=True))
+    return out.getvalue()

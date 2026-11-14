@@ -52,6 +52,12 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .bar h1{font-size:20px;font-weight:400;flex:1;min-width:0}
 .dots{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:10px 6px;margin-left:-6px;border-radius:50%;display:flex;flex-direction:column;gap:4px;opacity:.9}.dots i{width:18px;height:2px;background:currentColor;border-radius:2px}
 .dots:focus-visible{outline:2px solid currentColor}
+.getapp .card-b{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:22px}
+.getapp h2{margin:0;font-size:19px;font-weight:500}
+.getapp p{margin:0;max-width:60ch;line-height:1.55;color:var(--secondary-text-color)}
+.getapp .getapp-note{font-size:13px}
+.getapp #btn-getapp{margin-top:4px}
+.getapp .getapp-err{color:var(--error-color,#c62828);font-size:13px}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
   background:rgba(255,255,255,.16);white-space:nowrap}
 .gear{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:8px;border-radius:50%;
@@ -355,6 +361,17 @@ const MARKUP=`
 </div></div>
 
 <div class="wrap">
+  <div class="card getapp" id="getApp" hidden>
+    <div class="card-b">
+      <h2>Connect a Mac</h2>
+      <p>Your deck has no network of its own. It plugs into a Mac over USB, and a small
+         companion app on that Mac carries it to Home Assistant.</p>
+      <p class="getapp-note">The app arrives knowing this server, so there is nothing to
+         type and nothing to allow. <a href="https://github.com/sygad/ulanzi-d200-ha-deck#what-the-companion-app-is-before-you-run-it" target="_blank" rel="noreferrer">What it does, and what it never does</a>.</p>
+      <button class="btn pub" id="btn-getapp">Get the companion app</button>
+      <p class="getapp-err" id="getAppErr" hidden></p>
+    </div>
+  </div>
   <div class="card" id="configCard">
     <div class="card-b">
       <div id="insp">
@@ -1419,7 +1436,22 @@ function showStatus(st){
     :st.pending?"\u201c"+st.pending.name+"\u201d wants to connect"
     :st.bridge==="connected"?"Bridge connected, no deck":"Bridge not connected";
   allow.hidden=!st.pending;
+  $("#getApp").hidden=!(st.bridge==="none");
 }
+$("#btn-getapp").addEventListener("click",async()=>{
+  const b=$("#btn-getapp"), err=$("#getAppErr");
+  b.disabled=true; b.textContent="Preparing\u2026"; err.hidden=true;
+  try{
+    // Signed so the download carries this admin's authority: the zip holds a key
+    // that lets a Mac in, so it must not be a link anyone could follow.
+    const {path}=await hass().callWS({type:"auth/sign_path",path:"/api/ulanzi_deck/companion-app",expires:60});
+    location.href=path;
+  }catch(e){
+    err.textContent=(e&&e.message)||"It could not be prepared. Try again.";
+    err.hidden=false;
+  }
+  b.disabled=false; b.textContent="Get the companion app";
+});
 $("#btn-allow").addEventListener("click",()=>{
   if(pendingBridge)hass().callWS({type:"ulanzi_deck/allow",bridge_id:pendingBridge.bridge_id}).catch(()=>{});
 });

@@ -19,6 +19,7 @@ import hashlib
 import hmac
 import json
 import logging
+import secrets
 import struct
 from typing import Any
 
@@ -444,6 +445,32 @@ class DeckHub:
         await self._store.async_save(self.data)
         await self._admit(bridge)
         return True
+
+    async def async_new_pairing(self, name: str = "Mac") -> dict[str, str]:
+        """Write down a Mac before it has ever connected, and hand back its key.
+
+        This is what makes the download button worth pressing: the key goes into
+        the zip beside the app, so the app proves itself the first time it
+        connects and nobody has to press Allow. Only an admin can ask for one,
+        and the key itself is never stored — only what it hashes to, exactly as
+        for a Mac that was allowed by hand.
+        """
+        bridge_id = secrets.token_hex(8)
+        secret = secrets.token_hex(32)
+        bridges = self.data["bridges"]
+        bridges[bridge_id] = {
+            "name": name,
+            "hash": hashlib.sha256(secret.encode()).hexdigest(),
+        }
+        # Pressing the button more than once should not leave a pile of keys
+        # behind that would each still be let in. The newest few are kept, so a
+        # Mac that is simply switched off at the time does not lose its place.
+        connected = self._bridge.id if self._bridge else None
+        for old in list(bridges)[:-4]:
+            if old != connected:
+                del bridges[old]
+        await self._store.async_save(self.data)
+        return {"bridgeId": bridge_id, "secret": secret}
 
     async def _send(self, data: bytes) -> None:
         bridge = self._bridge
