@@ -40,7 +40,7 @@ In **Settings → Marketplace**, press the three dots at the top right and choos
 **Custom repositories**. Paste `https://github.com/sygad/ulanzi-d200-ha-deck`, pick
 **Integration**, and press Add.
 
-Ulanzi Deck then appears in the list like any other. Open it and press **Download**.
+The dialog then lists **Ulanzi Deck** underneath. Click that entry — its own page opens — and press **Download**. You are not searching for it; it is already there because you just added it.
 
 <br>
 
