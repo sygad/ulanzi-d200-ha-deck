@@ -71,18 +71,21 @@ that suits and trigger an automation from the `ulanzi_deck_key` event.
 
 ## Add just this part
 
+The ordinary way is the Marketplace, in [step 1 of the setup guide](../../README.md#setting-it-up).
+This is the same thing by hand, for working on it:
+
 1. Copy the folder `custom_components/ulanzi_deck` from this repo into the
    `custom_components` folder inside your Home Assistant `config` folder. Create
    `custom_components` if it isn't there.
 2. Restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**, search for
    **Ulanzi Deck**, and add it. It asks no questions.
-4. **Ulanzi Deck** appears in the sidebar. Until the bridge is running its chip reads
-   "Bridge not connected".
+4. **Ulanzi Deck** appears in the sidebar. Until the companion app is running its chip
+   reads "Bridge not connected".
 
-**With HACS:** the repo is laid out for it, so adding it as a custom repository
-(type: Integration) should work. I installed it by copying the folder, and have not
-tested the HACS route.
+The repo carries a `hacs.json` and is laid out the way the Marketplace expects, so it
+installs as a custom repository (type: Integration). It is not in the Marketplace's own
+list of integrations, so it has to be added by its address first.
 
 To remove it: delete the integration under Devices & services, delete the folder,
 and restart.

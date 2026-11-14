@@ -1,203 +1,186 @@
 # Ulanzi D200 Home Assistant Control Deck
 
-Turns an Ulanzi D200 stream deck into a Home Assistant control surface. Its fourteen
-keys toggle lights, run scenes and switch screens, and show sensor readings as
-numbers, bars, dials and graphs. You set it all up from a panel inside Home Assistant.
+Fourteen keys on your desk that run your house. Toggle lights, fire scenes, switch
+screens, and watch a reading move as a number, a bar, a dial or a graph. You set all
+of it up from a page inside Home Assistant, pressing keys to try them before they ever
+reach the deck.
 
-<!-- TODO: video goes here once recorded.
-[![Watch it in action on YouTube](https://img.youtube.com/vi/VIDEO_ID/hqdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
+<br>
 
-**On the deck** — one of its screens, drawn by the deck itself. Click any picture to see it full size.
+<a href="images/ulanzi-d200.png"><img src="images/ulanzi-d200.png" alt="The Ulanzi D200: a desk stream deck with fourteen clear keys and a stand" width="100%"></a>
+
+<p align="center"><sub>The Ulanzi D200. Thirteen keys plus one double-width key, sold as U·STUDIO.</sub></p>
+
+<br>
+
+---
+
+<br>
+
+## Try it right now, in your browser
+
+### **[→ Open the panel](https://sygad.github.io/ulanzi-d200-ha-deck/docs/try/)**
+
+That is the real panel out of this repository, running against a house that does not
+exist. Nothing is installed, nothing is downloaded, and nothing of yours is touched.
+
+Press **PREVIEW** at the top right and the keys become live: tap a light and watch it
+come on, tap **Next screen** and the deck moves. It is the same preview you get once
+it is installed, and it is the quickest way to decide whether you want this.
+
+<br>
+
+---
+
+<br>
+
+## What it looks like
+
+### On the deck
+
+One of its screens, drawn by the deck itself. Click to see it full size.
+
+<br>
 
 <a href="images/deck.png"><img src="images/deck.png" alt="The deck: fourteen keys showing lights, a temperature graph, a power dial and a wide CO2 reading" width="100%"></a>
 
-**In Home Assistant** — where you set it all up, with a live preview of the deck beside you.
+<br>
+<br>
+
+### In Home Assistant
+
+Where you set it up, with a live preview of the deck beside you.
+
+<br>
 
 <a href="images/panel.jpg"><img src="images/panel.jpg" alt="The Ulanzi Deck panel: key settings on the left, a live preview of the fourteen keys on the right" width="100%"></a>
 
-Everything shown is the made-up house in [`tools/demo_house.py`](tools/demo_house.py), which the repo
-comes with. No real home is pictured anywhere in here.
+<br>
+
+Everything pictured is the invented house in [`tools/demo_house.py`](tools/demo_house.py),
+which comes with the repository. No real home appears anywhere in here.
+
+<br>
 
 ---
 
-## Try it before you do anything else
+<br>
 
-**[Open the panel in your browser →](https://sygad.github.io/ulanzi-d200-ha-deck/docs/try/)**
+## Setting it up
 
-That is the real panel from this repo, running on a made-up house. Nothing is installed and
-nothing of yours is touched. Press **PREVIEW** on the right and you can press the keys and
-watch them answer, exactly as the deck does. It is the quickest way to see whether this is
-for you.
+Five steps. Three of them happen inside Home Assistant, and none of them involves a
+terminal, a file copied by hand, or lining anything up.
 
-**[The setup guide, step by step →](https://sygad.github.io/ulanzi-d200-ha-deck/docs/)**
+### **[→ The setup guide, with a picture of every step](https://sygad.github.io/ulanzi-d200-ha-deck/docs/)**
 
-Five steps with a picture of each one. Three happen inside Home Assistant, and nothing is
-typed into a terminal.
+In short:
 
----
-
-## ⚠️ Read this before you start
-
-- **It replaces the app on the deck.** Ulanzi's own software will not see the deck
-  while this is installed. The vendor app is saved first and one command puts it
-  back: see [Part 2](parts/02-deck-app/README.md#going-back).
-- **The bridge is Mac only.** The deck has no network of its own, so the computer it
-  is plugged into carries its traffic. That piece is written for macOS. There is no
-  Windows or Linux bridge yet.
-- **It has been built and tested on one deck.** Mine. Where something might differ on
-  yours, the page says so.
-
----
-
-## How this repo works
-
-Every piece has a **number**, and that number is used everywhere: in the picture
-below, in the table, in the folder name. Drop in at any part without reading the rest.
-
-```
-README.md                         this page
-BUILD-WITH-AI.md                  point your own AI at the repo and let it do the install
-docs/                             the setup guide, and the panel running in your browser
-custom_components/ulanzi_deck/    the Home Assistant integration (Parts 4 and 5), where
-                                  Home Assistant and HACS expect to find it
-parts/
-  01-the-deck/                    what is inside a D200, and how to get in
-  02-deck-app/                    the app that runs on the deck: source, a ready-made
-                                  binary, and the installer
-  03-mac-bridge/                  the Mac agent that carries messages: source and installer
-  04-home-assistant/              installing the integration, and what it gives you
-  05-the-panel/                   setting up keys and screens
-  06-lining-up-the-keys/          telling the deck where its own keys are
-shared/                           things several parts rely on: the wire format, the layout
-                                  file, the sizing rule
-tools/                            small helpers for working on it
-```
-
-**Pick your route:**
-
-| I want to… | Go to |
+| | |
 |---|---|
-| Have an AI install it for me | [BUILD-WITH-AI.md](BUILD-WITH-AI.md) |
-| Install all of it myself | [Quick start](#quick-start) |
-| Understand one piece | [The parts](#the-parts): open that part's folder |
+| **1** | **Add it to the Marketplace, once.** In Home Assistant go to **Settings → Marketplace**, press the three dots at the top right, choose **Custom repositories**, paste `https://github.com/sygad/ulanzi-d200-ha-deck`, pick **Integration** and press Add. Ulanzi Deck then appears in the list: open it and press **Download**. |
+| **2** | **Restart Home Assistant.** It asks you to. Nothing you have just downloaded is running until it has. |
+| **3** | **Open Ulanzi Deck in the sidebar.** It is there after the restart. Press **Get the companion app**. |
+| **4** | **Open the companion app on your Mac.** It finds Home Assistant by itself. Plug the deck in whenever you like — before or after makes no difference — and it sets the deck up on its own. |
+| **5** | **Customise your deck.** Pick a key, give it something to do, press it in the preview to check, then **Send to device**. |
 
----
+Steps 1 to 4 take a few minutes. Step 5 is yours and has no end.
 
-## The parts
+<br>
 
-![How the six parts fit together](images/overview.svg)
+### What you need
 
-| # | Part | What it does | Built from |
-|---|---|---|---|
-| 1 | [The deck](parts/01-the-deck/README.md) | The hardware: one screen behind fourteen clear keys, a small Linux computer, USB only | Ulanzi D200 |
-| 2 | [Deck app](parts/02-deck-app/README.md) | Runs on the deck. Draws the keys, reads presses, remembers the layout | One C file, no libraries |
-| 3 | [Mac bridge](parts/03-mac-bridge/README.md) | Runs on the Mac. Carries messages between the deck and Home Assistant, and tells the deck the time | One Swift file, no dependencies |
-| 4 | [Home Assistant integration](parts/04-home-assistant/README.md) | Draws every key, sends it to the deck, and acts on presses | A custom integration, Python |
-| 5 | [The panel](parts/05-the-panel/README.md) | Where you set up keys and screens, with a live preview you can press | A sidebar panel, part of the integration |
-| 6 | [Lining up the keys](parts/06-lining-up-the-keys/README.md) | Finds where each key's window sits over the screen, so content is centred | A tool built into the bridge |
-
-Things used by more than one part are explained once, in [shared/README.md](shared/README.md).
-
----
-
-## What you need
-
-### Hardware
-
-| What | Notes |
+| | |
 |---|---|
-| Ulanzi D200 stream deck | 13 keys plus one double-width key. Sold by [Ulanzi](https://www.ulanzi.com). Its case is printed U·STUDIO |
-| A Mac | The deck plugs into it by USB and is powered by it. Apple silicon is what I tested |
-| A USB **data** cable | The one that came with the deck |
-| A Home Assistant server | On the same network as the Mac. It does not need to be the Mac |
+| **An Ulanzi D200** | Sold by [Ulanzi](https://www.ulanzi.com). Its case is printed U·STUDIO |
+| **A Mac** | The deck plugs into it over USB and is powered by it. Tested on Apple silicon, macOS 13 or newer |
+| **The cable it came with** | It has to be a data cable. Some are power only |
+| **Home Assistant** | Anywhere on the same network as the Mac. It does not have to be the Mac. Tested on 2026.11.1 |
 
-### Downloads
+Nothing else. No Xcode, no Homebrew, no `adb`, no Python — the companion app carries
+everything it needs inside it.
 
-| What | Needed for | Get it |
-|---|---|---|
-| Xcode Command Line Tools | Building the bridge (Part 3) | Run `xcode-select --install` |
-| Android platform tools (`adb`) | Putting the app on the deck (Part 2) | `brew install android-platform-tools`, or [download from Google](https://developer.android.com/tools/releases/platform-tools) |
-| [Homebrew](https://brew.sh) | The easy way to get `adb` | Optional |
-| This repo | Everything | `git clone`, or the green **Code** button and Download ZIP |
-| `lld` linker | Only if you want to rebuild the deck app yourself. A ready-made binary is in [Part 2](parts/02-deck-app/README.md) | `brew install lld` |
-| Python 3 with Pillow | Only for the helper scripts in `tools/` | `pip install pillow` |
-
-Nothing is downloaded onto the deck from the internet. The app is copied to it over USB.
-
-### Tested with
-
-| | Version |
-|---|---|
-| Home Assistant | 2026.11.1 |
-| macOS | 26.6.2, Apple silicon |
-| Swift | 6.3.3 (from the Command Line Tools) |
-| adb | 1.0.41 |
-| The deck | Buildroot 2021.11, Linux 5.10.160; vendor app built 20 May 2025 |
-
----
-
-## Quick start
-
-Each step points at the page that has the detail.
-
-1. **Check the Mac can see the deck.** Plug it in and run `adb devices`. One device
-   should be listed. More in [Part 1](parts/01-the-deck/README.md).
-2. **Put the app on the deck.** `./parts/02-deck-app/install.sh`. It saves the vendor
-   app first. The wide key should then read "Waiting for Home Assistant".
-   [Part 2](parts/02-deck-app/README.md).
-3. **Install the integration.** Copy `custom_components/ulanzi_deck` into your Home
-   Assistant `config/custom_components` folder, restart Home Assistant, and add
-   **Ulanzi Deck** under Settings → Devices & services. [Part 4](parts/04-home-assistant/README.md).
-4. **Start the bridge.** `./parts/03-mac-bridge/install.sh http://homeassistant.local:8123`,
-   with your own Home Assistant address. [Part 3](parts/03-mac-bridge/README.md).
-5. **Allow the bridge.** Open **Ulanzi Deck** in the Home Assistant sidebar and press
-   **Allow**. The chip beside it should change to "Deck connected".
-6. **Set up your keys.** Pick a key, give it something to do, and press
-   **Send to device**. [Part 5](parts/05-the-panel/README.md).
-7. **If content sits off-centre in the keys,** line them up.
-   [Part 6](parts/06-lining-up-the-keys/README.md).
-
-Steps 1 to 5 take a few minutes. Step 6 is yours and has no end.
+<br>
 
 ### You start with a blank deck
 
 The panel opens on one empty screen. Nothing is set up for you, on purpose: a key
-pointing at a light you do not own is worse than no key. Press a **+**, pick one of
-your own entities, press **Send to device**, and it is on the deck a second later.
+pointing at a light you do not own is worse than no key. Press a **+**, pick one of your
+own entities, press **Send to device**, and it is on the deck a second later.
 
-The screens in the pictures above are a demonstration, built from a house that does
-not exist ([`tools/demo_house.py`](tools/demo_house.py)). They are there to show what
-a key can be — a light, a scene, a script, a reading drawn as a number, a bar, a dial
-or a graph, a clock, a jump to another screen — not to be copied. **Preview**, at the
-right of the screen tabs, lets you press a key in the browser and watch it work before
-it ever reaches the deck.
+<br>
 
 ---
+
+<br>
+
+## Before you start
+
+- **It replaces the software on the deck.** Ulanzi's own app will not see the deck while
+  this is installed. Yours is saved first and the companion app puts it back.
+- **The companion app is Mac only.** The deck has no network of its own, so the computer
+  it is plugged into carries its traffic. There is no Windows or Linux version yet.
+- **It has been built and tested on one deck.** Mine. Where something might differ on
+  yours, the page says so.
+
+<br>
+
+---
+
+<br>
 
 ## Things to know
 
 | | |
 |---|---|
-| **The deck needs the Mac** | It is powered over USB and has no network. Mac off, deck off |
-| **It starts fast** | The deck draws its last layout from its own memory as soon as it has power, before the bridge is running |
-| **A dot means not connected** | Top right of the wide key: red for no bridge, amber for a bridge with no Home Assistant behind it. Keys do nothing until it clears |
+| **The deck needs the Mac** | It is powered over USB and has no network of its own. Mac off, deck off |
+| **It starts fast** | The deck draws its last layout from its own memory the moment it has power, before anything else is running |
+| **A dot means not connected** | Top right of the wide key: red for no companion app, amber for an app with no Home Assistant behind it. Keys do nothing until it clears |
 | **Nothing is queued** | A press made while disconnected is dropped, not saved up |
-| **The screen turns itself off** | After 20 minutes with nothing happening, to save the panel. Any key wakes it, and that waking press does nothing else. Set it, or turn it off, with the gear in the panel's top bar |
-| **It froze once** | During development the deck stopped completely, screen lit and not answering, and needed its cable pulled. It has not happened again and I have not found the cause |
+| **The screen turns itself off** | After 20 minutes of nothing happening, to save the panel. Any key wakes it, and that waking press does nothing else. Change it, or turn it off, with the gear in the panel's top bar |
+| **It froze once** | During development the deck stopped completely, screen lit and not answering, and needed its cable pulled. It has not happened again and I never found the cause |
+
+<br>
 
 ---
+
+<br>
+
+## Looking inside
+
+You do not need any of this to use it. It is here because the whole thing is open, and
+because somebody will want to know how a deck with no network ends up showing a graph.
+
+```
+docs/                             the setup guide, and the panel you can try in a browser
+custom_components/ulanzi_deck/    the Home Assistant integration and its panel
+parts/
+  01-the-deck/                    what is inside a D200
+  02-deck-app/                    the app that runs on the deck: one C file, no libraries
+  03-mac-bridge/                  the companion app, and the agent underneath it
+  04-home-assistant/              the integration, and what it gives you
+  05-the-panel/                   how keys and screens are set up
+  06-lining-up-the-keys/          how the key positions were measured in the first place
+shared/                           the wire format, the layout file, the sizing rule
+tools/                            helpers, and the invented house everything is demonstrated on
+```
+
+<br>
+
+---
+
+<br>
 
 ## Licence
 
 [MIT](LICENSE): use, copy and change anything here, for any purpose.
 
 The fonts and icons bundled with the integration keep their own licences, listed in
-[NOTICE.md](NOTICE.md). Ulanzi's own software is not included in this repo.
+[NOTICE.md](NOTICE.md). Ulanzi's own software is not included in this repository.
 
 ## Credits
 
 - **Roboto** by Google, [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 - **Material Design Icons** by [Pictogrammers](https://pictogrammers.com/library/mdi/),
   under the Pictogrammers Free License (fonts and icons: Apache License 2.0).
+- `adb`, carried inside the companion app, is Apache License 2.0.
 - Not affiliated with Ulanzi or with Home Assistant.

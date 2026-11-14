@@ -60,6 +60,7 @@ h1{font-size:clamp(27px,5vw,35px);font-weight:600;letter-spacing:-.022em;margin:
 .step h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.015em;text-wrap:balance}
 .step p{margin:0;color:var(--ink-soft);font-size:16px;line-height:1.55}
 .step p strong{color:var(--ink);font-weight:600}
+.step code{font-family:var(--mono);font-size:14px;background:var(--sunk);padding:1px 6px;border-radius:5px;word-break:break-all}
 figure{margin:0;display:flex;flex-direction:column;gap:9px}
 .step figure{margin-left:32px}   /* line up with the title: number (18px) + gap (14px) */
 figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding-left:2px}
@@ -141,8 +142,13 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
 
   <header style="display:flex;flex-direction:column;gap:11px">
     <h1>Setting up your Ulanzi deck</h1>
-    <p class="lede">Four steps, and three of them happen inside Home Assistant. Nothing is typed into a terminal and no files are copied by hand.</p>
+    <p class="lede">Five steps, and three of them happen inside Home Assistant. Nothing is typed into a terminal and no files are copied by hand.</p>
   </header>
+
+  <figure style="margin-top:4px">
+    <img src="ulanzi-d200.png" alt="The Ulanzi D200: a desk stream deck with fourteen clear keys and a stand"
+         style="display:block;width:100%;border-radius:12px">
+  </figure>
 
   <section class="kit">
     <h2>What you need, and how it joins up</h2>
@@ -227,7 +233,8 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
       <div class="num">1</div>
       <div class="txt">
         <h3>Download from the Marketplace</h3>
-        <p>In <strong>Settings → Marketplace</strong>, search for Ulanzi Deck and press Download, the same as any other integration.</p>
+        <p>In <strong>Settings → Marketplace</strong>, press the three dots at the top right and choose <strong>Custom repositories</strong>. Paste <code>https://github.com/sygad/ulanzi-d200-ha-deck</code>, pick <strong>Integration</strong>, and press Add.</p>
+        <p>Ulanzi Deck then appears in the list like any other. Open it and press <strong>Download</strong>.</p>
       </div>
     </div>
     <figure>
