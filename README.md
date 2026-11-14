@@ -37,10 +37,20 @@ nothing of yours is touched. Press **PREVIEW** and the keys answer.
 ## 1 &nbsp; Download from the Marketplace
 
 In **Settings → Marketplace**, press the three dots at the top right and choose
-**Custom repositories**. Paste `https://github.com/sygad/ulanzi-d200-ha-deck`, pick
-**Integration**, and press Add.
+**Custom repositories**.
 
-The dialog then lists **Ulanzi Deck** underneath. Click that entry — its own page opens — and press **Download**. You are not searching for it; it is already there because you just added it.
+Press **Add from link** at the bottom right, paste
+`https://github.com/sygad/ulanzi-d200-ha-deck` and press **Add**. Nothing else is asked;
+it works out what it is.
+
+<br>
+
+<img src="images/guide/fig-step1-add.png" alt="The Add from a GitHub link dialog, with the repository address typed in" width="100%">
+
+<br>
+
+The list then has **Ulanzi Deck** in it. Click that row — its own page opens — and press
+**Download**. You are not searching for it; it is already there because you just added it.
 
 <br>
 
