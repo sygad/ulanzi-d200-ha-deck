@@ -1,3 +1,49 @@
+    <div class="gate">
+      <h3>macOS will stop you the first time. Here is how to get past it.</h3>
+      <div class="pair">
+        <div class="mac-dialog">
+          <span class="help">?</span>
+          <span class="mk"></span>
+          <b>“Ulanzi Deck” Not Opened</b>
+          <span>Apple could not verify “Ulanzi Deck” is free of malware that may harm your Mac or compromise your privacy.</span>
+          <span class="btns"><i>Done</i><i class="p">Move to Bin</i></span>
+        </div>
+        <div class="fix">
+          <ol>
+            <li>Press <strong>Done</strong>. <strong>Not</strong> Move to Bin, however blue it is.</li>
+            <li>Open <strong>System Settings → Privacy &amp; Security</strong> and scroll down to <strong>Security</strong>.</li>
+            <li>Beside “Ulanzi Deck” was blocked to protect your Mac, press <strong>Open Anyway</strong>.</li>
+            <li>It asks once more, and puts <strong>Move to Bin</strong> in blue again. Press <strong>Open Anyway</strong>, the middle button.</li>
+          </ol>
+          <p class="after">That is it, once, forever. Every Mac shows this for software not sold through Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is wrong with it.</p>
+        </div>
+      </div>
+
+      <div class="pair" style="grid-template-columns:1fr 262px;align-items:start">
+        <div class="sec-pane">
+          <h4>Security</h4>
+          <div class="sec-row">
+            <span class="grow">Allow applications from</span>
+            <span class="pick">App Store &amp; Known Developers<s></s></span>
+          </div>
+          <div class="sec-block">
+            <div class="line">
+              <span class="grow">“Ulanzi Deck” was blocked to protect your Mac.</span>
+              <span class="sec-btn">Open Anyway</span>
+            </div>
+            <div class="why">Apple could not verify “Ulanzi Deck” is free of malware that may harm your Mac or compromise your privacy.</div>
+          </div>
+        </div>
+
+        <div class="mac-dialog stack">
+          <span class="help">?</span>
+          <span class="mk"></span>
+          <b>Open “Ulanzi Deck”?</b>
+          <span>Apple is not able to verify that it is free from malware that could harm your Mac or compromise your privacy. Don’t open this unless you are certain it is from a trustworthy source.</span>
+          <span class="btns"><i class="p">Move to Bin</i><i>Open Anyway</i><i>Done</i></span>
+        </div>
+      </div>
+    </div>
 <title>Ulanzi Deck Setup Guide</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -139,6 +185,22 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
   border-radius:9px;background:#e9e7e7;color:#111;border:0;white-space:nowrap}
 .mac-dialog .btns i.p{background:#1f7ae0;color:#fff}
 .fix{display:flex;flex-direction:column;gap:10px}
+/* the Security section of System Settings, where the block is lifted */
+.sec-pane{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f2f2f4;
+  display:flex;flex-direction:column;gap:10px;padding:14px}
+.sec-pane h4{margin:0;font-size:15px;font-weight:600;color:#111}
+.sec-row{background:#fff;border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:12px;
+  font-size:13px;color:#111}
+.sec-row .grow{flex:1;min-width:0}
+.sec-row .pick{display:flex;align-items:center;gap:7px;color:#444;font-size:12.5px}
+.sec-row .pick s{display:block;width:17px;height:21px;border-radius:5px;background:#e6e6e8;text-decoration:none}
+.sec-block{background:#fff;border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:9px}
+.sec-block .line{display:flex;align-items:center;gap:12px;font-size:13px;color:#111}
+.sec-block .why{font-size:11.5px;color:#6b6b70;line-height:1.45}
+.sec-btn{background:#e4e4e6;border-radius:7px;padding:6px 13px;font-size:12.5px;color:#111;white-space:nowrap}
+/* the second dialog stacks its buttons, with the dangerous one on top */
+.mac-dialog.stack .btns{flex-direction:column;gap:8px}
+.mac-dialog.stack .btns i{flex:none;width:100%}
 .fix ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:14px;font-size:16px;line-height:1.55;color:var(--ink-soft)}
 .fix ol strong{color:var(--ink);font-weight:600}
 .fix .after{font-size:16px;line-height:1.55;color:var(--ink-soft);margin:0}

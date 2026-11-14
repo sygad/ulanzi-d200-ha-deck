@@ -170,9 +170,23 @@ Applications if you want it there.
 <img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="320">
 
 1. Press **Done**. **Not** Move to Bin, however blue that button is.
-2. Open **System Settings → Privacy & Security**.
-3. Scroll down to Security. There is a line about Ulanzi Deck being blocked.
-4. Press **Open Anyway**.
+2. Open **System Settings → Privacy & Security** and scroll down to **Security**.
+3. Beside *"Ulanzi Deck" was blocked to protect your Mac*, press **Open Anyway**.
+
+<br>
+
+<img src="images/guide/fig-gate-security.png" alt="The Security section of Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button" width="100%">
+
+<br>
+
+4. It asks once more, and puts **Move to Bin** in blue again. Press **Open Anyway** — the
+   middle button.
+
+<br>
+
+<img src="images/guide/fig-gate-dialog2.png" alt="The second macOS dialog: Open Ulanzi Deck, with Move to Bin, Open Anyway and Done" width="300">
+
+<br>
 
 That is it, once, forever. Every Mac shows this for software not sold through Apple's
 own store — it means nobody has paid Apple to vouch for it, not that anything is wrong
