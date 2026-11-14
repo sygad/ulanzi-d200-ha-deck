@@ -24,21 +24,51 @@ enum Pairing {
         FileManager.default.fileExists(atPath: settingsFile.path)
     }
 
-    /// The pairing file, if Home Assistant sent one and it is still beside the app.
+    /// The pairing file Home Assistant sent, wherever it has ended up.
+    ///
+    /// Three things conspire against simply looking next to the app. macOS runs a
+    /// freshly downloaded app from a random read-only copy of itself (translocation),
+    /// so "next to the app" is a folder that holds nothing else. The zip is usually
+    /// opened into a folder of its own inside Downloads rather than into Downloads.
+    /// And people move the app to Applications and leave the file behind.
+    ///
+    /// So look in all the places it can honestly be, and take the first one that is
+    /// a valid pairing. It is only ever put there by a Home Assistant that an admin
+    /// was signed in to.
     static func findBesideTheApp() -> Settings? {
-        guard !haveSettingsFile() else { return nil }      // already paired; leave it alone
         let fm = FileManager.default
+        var folders: [URL] = []
+
         let beside = Bundle.main.bundleURL.deletingLastPathComponent()
-        let downloads = fm.urls(for: .downloadsDirectory, in: .userDomainMask).first
-        for folder in [beside, downloads].compactMap({ $0 }) {
-            let f = folder.appendingPathComponent(fileName)
-            if let d = try? Data(contentsOf: f),
-               let s = try? JSONDecoder().decode(Settings.self, from: d),
-               !s.url.isEmpty, s.bridgeId.count >= 8, s.secret.count >= 16 {
-                return s
+        folders.append(beside)
+        folders.append(beside.deletingLastPathComponent())
+
+        for dir in [FileManager.SearchPathDirectory.downloadsDirectory, .desktopDirectory] {
+            guard let root = fm.urls(for: dir, in: .userDomainMask).first else { continue }
+            folders.append(root)
+            let kids = (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey],
+                                                    options: [.skipsHiddenFiles])) ?? []
+            for kid in kids where (try? kid.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true {
+                folders.append(kid)
             }
         }
+
+        for folder in folders {
+            let f = folder.appendingPathComponent(fileName)
+            guard let d = try? Data(contentsOf: f),
+                  let s = try? JSONDecoder().decode(Settings.self, from: d),
+                  !s.url.isEmpty, s.bridgeId.count >= 8, s.secret.count >= 16 else { continue }
+            // Already using it? Then there is nothing to do and nothing to rewrite.
+            if let now = current(), now.bridgeId == s.bridgeId, now.url == s.url { return nil }
+            return s
+        }
         return nil
+    }
+
+    /// What the app is using at the moment, if it has been set up before.
+    static func current() -> Settings? {
+        guard let d = try? Data(contentsOf: settingsFile) else { return nil }
+        return try? JSONDecoder().decode(Settings.self, from: d)
     }
 
     /// Save what Home Assistant sent as this Mac's settings, before anything connects.
