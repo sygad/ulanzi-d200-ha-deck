@@ -147,9 +147,9 @@ it, change it, or build the app yourself rather than download it.
 
 ### macOS will stop you the first time. Here is how to get past it.
 
-<img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck can't be opened because Apple cannot check it for malicious software" width="320">
+<img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="320">
 
-1. Press **OK**. Do not move it to the bin.
+1. Press **Done**. **Not** Move to Bin, however blue that button is.
 2. Open **System Settings → Privacy & Security**.
 3. Scroll down to Security. There is a line about Ulanzi Deck being blocked.
 4. Press **Open Anyway**.
