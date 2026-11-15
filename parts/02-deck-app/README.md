@@ -1,6 +1,6 @@
 [← Part 1](../01-the-deck/README.md) · [All parts](../../README.md) · [Part 3 →](../03-mac-bridge/README.md)
 
-# Part 2 · Deck app
+# Part 2 · The deck software
 
 ![What a freshly installed deck shows: "Waiting for Home Assistant" on the wide key](starter-screen.png)
 

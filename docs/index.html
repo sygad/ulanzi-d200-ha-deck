@@ -154,7 +154,9 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
 
   <header style="display:flex;flex-direction:column;gap:11px">
     <h1>Setting up your Ulanzi deck</h1>
-    <p class="lede">Six steps, and only one of them happens outside Home Assistant. Nothing is typed into a terminal and no files are copied by hand.</p>
+    <p class="lede">An <strong>Ulanzi D200</strong> is a desk pad with fourteen clear keys over one screen. This turns it into a control deck for <strong>Home Assistant</strong>: press a key to switch a light, run a scene or change screen, and watch readings from your house on the keys themselves &mdash; a temperature graph, a power dial, the time. You lay it out from a panel inside Home Assistant, with no YAML and nothing typed into a terminal.</p>
+    <p class="lede">Six steps, and only one of them happens outside Home Assistant.</p>
+    <p class="lede"><strong>You need</strong> an Ulanzi D200, <strong>a Mac</strong> the deck plugs into and leaves plugged in, and <strong>Home Assistant 2026.11 or newer</strong>. The Mac is not optional: the deck has no network of any kind, so something has to sit on the computer it is cabled to. There is no Windows or Linux version. The deck also has to let a computer in over USB, which mine did with nothing asked for &mdash; whether every D200 does, I don't know. <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/01-the-deck/README.md">Part 1</a> has the one command that tells you.</p>
   </header>
 
   <figure style="margin-top:4px">
@@ -452,6 +454,27 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
         <p>There are three parts — the <strong>integration</strong> inside Home Assistant, the <strong>connector app</strong> on your Mac, and the <strong>deck software</strong> on the deck itself. They are released together and all carry the same number, so any part showing a lower one is simply behind.</p>
         <p>A line under the panel always says where all three are. Grey means there is nothing to do; amber means that part is behind, and a bar appears above the line with the one thing to do next — never a list of them, and always in the order they have to happen: the <strong>integration</strong> first, from the Marketplace, which needs Home Assistant to restart before the new one is the one running; then the <strong>connector app</strong>, which the integration hands over when you press <strong>Update now</strong>; then the <strong>deck software</strong>, which the connector app copies across — so it can only install the version that app is carrying, which is why it comes last.</p>
         <p>The app's update is fetched by your Home Assistant and handed to the Mac over the connection it is already on, so macOS does not ask about it again — the warning and the two Open Anyways happen once in the life of the app.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="step">
+    <div class="step-head">
+      <span class="num"></span>
+      <div class="txt">
+        <h3>How it is built</h3>
+        <p>Six pages, one per piece, for anyone who wants to see inside it or build their
+           own. None of this is needed to set a deck up.</p>
+        <p>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/01-the-deck/README.md">Part 1 &middot; The deck</a> &mdash; what an Ulanzi D200 actually is, read off the hardware<br>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/02-deck-app/README.md">Part 2 &middot; The deck software</a> &mdash; the program that runs on the deck. One C file, no libraries at all<br>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/03-mac-bridge/README.md">Part 3 &middot; The connector app</a> &mdash; the Mac app the deck plugs into<br>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/04-home-assistant/README.md">Part 4 &middot; The integration</a> &mdash; the part that does the thinking, inside Home Assistant<br>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/05-the-panel/README.md">Part 5 &middot; The panel</a> &mdash; where you set the deck up<br>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/06-lining-up-the-keys/README.md">Part 6 &middot; Lining up the keys</a> &mdash; how the key positions were measured
+        </p>
+        <p>The <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/shared/README.md">message formats</a> both ends agree on are
+           written down too.</p>
       </div>
     </div>
   </article>

@@ -1,7 +1,19 @@
 # Setting up your Ulanzi deck
 
-Six steps, and only one of them happens outside Home Assistant. Nothing is typed into a
-terminal and no files are copied by hand.
+An **Ulanzi D200** is a desk pad with fourteen clear keys over one screen. This turns it
+into a control deck for **Home Assistant**: press a key to switch a light, run a scene or
+change screen, and watch readings from your house on the keys themselves — a temperature
+graph, a power dial, the time. You lay it out from a panel inside Home Assistant, with no
+YAML and nothing typed into a terminal.
+
+Six steps, and only one of them happens outside Home Assistant.
+
+**You need** an Ulanzi D200, **a Mac** the deck plugs into and leaves plugged in, and
+**Home Assistant 2026.11 or newer**. The Mac is not optional: the deck has no network of
+any kind, so something has to sit on the computer it is cabled to. There is no Windows or
+Linux version. The deck also has to let a computer in over USB, which mine did with nothing
+asked for — whether every D200 does, I don't know. [Part 1](parts/01-the-deck/README.md)
+has the one command that tells you.
 
 <br>
 
@@ -250,6 +262,28 @@ next — never a list of them, and always in the order they have to happen:
 The app's update is fetched by your Home Assistant and handed to the Mac over the connection
 the Mac is already on, so macOS does not ask about it again — the warning and the two Open
 Anyways happen once in the life of the app.
+
+## How it is built
+
+Six pages, one per piece, for anyone who wants to see inside it or build their own.
+None of this is needed to set a deck up.
+
+| | |
+|---|---|
+| [Part 1 · The deck](parts/01-the-deck/README.md) | What an Ulanzi D200 actually is, read off the hardware |
+| [Part 2 · The deck software](parts/02-deck-app/README.md) | The program that runs on the deck. One C file, no libraries at all |
+| [Part 3 · The connector app](parts/03-mac-bridge/README.md) | The Mac app the deck plugs into |
+| [Part 4 · The integration](parts/04-home-assistant/README.md) | The part that does the thinking, inside Home Assistant |
+| [Part 5 · The panel](parts/05-the-panel/README.md) | Where you set the deck up |
+| [Part 6 · Lining up the keys](parts/06-lining-up-the-keys/README.md) | How the key positions were measured |
+
+The [message formats](shared/README.md) both ends agree on are written down too.
+
+<br>
+
+---
+
+<br>
 
 **Licence** — [MIT](LICENSE). Fonts and icons keep their own licences, listed in [NOTICE.md](NOTICE.md).
 
