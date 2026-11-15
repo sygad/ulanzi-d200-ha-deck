@@ -8,6 +8,7 @@ deck itself is reached through a small bridge on the Mac it is plugged into.
 from __future__ import annotations
 
 import asyncio
+import base64
 import importlib
 import io
 import json
@@ -206,24 +207,76 @@ def _version_in(plist: bytes) -> str:
 
 
 def _readme(version: str) -> str:
-    """The note that opens with the download. Three steps, nothing else."""
+    """The page that opens with the download.
+
+    It cannot be the app that says this. macOS refuses to run a program nobody
+    has paid Apple to vouch for, so at the moment somebody needs telling what
+    to do, our app is the one thing that cannot speak. A page can: it is a
+    document, not a program, so it opens.
+
+    It says what will happen before it happens, and carries a button that opens
+    System Settings at the Security section, so nobody goes hunting.
+    """
+    shot = (_FRONTEND / "blocked.png").read_bytes()
+    picture = base64.b64encode(shot).decode()
     title = f"Ulanzi Deck {version}".strip()
-    return (
-        f"{title}\n"
-        f"{'-' * len(title)}\n"
-        "\n"
-        "1. Double-click \"Ulanzi Deck\".\n"
-        "\n"
-        "2. macOS will say it cannot check the app. Press Done — not Move to Bin.\n"
-        "   Then open System Settings > Privacy & Security, scroll down to\n"
-        "   Security, and press Open Anyway. It asks a second time: press\n"
-        "   Open Anyway again, the middle button.\n"
-        "\n"
-        "3. Leave ulanzi-deck-pairing.json next to the app. It is what tells the\n"
-        "   app which Home Assistant is yours, so there is nothing to type and\n"
-        "   nothing to allow. Once the app has opened you can delete it.\n"
-        "\n"
-        "Everything else happens in Home Assistant, in the Ulanzi Deck panel.\n"
-        "\n"
-        "https://github.com/sygad/ulanzi-d200-ha-deck\n"
-    )
+    return f"""<!doctype html>
+<html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<style>
+  :root{{--ink:#1d1d1f;--soft:#6e6e73;--line:#e3e3e5;--blue:#2f7fe0}}
+  *{{box-sizing:border-box}}
+  body{{margin:0;padding:48px 24px;background:#f2f2f4;color:var(--ink);
+       font:400 15px/1.55 -apple-system,"SF Pro Text",system-ui,sans-serif}}
+  main{{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px}}
+  h1{{margin:0;font-size:26px;font-weight:600;letter-spacing:-.01em}}
+  .lede{{margin:0;color:var(--soft);max-width:62ch}}
+  .pair{{display:grid;grid-template-columns:1fr 280px;gap:32px;align-items:center;
+        background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}}
+  .pair img{{width:100%;height:auto;border-radius:10px;display:block}}
+  .flow{{display:flex;flex-direction:column;gap:12px;align-items:stretch}}
+  .step{{background:#ececef;border-radius:28px;padding:13px 18px;text-align:center;font-size:17px}}
+  .arrow{{text-align:center;color:var(--soft);font-size:18px;line-height:1}}
+  .go{{display:block;background:var(--blue);color:#fff;text-align:center;text-decoration:none;
+      font-size:17px;font-weight:500;padding:15px 18px;border-radius:28px;margin-top:8px}}
+  ol{{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px;max-width:68ch}}
+  .after{{margin:0;color:var(--soft);max-width:68ch}}
+  code{{background:#ececef;border-radius:5px;padding:1px 6px;font-size:14px}}
+  @media (max-width:760px){{.pair{{grid-template-columns:1fr}}}}
+</style>
+<main>
+  <div>
+    <h1>macOS will block Ulanzi Deck the first time</h1>
+    <p class="lede">Nothing is wrong with it. Every Mac does this for software not sold through
+      Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is
+      wrong with the app. You tell your Mac once that you want it, and never again.</p>
+  </div>
+
+  <div class="pair">
+    <img src="data:image/png;base64,{picture}" alt="System Settings, Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button">
+    <div class="flow">
+      <div class="step">System Settings</div>
+      <div class="arrow">&#8595;</div>
+      <div class="step">Privacy &amp; Security</div>
+      <div class="arrow">&#8595;</div>
+      <div class="step">Security</div>
+      <a class="go" href="x-apple.systempreferences:com.apple.preference.security?General">Open Settings</a>
+    </div>
+  </div>
+
+  <ol>
+    <li>Double-click <b>Ulanzi Deck</b>. macOS says it cannot check it: press <b>Done</b> —
+        not Move to Bin.</li>
+    <li>Press <b>Open Settings</b> above, and in the <b>Security</b> section press
+        <b>Open Anyway</b> beside Ulanzi Deck.</li>
+    <li>It asks once more, with Move to Bin in blue. Press <b>Open Anyway</b> — the middle
+        button.</li>
+  </ol>
+
+  <p class="after">Leave <code>ulanzi-deck-pairing.json</code> next to the app. It is what tells
+    the app which Home Assistant is yours, so there is nothing to type and nothing to allow.
+    Once the app has opened you can delete it, and this page.</p>
+</main>
+</html>
+"""

@@ -60,13 +60,6 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .getapp .getapp-note{font-size:13px}
 .getapp .getapp-note a{color:var(--fg2)}
 .getapp .getapp-err{color:#c62828;font-size:13px}
-.gatehelp{border-top:1px solid var(--divider);margin-top:4px;padding-top:16px;
-  display:flex;flex-direction:column;align-items:flex-start;gap:10px}
-.gatehelp h3{margin:0;font-size:15px;font-weight:500}
-.gatehelp p{margin:0;font-size:13.5px;line-height:1.55;color:var(--fg2)}
-.gatehelp b{color:var(--fg);font-weight:500}
-.gatehelp .btn{text-decoration:none;display:inline-block}
-.gatehelp .gateshot{width:190px;height:auto;border-radius:10px;align-self:center;
   box-shadow:0 2px 10px rgba(0,0,0,.14);margin:2px 0 4px}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
   background:rgba(255,255,255,.16);white-space:nowrap}
@@ -380,15 +373,6 @@ const MARKUP=`
          allow. Set it up once and your keys appear here.</p>
       <button class="btn" id="btn-getapp">Get the companion app</button>
       <p class="getapp-err" id="getAppErr" hidden></p>
-      <div class="gatehelp" id="gateHelp" hidden>
-        <h3>macOS will block it the first time</h3>
-        <img class="gateshot" src="${STATIC}/gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin">
-        <p>Open the zip and double-click <b>Ulanzi Deck</b>. macOS will say it cannot check the
-           app: press <b>Done</b> — not Move to Bin.</p>
-        <p>Then open Privacy &amp; Security, scroll to <b>Security</b>, and press
-           <b>Open Anyway</b>. It asks once more: press <b>Open Anyway</b> again.</p>
-        <a class="btn ghost" id="btn-privacy" href="x-apple.systempreferences:com.apple.preference.security?General">Open Privacy &amp; Security</a>
-      </div>
       <p class="getapp-note"><a href="https://github.com/sygad/ulanzi-d200-ha-deck#what-the-companion-app-is-before-you-run-it" target="_blank" rel="noreferrer">What it does, and what it never does</a></p>
     </div>
   </div>
@@ -1473,8 +1457,6 @@ $("#btn-getapp").addEventListener("click",async()=>{
     // that lets a Mac in, so it must not be a link anyone could follow.
     const {path}=await hass().callWS({type:"auth/sign_path",path:"/api/ulanzi_deck/companion-app",expires:60});
     location.href=path;
-    // The block comes a moment later, so the way past it is on screen first.
-    $("#gateHelp").hidden=false;
   }catch(e){
     err.textContent=(e&&e.message)||"It could not be prepared. Try again.";
     err.hidden=false;
