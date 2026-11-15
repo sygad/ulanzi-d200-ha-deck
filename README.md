@@ -227,13 +227,59 @@ The app stays in the menu bar beside the clock. Closing its window does not stop
 Back in the same sidebar page. Pick a key, give it something to do, and press **Send to
 device**. **Preview** lets you try a key in the browser before it ever reaches the deck.
 
-The deck's screen turns itself off after 20 minutes of nothing happening, to save the panel.
-Any key wakes it, and that waking press does nothing else. The gear in the top bar changes it,
-or turns it off.
+<a href="images/guide/fig-step5.png"><img src="images/guide/fig-step5.png" alt="The Ulanzi Deck panel: key settings on the left, a live preview of the fourteen keys on the right" width="100%"></a>
 
 <br>
 
-<a href="images/guide/fig-step5.png"><img src="images/guide/fig-step5.png" alt="The Ulanzi Deck panel: key settings on the left, a live preview of the fourteen keys on the right" width="100%"></a>
+---
+
+<br>
+
+## The screen: when it goes off, and how bright
+
+The gear in the top bar, between the status and **Send to device**, opens **Deck settings**.
+Two things live there, and both are about the deck's screen rather than the keys.
+
+<br>
+
+<img src="images/guide/fig-settings-gear.png" alt="The top bar of the panel, with the gear between Deck connected and Send to device" width="100%">
+
+<br>
+<br>
+
+<p align="center"><img src="images/guide/fig-settings.png" alt="Deck settings: a Turn the screen off after dropdown, a brightness slider, and the three version rows" width="500"></p>
+
+<br>
+
+### Turn the screen off after
+
+A deck showing the same fourteen keys to an empty room is a screen on for no reason, so the
+deck blanks its own when nothing has happened for a while. **20 minutes** to start
+with, and the dropdown offers **1, 2, 5, 10, 15, 20, 30 and 45 minutes**, then **1 hour,
+1 hour 30, 2, 3 and 4 hours** — and **Never**, if you would rather it stayed lit.
+
+Any key brings it back, and **that waking press does nothing else**: the press that lights
+the screen never also works a light. Nothing is lost while it is dark — the deck keeps taking
+updates from Home Assistant, so what you see on the way back is current, not what was there
+when it went off.
+
+This one is part of the layout, so a change to it reaches the deck when you press **Send to
+device**, along with everything else you have altered.
+
+### Brightness
+
+The slider runs from about 4% to full. **The deck follows your finger as you drag**, so set it
+by eye against the room rather than guessing at a number — the panel is only a few milliseconds
+down the cable from the Mac.
+
+The lowest setting is dim but never off. Off is what the timeout above is for.
+
+Two things make this one behave differently from everything else in the panel:
+
+- **It does not wait for Send to device.** The brightness is already on the deck by the time
+  you let go of the slider, and the deck writes it down itself, so a power cut does not forget it.
+- **Cancel puts the light back.** If you drag it somewhere you do not like, Cancel returns the
+  deck to where it was before you opened the dialog.
 
 <br>
 

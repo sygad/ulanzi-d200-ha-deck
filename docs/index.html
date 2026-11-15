@@ -60,6 +60,7 @@ h1{font-size:clamp(27px,5vw,35px);font-weight:600;letter-spacing:-.022em;margin:
 .step-head{display:flex;gap:14px;align-items:baseline}
 .num{flex:0 0 auto;font-size:19px;font-weight:600;letter-spacing:-.015em;color:var(--ink);width:18px}
 .step-head .txt{min-width:0;display:flex;flex-direction:column;gap:16px}
+.step-head .txt h4{margin:6px 0 -6px;font-size:17px;font-weight:600}
 .where{font-size:11.5px;color:var(--ink-faint);letter-spacing:.03em;text-transform:uppercase;font-weight:500}
 .step h3{font-size:19px;font-weight:600;margin:0;letter-spacing:-.015em;text-wrap:balance}
 .step p{margin:0;color:var(--ink-soft);font-size:16px;line-height:1.55}
@@ -423,7 +424,6 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
       <div class="txt">
         <h3>Customise your deck</h3>
         <p>Back in the same sidebar page. Pick a key, give it something to do, and press Send to device. Preview lets you try a key in the browser before it ever reaches the deck.</p>
-        <p>The deck's screen turns itself off after 20 minutes of nothing happening, to save the panel. Any key wakes it, and that waking press does nothing else. The gear in the top bar changes it, or turns it off.</p>
       </div>
     </div>
     <figure>
@@ -444,6 +444,39 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
         </div>
       </div>
     </figure>
+  </article>
+
+  <article class="step">
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">7</div>
+      <div class="txt">
+        <h3>The screen: when it goes off, and how bright</h3>
+        <p>The gear in the top bar, between the status and <strong>Send to device</strong>, opens <strong>Deck settings</strong>. Two things live there, and both are about the deck's screen rather than the keys.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="settings-gear.png" alt="The top bar of the panel, with the gear between Deck connected and Send to device"
+           style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
+    </figure>
+    <figure>
+      <img src="deck-settings.png" alt="Deck settings: a Turn the screen off after dropdown, a brightness slider, and the three version rows"
+           style="display:block;width:100%;max-width:500px;margin:0 auto;border-radius:10px;border:1px solid var(--hair)">
+    </figure>
+
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">7</div>
+      <div class="txt">
+        <h4>Turn the screen off after</h4>
+        <p>A deck showing the same fourteen keys to an empty room is a screen on for no reason, so the deck blanks its own when nothing has happened for a while. <strong>20 minutes</strong> to start with, and the dropdown offers <strong>1, 2, 5, 10, 15, 20, 30 and 45 minutes</strong>, then <strong>1 hour, 1 hour 30, 2, 3 and 4 hours</strong> — and <strong>Never</strong>, if you would rather it stayed lit.</p>
+        <p>Any key brings it back, and <strong>that waking press does nothing else</strong>: the press that lights the screen never also works a light. Nothing is lost while it is dark — the deck keeps taking updates from Home Assistant, so what you see on the way back is current, not what was there when it went off.</p>
+        <p>This one is part of the layout, so a change to it reaches the deck when you press <strong>Send to device</strong>, along with everything else you have altered.</p>
+
+        <h4>Brightness</h4>
+        <p>The slider runs from about 4% to full. <strong>The deck follows your finger as you drag</strong>, so set it by eye against the room rather than guessing at a number — the panel is only a few milliseconds down the cable from the Mac.</p>
+        <p>The lowest setting is dim but never off. Off is what the timeout above is for.</p>
+        <p>Two things make this one behave differently from everything else in the panel. <strong>It does not wait for Send to device</strong>: the brightness is already on the deck by the time you let go of the slider, and the deck writes it down itself, so a power cut does not forget it. And <strong>Cancel puts the light back</strong> — if you drag it somewhere you do not like, Cancel returns the deck to where it was before you opened the dialog.</p>
+      </div>
+    </div>
   </article>
 
   <article class="step">

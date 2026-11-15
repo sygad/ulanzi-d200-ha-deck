@@ -56,4 +56,22 @@ const el = document.createElement("ulanzi-deck-panel");
 el.hass = hass; el.narrow = false;
 document.body.appendChild(el);
 window.panel = el; window.hass = hass;
+
+// ?settings opens the deck settings dialog, so it can be screenshotted headless.
+const q = new URLSearchParams(location.search);
+if (q.has("settings") || q.has("connected")) {
+  // A settled deck: connected, everything on the same release, nothing to do.
+  status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
+            app_version: "4.8", bridge_version: "4.8", deck_firmware: "4.8",
+            deckd_available: "4.8", latest_release: "4.8", on_disk_version: "4.8",
+            restart_pending: false};
+  statusCb && statusCb(status);
+  if (q.has("settings")) {
+    const open = () => {
+      const b = el.shadowRoot && el.shadowRoot.getElementById("btn-settings");
+      if (b) b.click(); else setTimeout(open, 50);
+    };
+    setTimeout(open, 300);
+  }
+}
 </script></body></html>
