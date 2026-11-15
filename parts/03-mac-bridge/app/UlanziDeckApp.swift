@@ -17,7 +17,17 @@ struct UlanziDeckApp: App {
             MainView(service: service)
                 .frame(width: 420)
                 .fixedSize(horizontal: false, vertical: true)
-                .onAppear { service.start() }
+                .onAppear {
+                    service.start()
+                    // Opened by hand, the window should stay. Started with the Mac,
+                    // nobody asked for it: a login launch does not make the app
+                    // active, so that is the difference to go on.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        if !NSApplication.shared.isActive {
+                            NSApplication.shared.windows.first { $0.isVisible }?.close()
+                        }
+                    }
+                }
         }
         .windowResizability(.contentSize)
         .commands { CommandGroup(replacing: .newItem) {} }
