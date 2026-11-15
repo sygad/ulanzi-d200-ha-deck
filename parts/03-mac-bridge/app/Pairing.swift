@@ -24,45 +24,47 @@ enum Pairing {
         FileManager.default.fileExists(atPath: settingsFile.path)
     }
 
-    /// The pairing file Home Assistant sent, wherever it has ended up.
+    /// The pairing file Home Assistant sent, in the one folder it can be in.
     ///
-    /// Three things conspire against simply looking next to the app. macOS runs a
-    /// freshly downloaded app from a random read-only copy of itself (translocation),
-    /// so "next to the app" is a folder that holds nothing else. The zip is usually
-    /// opened into a folder of its own inside Downloads rather than into Downloads.
-    /// And people move the app to Applications and leave the file behind.
+    /// macOS runs a freshly downloaded app from a random read-only copy of
+    /// itself, so the app's own idea of where it lives is wrong and the file
+    /// appears to be missing. An earlier version answered that by sweeping
+    /// Downloads and the Desktop and everything one level inside them, which
+    /// made macOS ask permission for folder after folder — for a file that is
+    /// always in exactly one place.
     ///
-    /// So look in all the places it can honestly be, and take the first one that is
-    /// a valid pairing. It is only ever put there by a Home Assistant that an admin
-    /// was signed in to.
+    /// macOS will say where the app really came from, so ask it, and read that
+    /// one folder. At most one permission, for the folder the download is
+    /// sitting in, which is the only folder any of this is about.
     static func findBesideTheApp() -> Settings? {
-        let fm = FileManager.default
-        var folders: [URL] = []
+        let folder = realHome.deletingLastPathComponent()
+        let f = folder.appendingPathComponent(fileName)
+        guard let d = try? Data(contentsOf: f),
+              let s = try? JSONDecoder().decode(Settings.self, from: d),
+              !s.url.isEmpty, s.bridgeId.count >= 8, s.secret.count >= 16 else { return nil }
+        if let now = current(), now.bridgeId == s.bridgeId, now.url == s.url { return nil }
+        return s
+    }
 
-        let beside = Bundle.main.bundleURL.deletingLastPathComponent()
-        folders.append(beside)
-        folders.append(beside.deletingLastPathComponent())
+    /// Where this app actually is, rather than the copy macOS is running it from.
+    private static var realHome: URL {
+        let here = Bundle.main.bundleURL
+        typealias IsTranslocated = @convention(c)
+            (CFURL, UnsafeMutablePointer<DarwinBoolean>, UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Bool
+        typealias OriginalPath = @convention(c)
+            (CFURL, UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Unmanaged<CFURL>?
 
-        for dir in [FileManager.SearchPathDirectory.downloadsDirectory, .desktopDirectory] {
-            guard let root = fm.urls(for: dir, in: .userDomainMask).first else { continue }
-            folders.append(root)
-            let kids = (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey],
-                                                    options: [.skipsHiddenFiles])) ?? []
-            for kid in kids where (try? kid.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true {
-                folders.append(kid)
-            }
-        }
+        // Public API, but not bridged into Swift, so it is reached by name.
+        guard let lib = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY),
+              let a = dlsym(lib, "SecTranslocateIsTranslocatedURL"),
+              let b = dlsym(lib, "SecTranslocateCreateOriginalPathForURL") else { return here }
 
-        for folder in folders {
-            let f = folder.appendingPathComponent(fileName)
-            guard let d = try? Data(contentsOf: f),
-                  let s = try? JSONDecoder().decode(Settings.self, from: d),
-                  !s.url.isEmpty, s.bridgeId.count >= 8, s.secret.count >= 16 else { continue }
-            // Already using it? Then there is nothing to do and nothing to rewrite.
-            if let now = current(), now.bridgeId == s.bridgeId, now.url == s.url { return nil }
-            return s
-        }
-        return nil
+        var translocated: DarwinBoolean = false
+        guard unsafeBitCast(a, to: IsTranslocated.self)(here as CFURL, &translocated, nil),
+              translocated.boolValue,
+              let original = unsafeBitCast(b, to: OriginalPath.self)(here as CFURL, nil)?.takeRetainedValue()
+        else { return here }
+        return original as URL
     }
 
     /// What the app is using at the moment, if it has been set up before.
