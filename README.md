@@ -163,13 +163,13 @@ Applications if you want it there.
 
 <br>
 
-<p align="center"><img src="images/guide/fig-step5-unzip.png" alt="The unzipped folder: the Ulanzi Deck app, and the pairing file beside it" width="560"></p>
+<img src="images/guide/fig-step5-unzip.png" alt="The Downloads folder: the zip, the folder it opened into, and which file to double-click" width="100%">
 
 <br>
 
 ### macOS will stop you the first time. Here is how to get past it.
 
-<img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="320">
+<img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="300">
 
 1. Press **Done**. **Not** Move to Bin, however blue that button is.
 2. Open **System Settings → Privacy & Security** and scroll down to **Security**.
