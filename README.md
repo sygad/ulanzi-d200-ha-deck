@@ -193,6 +193,10 @@ blue: press **Open Anyway** again, the middle button. That is it, once, forever.
 whenever you like** — before or after makes no difference. When both lights are green, press
 **Proceed** and it sets the deck up in a few seconds.
 
+It also puts itself in your **Applications** folder on that first run, so it disappears from
+the download folder — that is meant to happen. From then on it is an app like any other, with
+its icon in the menu bar beside the clock.
+
 <br>
 
 <p align="center"><img src="images/guide/fig-step5-ready.png" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button" width="460"></p>

@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="2.6"
+VERSION="2.7"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -24,8 +24,7 @@ cp app/*.swift "$TMP/"
 echo "Building…"
 for arch in arm64 x86_64; do
   swiftc -O -parse-as-library -target "$arch-apple-macos13" \
-    "$TMP"/Core.swift "$TMP"/Pairing.swift "$TMP"/DeckInstaller.swift \
-    "$TMP"/Service.swift "$TMP"/UlanziDeckApp.swift \
+    "$TMP"/*.swift \
     -o "$TMP/UlanziDeck-$arch"
 done
 lipo -create "$TMP/UlanziDeck-arm64" "$TMP/UlanziDeck-x86_64" -output "$TMP/UlanziDeck"

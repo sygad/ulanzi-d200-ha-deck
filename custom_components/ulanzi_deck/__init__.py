@@ -292,6 +292,9 @@ def _readme(version: str) -> str:
     <p>The app opens and finds your Home Assistant by itself. Plug the deck in whenever you like
        — before or after makes no difference. When both lights are green, press <b>Proceed</b> and
        it sets the deck up in a few seconds.</p>
+    <p>It also puts itself in your <b>Applications</b> folder on that first run, so it disappears
+       from this folder — that is meant to happen. From then on it is an app like any other, with
+       its icon in the menu bar beside the clock.</p>
     <figure class="mid"><img src="data:image/png;base64,{picture('ready.png')}" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button"></figure>
   </div>
 

@@ -47,7 +47,7 @@ enum Pairing {
     }
 
     /// Where this app actually is, rather than the copy macOS is running it from.
-    private static var realHome: URL {
+    static var realHome: URL {
         let here = Bundle.main.bundleURL
         typealias IsTranslocated = @convention(c)
             (CFURL, UnsafeMutablePointer<DarwinBoolean>, UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Bool

@@ -20,7 +20,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     let service = Service()
 
     func applicationDidFinishLaunching(_ note: Notification) {
-        service.start()
+        service.start()                       // reads the pairing file, while beside it
+        if Installer.settleIn() { return }    // moving to Applications; this copy is going
         // macOS remembers how a window was left and restores it. A version of
         // this app closed its own window at startup, so every launch afterwards
         // restored a closed window and it looked dead. It does not get to
