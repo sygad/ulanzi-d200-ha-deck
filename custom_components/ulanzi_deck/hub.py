@@ -683,8 +683,24 @@ class DeckHub:
         # A deck that has just come back is the proof a finished setup worked:
         # the version it now reports is the answer, so the message about doing
         # it has nothing left to say.
+        #
+        # Unless it came back on the same version. That means the copy went
+        # across and changed nothing — a Mac carrying a stale deck app, which
+        # once shipped for three releases and showed as a banner that could be
+        # pressed for ever and never go away. Say that, rather than offering it
+        # again.
         if self.job and self.job.get("state") == "done":
-            self.job = None
+            want = self._bridge.deckd if self._bridge else ""
+            if want and self.firmware and _cmp_ver(want, self.firmware) > 0:
+                self.job = {
+                    "what": "setup_deck", "state": "failed",
+                    "line": ("The deck restarted still running " + str(self.firmware)
+                             + ", so the copy on this Mac is not "
+                             + str(want) + " after all. Update the connector app first; "
+                             + "if it is already current, this release needs reporting."),
+                }
+            else:
+                self.job = None
         if self._blob is not None and self._device_layout != render.layout_id(self._blob):
             await self._send_layout()          # the deck is holding something older
         else:

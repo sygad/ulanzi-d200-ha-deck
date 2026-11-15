@@ -23,4 +23,9 @@ clang --target=armv7a-linux-gnueabihf -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-a
   -nostdlib -c deckd.c -o build/deckd.o
 # shellcheck disable=SC2086
 "$LLD" $FLAVOR -static -e _start -z noexecstack -o build/deckd build/deckd.o
-ls -l build/deckd
+# The copy beside the source is the published one: it is what the Mac app
+# bundles and what anybody without a cross-compiler gets. Keeping it in step
+# here is the only way it cannot drift — it silently shipped a version behind
+# for three releases when this was a step somebody had to remember.
+cp build/deckd deckd
+ls -l deckd

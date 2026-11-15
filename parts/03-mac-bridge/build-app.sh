@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="4.3"
+VERSION="4.4"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -36,7 +36,15 @@ cp "$TMP/UlanziDeck" "$APP/Contents/MacOS/UlanziDeck"
 # what it needs to set a deck up
 cp app/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp app/menubar.png app/menubar@2x.png "$APP/Contents/Resources/"
-cp "$ROOT/parts/02-deck-app/deckd" "$APP/Contents/Resources/deckd"
+# Build the deck app rather than trusting the copy on disk: the version this
+# bundle claims is read from deckd.c below, so a stale binary here means the
+# app offers an update that installs the old one and never goes away.
+sh "$ROOT/parts/02-deck-app/build.sh" >/dev/null
+DECKD="$ROOT/parts/02-deck-app/deckd"
+[ -f "$DECKD" ] || { echo "FAILED: no deck app at $DECKD" >&2; exit 1; }
+[ "$DECKD" -nt "$ROOT/parts/02-deck-app/deckd.c" ] || {
+  echo "FAILED: $DECKD is older than deckd.c" >&2; exit 1; }
+cp "$DECKD" "$APP/Contents/Resources/deckd"
 # the version of that deck app, so the Mac can tell whether a deck is behind
 awk '/#define FW_MAJOR/{maj=$3} /#define FW_MINOR/{min=$3} END{printf "%s.%s\n", maj, min}' \
   "$ROOT/parts/02-deck-app/deckd.c" > "$APP/Contents/Resources/deckd.version"
