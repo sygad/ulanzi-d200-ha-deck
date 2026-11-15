@@ -150,7 +150,9 @@ class DeckHub:
         self.hass = hass
         self.entry = entry
         self._store: Store = Store(hass, 1, DOMAIN)
-        self.latest_release = ""        # newest release on GitHub, as it says itself
+        self.latest_release = ""        # the newest release there is, however we heard
+        self._from_github = ""          # what GitHub said, when we last managed to ask
+        self._from_shop = ""            # what the shop already knows, which is instant
         # Read once, here, at setup: this is the version Home Assistant actually
         # loaded. The files on disk can be replaced under a running server by a
         # download from the shop, and then the two differ until a restart — which
@@ -207,14 +209,24 @@ class DeckHub:
         self.running_version = await self.hass.async_add_executor_job(_manifest_version)
         self.on_disk_version = self.running_version
         self._unsub_rel = async_track_time_interval(
-            self.hass, self._check_releases, timedelta(hours=6))
+            self.hass, self._check_releases, timedelta(hours=1))
         self._unsub_disk = async_track_time_interval(
             self.hass, self._check_on_disk, timedelta(minutes=1))
+        # The shop's own update entity, watched so a Refresh there shows here at
+        # once rather than whenever we next get to ask GitHub.
+        self._read_shop()
+        if entity := self._shop_entity():
+            self._unsub_shop = async_track_state_change_event(
+                self.hass, [entity], self._read_shop)
+        else:
+            # It may not exist yet at start-up; look again shortly.
+            self._unsub_shop = async_track_time_interval(
+                self.hass, self._read_shop, timedelta(minutes=5))
         self.hass.async_create_task(self._check_releases())
         self._notify()
 
     async def async_stop(self) -> None:
-        for name in ("_unsub_rel", "_unsub_disk"):
+        for name in ("_unsub_rel", "_unsub_disk", "_unsub_shop"):
             if getattr(self, name, None):
                 getattr(self, name)()
                 setattr(self, name, None)
@@ -584,9 +596,58 @@ class DeckHub:
                 "The panel will not offer an integration update until this works.", err)
             return
         tag = tag.lstrip("vV")
-        if tag and tag != self.latest_release:
-            self.latest_release = tag
+        if tag and tag != self._from_github:
+            self._from_github = tag
+            self._settle_latest()
+
+    @callback
+    def _settle_latest(self) -> None:
+        """The newest release anyone here has heard of.
+
+        Two sources, because each is wrong on its own. The shop beside us knows
+        the moment somebody presses Refresh, but only re-reads GitHub every
+        couple of days by itself. Asking GitHub directly is current but capped
+        at sixty questions an hour, so it cannot be asked often. Whichever is
+        further ahead is the answer.
+        """
+        newest = ""
+        for seen in (self._from_shop, self._from_github):
+            if seen and (not newest or _cmp_ver(seen, newest) > 0):
+                newest = seen
+        if newest != self.latest_release:
+            self.latest_release = newest
             self._notify()
+
+    @callback
+    def _shop_entity(self) -> str | None:
+        """The update entity the shop made for this integration, if it made one."""
+        for state in self.hass.states.async_all("update"):
+            if state.entity_id == "update." + DOMAIN:
+                return state.entity_id
+            picture = str(state.attributes.get("entity_picture") or "")
+            if "/" + DOMAIN + "/" in picture:
+                return state.entity_id
+        return None
+
+    @callback
+    def _read_shop(self, _event: Any = None) -> None:
+        """Take what the shop is showing right now.
+
+        Without this the panel could sit for hours telling somebody they were
+        up to date while Settings offered them a newer one — the two disagreeing
+        about the same integration, which is the whole thing this is meant to
+        stop.
+        """
+        entity = self._shop_entity()
+        if not entity:
+            return
+        state = self.hass.states.get(entity)
+        if state is None:
+            return
+        tag = str(state.attributes.get("latest_version") or "").lstrip("vV")
+        if tag and tag != self._from_shop:
+            self._from_shop = tag
+        self._settle_latest()
 
     def new_download_token(self) -> str:
         """A one-time address for the app to fetch its own update from."""
