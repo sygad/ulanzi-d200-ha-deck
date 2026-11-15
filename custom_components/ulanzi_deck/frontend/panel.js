@@ -275,6 +275,12 @@ input[type=text]:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0
   box-shadow:0 12px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;max-height:86vh}
 .dlg h3{margin:0;font-size:19px;font-weight:400;padding:22px 24px 4px}
 .dlgbody{padding:8px 24px 18px;overflow-y:auto}
+.vers .vrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--divider)}
+.vers .vrow:first-of-type{border-top:0}
+.vers .vname{flex:1;min-width:0;font-size:13.5px}
+.vers .vval{font-size:13px;color:var(--fg2);white-space:nowrap}
+.vers .vval.old{color:var(--primary);font-weight:500}
+.vers .vbtn{padding:5px 12px;font-size:12px}
 .brirow{display:flex;align-items:center;gap:12px}
 .brirow input[type=range]{flex:1;min-width:0;accent-color:var(--primary)}
 .brirow .mi{font-size:20px;color:var(--fg2);flex:none}
@@ -600,8 +606,18 @@ const MARKUP=`
           <span class="mi" id="bri-bright"></span>
           <output id="bri-out"></output>
         </div>
-        <p class="hint">The deck changes as you drag, so you can set it by eye. It keeps this
-          itself, so a power cut does not forget it.</p>
+        <p class="hint">The deck changes as you drag, so you can set it by eye. A deck running
+          1.2 or newer keeps it itself, so a power cut does not forget it.</p>
+      </div>
+      <div class="field vers">
+        <span class="lab">Versions</span>
+        <div class="vrow" id="v-int"><span class="vname">Home Assistant integration</span>
+          <span class="vval"></span><button class="btn ghost vbtn" hidden></button></div>
+        <div class="vrow" id="v-app"><span class="vname">Companion app</span>
+          <span class="vval"></span><button class="btn ghost vbtn" hidden></button></div>
+        <div class="vrow" id="v-deck"><span class="vname">Deck software</span>
+          <span class="vval"></span><button class="btn ghost vbtn" hidden></button></div>
+        <p class="hint" id="v-note"></p>
       </div>
     </div>
     <div class="dlgfoot">
@@ -1407,6 +1423,34 @@ $("#dlg-del").addEventListener("click",e=>{
 $("#viewDlg").addEventListener("mousedown",e=>{if(e.target===$("#viewDlg"))closeViewDlg()});
 root.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#viewDlg").hidden)closeViewDlg()});
 
+/* ---------- what is running, and what is waiting ----------
+   Three separate things carry their own version, and before this was here the
+   only way to know was to look in three different places. */
+let lastStatus=null;
+function vrow(id,have,want,label,action){
+  const row=$("#"+id), val=row.querySelector(".vval"), btn=row.querySelector(".vbtn");
+  const behind=have&&want&&cmpVer(want,have)>0;
+  val.textContent=!have?"not connected":behind?have+" \u2192 "+want+" ready":have;
+  val.classList.toggle("old",!!behind);
+  btn.hidden=!(behind&&action);
+  btn.textContent=label;
+  btn.onclick=action?()=>{btn.disabled=true;btn.textContent="Asking\u2026";action()}:null;
+}
+function showVersions(){
+  const st=lastStatus||{};
+  vrow("v-int", st.app_version, st.latest_release, "Marketplace", ()=>{
+    window.open("/marketplace","_blank");   // where this came from
+  });
+  const macOld=st.bridge_version&&cmpVer(st.bridge_version,"3.5")<0;
+  vrow("v-app", st.bridge_version, st.app_version, "Update",
+       macOld?null:()=>hass().callWS({type:"ulanzi_deck/update_app"}).catch(()=>{}));
+  vrow("v-deck", st.deck_firmware, st.deckd_available, "Update",
+       ()=>hass().callWS({type:"ulanzi_deck/update_deck"}).catch(()=>{}));
+  $("#v-note").textContent = macOld
+    ? "This Mac is too old to be told from here: open Ulanzi Deck on it and press Update."
+    : "The integration updates from the Marketplace; the other two from here.";
+}
+
 /* ---------- the deck's own settings ---------- */
 $("#btn-settings").querySelector(".mi").textContent=ico("cog");
 function closeSetDlg(){$("#setDlg").hidden=true}
@@ -1425,6 +1469,7 @@ $("#btn-settings").addEventListener("click",()=>{
   $("#bri-dim").textContent=ico("brightness-5");
   $("#bri-bright").textContent=ico("brightness-7");
   briWas=settings.brightness;
+  showVersions();
   $("#setDlg").hidden=false;
   dd.focus();
 });
@@ -1508,6 +1553,8 @@ function cmpVer(a,b){
 }
 let pendingBridge=null;
 function showStatus(st){
+  lastStatus=st;
+  if(!$("#setDlg").hidden)showVersions();
   const dot=$("#chipDot"), text=$("#chipText"), allow=$("#btn-allow");
   pendingBridge=st.pending;
   dot.className="dot"+(st.deck?" ok":st.pending?" warn":"");

@@ -24,7 +24,7 @@ import secrets
 import struct
 from typing import Any
 
-from aiohttp import WSMsgType, web
+from aiohttp import ClientError, WSMsgType, web
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
@@ -36,11 +36,13 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from . import render
 from .const import (
+    RELEASES_URL,
     ACTIONS,
     DOMAIN,
     EVENT_KEY,
@@ -112,6 +114,7 @@ class _Bridge:
         self.name = name
         self.digest = digest
         self.version = ""            # which companion app it is
+        self.deckd = ""              # the deck software it carries
         self.allowed = False
 
 
@@ -122,6 +125,7 @@ class DeckHub:
         self.hass = hass
         self.entry = entry
         self._store: Store = Store(hass, 1, DOMAIN)
+        self.latest_release = ""        # newest release on GitHub, as it says itself
         self.data: dict[str, Any] = {
             "pages": clean_pages(None), "published": None, "bridges": {},
             "settings": clean_settings(None), "published_settings": None,
@@ -162,9 +166,15 @@ class DeckHub:
                 clean_settings(stored["published_settings"]) if stored.get("published_settings") else None)
         await self._rebuild()
         self._unsub_timer = async_track_time_interval(self.hass, self._history_tick, timedelta(minutes=5))
+        self._unsub_rel = async_track_time_interval(
+            self.hass, self._check_releases, timedelta(hours=6))
+        self.hass.async_create_task(self._check_releases())
         self._notify()
 
     async def async_stop(self) -> None:
+        if getattr(self, "_unsub_rel", None):
+            self._unsub_rel()
+            self._unsub_rel = None
         for unsub in (self._unsub_states, self._unsub_flush, self._unsub_timer):
             if unsub:
                 unsub()
@@ -205,6 +215,9 @@ class DeckHub:
             "bridge_name": self._bridge.name if self._bridge else None,
             "bridge_version": self._bridge.version if self._bridge else None,
             "app_version": self.app_version,
+            "latest_release": self.latest_release,
+            "deck_firmware": self.firmware if self.deck_online else None,
+            "deckd_available": self._bridge.deckd if self._bridge else None,
             "pending": {"bridge_id": self._pending.id, "name": self._pending.name} if self._pending else None,
             "deck": self.deck_online,
             "screen": self.screen,
@@ -404,6 +417,7 @@ class DeckHub:
         bridge = _Bridge(ws, bridge_id, str(hello.get("name") or "Mac")[:60],
                          hashlib.sha256(secret.encode()).hexdigest())
         bridge.version = str(hello.get("version") or "")[:20]
+        bridge.deckd = str(hello.get("deckd") or "")[:20]
         known = self.data["bridges"].get(bridge_id)
         try:
             if known and hmac.compare_digest(known.get("hash", ""), bridge.digest):
@@ -464,6 +478,28 @@ class DeckHub:
             return False
         await bridge.ws.send_json({"type": "update_now"})
         return True
+
+    async def _check_releases(self, _now: Any = None) -> None:
+        """Ask GitHub what the newest release is, so the panel can say so.
+
+        The shop this is installed from only re-reads GitHub every couple of
+        days. Waiting on that means telling somebody to update from a shop that
+        does not yet know there is one, which is exactly the run-around worth
+        saving them.
+        """
+        session = async_get_clientsession(self.hass)
+        try:
+            async with asyncio.timeout(20):
+                r = await session.get(RELEASES_URL, headers={"Accept": "application/vnd.github+json"})
+                if r.status != 200:
+                    return
+                tag = str((await r.json()).get("tag_name") or "")
+        except (ClientError, TimeoutError, ValueError):
+            return
+        tag = tag.lstrip("vV")
+        if tag and tag != self.latest_release:
+            self.latest_release = tag
+            self._notify()
 
     def new_download_token(self) -> str:
         """A one-time address for the app to fetch its own update from."""
@@ -526,6 +562,14 @@ class DeckHub:
                 del bridges[old]
         await self._store.async_save(self.data)
         return {"bridgeId": bridge_id, "secret": secret}
+
+    async def async_tell_mac_to_set_up_deck(self) -> bool:
+        """Ask the Mac to put its copy of the deck software on the deck."""
+        bridge = self._bridge
+        if not bridge:
+            return False
+        await bridge.ws.send_json({"type": "setup_deck"})
+        return True
 
     async def async_set_brightness(self, value: int) -> None:
         """Set the deck's backlight now, while somebody is dragging the slider.

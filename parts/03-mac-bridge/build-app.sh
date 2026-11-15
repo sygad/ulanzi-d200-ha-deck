@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="4.0"
+VERSION="4.1"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -37,6 +37,9 @@ cp "$TMP/UlanziDeck" "$APP/Contents/MacOS/UlanziDeck"
 cp app/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp app/menubar.png app/menubar@2x.png "$APP/Contents/Resources/"
 cp "$ROOT/parts/02-deck-app/deckd" "$APP/Contents/Resources/deckd"
+# the version of that deck app, so the Mac can tell whether a deck is behind
+awk '/#define FW_MAJOR/{maj=$3} /#define FW_MINOR/{min=$3} END{printf "%s.%s\n", maj, min}' \
+  "$ROOT/parts/02-deck-app/deckd.c" > "$APP/Contents/Resources/deckd.version"
 cp "$ROOT/parts/02-deck-app/default-layout.bin" "$APP/Contents/Resources/default-layout.bin"
 
 ADB="${ADB:-}"

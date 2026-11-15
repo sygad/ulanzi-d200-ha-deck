@@ -127,6 +127,9 @@ final class Service: ObservableObject {
         link.onUpdateNow = { [weak self] in
             Task { @MainActor in self?.update() }
         }
+        link.onSetUpDeck = { [weak self] in
+            Task { @MainActor in self?.setUpDeck() }
+        }
         link.onAppAt = { [weak self] token in
             Task { @MainActor in self?.fetchUpdate(token: token) }
         }

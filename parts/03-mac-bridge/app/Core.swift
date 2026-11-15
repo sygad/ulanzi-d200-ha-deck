@@ -10,6 +10,13 @@ import CoreGraphics
 
 
 let bridgeVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0"
+/// The version of the deck's own software carried inside this app, so Home
+/// Assistant can tell whether a deck is running something older.
+let deckdVersion: String = {
+    guard let u = Bundle.main.url(forResource: "deckd", withExtension: "version"),
+          let s = try? String(contentsOf: u, encoding: .utf8) else { return "" }
+    return s.trimmingCharacters(in: .whitespacesAndNewlines)
+}()
 let stamp: DateFormatter = {
     let f = DateFormatter()
     f.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -199,6 +206,8 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
     var onAppAt: ((String) -> Void)?
     /// Somebody pressing Update in the Home Assistant panel.
     var onUpdateNow: (() -> Void)?
+    /// Somebody asking, from the panel, for the deck's own software to be put on.
+    var onSetUpDeck: (() -> Void)?
     var onDown: (() -> Void)?
     var onDeckMessage: ((Data) -> Void)?
 
@@ -243,7 +252,7 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
         guard t === task else { return }
         let host = Host.current().localizedName ?? "Mac"
         sendJSON(["type": "hello", "bridge_id": settings.bridgeId, "secret": settings.secret,
-                  "name": host, "version": bridgeVersion])
+                  "name": host, "version": bridgeVersion, "deckd": deckdVersion])
         pinger = Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { [weak self] _ in
             guard let self = self, let t = self.task else { return }
             t.sendPing { err in
@@ -295,6 +304,8 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
             if let want = obj["app_version"] as? String, !want.isEmpty { onVersion?(want) }
         case "update_now":
             onUpdateNow?()
+        case "setup_deck":
+            onSetUpDeck?()
         case "app_at":
             if let token = obj["token"] as? String, !token.isEmpty { onAppAt?(token) }
         default:
