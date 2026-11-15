@@ -363,51 +363,52 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
       <div class="num">5</div>
       <div class="txt">
         <h3>Open the companion app</h3>
-        <p>Open the zip. Three things are inside: the app, <strong>Start here.html</strong> — a page with these same steps and a button that opens System Settings where macOS wants you — and a small pairing file.</p>
-        <p><strong>Double-click Ulanzi Deck.</strong> Leave <code>ulanzi-deck-pairing.json</code> where it is — the app reads it the first time it runs. That file is what tells the app where your Home Assistant is and lets it straight in, which is why there is nothing to type and nothing to allow. Once the app has opened you can throw it away, and move the app into Applications if you want it there.</p>
-        <p>One window, and it finds Home Assistant by itself. <strong>Plug the deck in whenever you like</strong> — before or after opening the app makes no difference. A deck already plugged in is picked up the moment it starts.</p>
-        <p>If your deck is still running the software it came with, the app says so and offers one button, <em>Set up my deck</em>. Press it once and it takes a few seconds. After that there is never anything to press.</p>
+        <p>Open the zip. Three things are inside: the app, <strong>Start here.html</strong> — the same four steps as below, with a button that opens System Settings where macOS wants you — and a small pairing file.</p>
+      </div>
+    </div>
+
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">5</div>
+      <div class="txt">
+        <p><strong>1. Double-click Ulanzi Deck.</strong> Leave <code>ulanzi-deck-pairing.json</code> where it is: that is what tells the app which Home Assistant is yours, so there is nothing to type and nothing to allow.</p>
       </div>
     </div>
     <figure>
       <img src="unzip.png" alt="The Downloads folder: the zip, the folder it opened into, and which file to double-click"
            style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
     </figure>
-    <div class="gate">
-      <h3>macOS will stop you the first time. Here is how to get past it.</h3>
-      <div class="pair">
-        <div class="mac-dialog">
-          <span class="help">?</span>
-          <span class="mk"></span>
-          <b>“Ulanzi Deck” Not Opened</b>
-          <span>Apple could not verify “Ulanzi Deck” is free of malware that may harm your Mac or compromise your privacy.</span>
-          <span class="btns"><i>Done</i><i class="p">Move to Bin</i></span>
-        </div>
-        <div class="fix">
-          <ol>
-            <li>Press <strong>Done</strong>. <strong>Not</strong> Move to Bin, however blue it is.</li>
-            <li>Open <strong>System Settings → Privacy &amp; Security</strong> and scroll down to <strong>Security</strong>.</li>
-            <li>Beside “Ulanzi Deck” was blocked to protect your Mac, press <strong>Open Anyway</strong>.</li>
-            <li>It asks once more, and puts <strong>Move to Bin</strong> in blue again. Press <strong>Open Anyway</strong>, the middle button.</li>
-          </ol>
-          <p class="after">That is it, once, forever. Every Mac shows this for software not sold through Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is wrong with it.</p>
-        </div>
-      </div>
 
-      <div class="pair" style="grid-template-columns:1fr 262px;align-items:start">
-        <img src="settings-security.png" alt="System Settings, Privacy and Security, with the Ulanzi Deck block and its Open Anyway button"
-             style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
-        <div class="mac-dialog stack">
-          <span class="help">?</span>
-          <span class="mk"></span>
-          <b>Open “Ulanzi Deck”?</b>
-          <span>Apple is not able to verify that it is free from malware that could harm your Mac or compromise your privacy. Don’t open this unless you are certain it is from a trustworthy source.</span>
-          <span class="btns"><i class="p">Move to Bin</i><i>Open Anyway</i><i>Done</i></span>
-        </div>
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">5</div>
+      <div class="txt">
+        <p><strong>2. macOS will stop you. Press Done</strong> — <strong>not</strong> Move to Bin, however blue that button is. Every Mac shows this for software not sold through Apple's own store. It means nobody has paid Apple to vouch for it, not that anything is wrong with the app.</p>
       </div>
     </div>
     <figure>
-      <img src="app-window.png" alt="The Ulanzi Deck companion app: Everything is working, with Home Assistant and Deck both showing a green dot" style="display:block;width:100%;max-width:440px;margin:0 auto">
+      <img src="gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin"
+           style="display:block;width:100%;max-width:300px;margin:0 auto">
+    </figure>
+
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">5</div>
+      <div class="txt">
+        <p><strong>3. Tell your Mac you meant it.</strong> Open <strong>System Settings → Privacy &amp; Security</strong>, scroll to <strong>Security</strong>, and press <strong>Open Anyway</strong> beside Ulanzi Deck. It asks once more with Move to Bin in blue: press <strong>Open Anyway</strong> again, the middle button. That is it, once, forever.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="settings-security.png" alt="System Settings, Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button"
+           style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
+    </figure>
+
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">5</div>
+      <div class="txt">
+        <p><strong>4. Press Proceed.</strong> The app opens and finds your Home Assistant by itself. <strong>Plug the deck in whenever you like</strong> — before or after makes no difference. When both lights are green, press <strong>Proceed</strong> and it sets the deck up in a few seconds.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="app-ready.png" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button"
+           style="display:block;width:100%;max-width:460px;margin:0 auto">
     </figure>
   </article>
 

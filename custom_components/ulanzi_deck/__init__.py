@@ -241,6 +241,7 @@ def _readme(version: str) -> str:
   figure{{margin:16px 0 0;grid-column:2}}
   figure img{{display:block;width:100%;height:auto;border-radius:10px}}
   figure.small img{{max-width:300px}}
+  figure.mid img{{max-width:460px}}
   hr{{border:0;border-top:1px solid var(--line);margin:34px 0 0}}
   .go{{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-size:16px;
       font-weight:500;padding:13px 24px;border-radius:9px;margin-top:16px;grid-column:2}}
@@ -283,8 +284,19 @@ def _readme(version: str) -> str:
     <figure><img src="data:image/png;base64,{picture('blocked.png')}" alt="System Settings, Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button"></figure>
   </div>
 
-  <p class="after">The app opens, finds your Home Assistant by itself, and sets your deck up when
-    you press Proceed. You can delete this page and the pairing file afterwards.</p>
+  <hr>
+
+  <div class="step">
+    <span class="n">4</span>
+    <h2>Press Proceed</h2>
+    <p>The app opens and finds your Home Assistant by itself. Plug the deck in whenever you like
+       — before or after makes no difference. When both lights are green, press <b>Proceed</b> and
+       it sets the deck up in a few seconds.</p>
+    <figure class="mid"><img src="data:image/png;base64,{picture('ready.png')}" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button"></figure>
+  </div>
+
+  <p class="after">That is everything. Your keys are set up in the Ulanzi Deck panel in Home
+    Assistant, and you can delete this page and the pairing file whenever you like.</p>
 </main>
 </html>
 """

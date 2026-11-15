@@ -151,62 +151,51 @@ it, change it, or build the app yourself rather than download it.
 
 ## 5 &nbsp; Open the companion app
 
-Open the zip. Three things are inside: the app, **Start here.html** — a page with these
-same steps and a button that opens System Settings where macOS wants you — and a small
-pairing file.
+Open the zip. Three things are inside: the app, **Start here.html** — the same four steps as
+below, with a button that opens System Settings where macOS wants you — and a small pairing
+file.
 
-**Double-click Ulanzi Deck.** Leave `ulanzi-deck-pairing.json` where it is — the app
-reads it the first time it runs. That file is what tells the app where your Home
-Assistant is and lets it straight in, which is why there is nothing to type and nothing
-to allow. Once the app has opened, you can throw it away and move the app into
-Applications if you want it there.
+<br>
+
+**1. Double-click Ulanzi Deck.** Leave `ulanzi-deck-pairing.json` where it is: that is what
+tells the app which Home Assistant is yours, so there is nothing to type and nothing to allow.
 
 <br>
 
 <img src="images/guide/fig-step5-unzip.png" alt="The Downloads folder: the zip, the folder it opened into, and which file to double-click" width="100%">
 
 <br>
+<br>
 
-### macOS will stop you the first time. Here is how to get past it.
+**2. macOS will stop you. Press Done** — **not** Move to Bin, however blue that button is. Every
+Mac shows this for software not sold through Apple's own store. It means nobody has paid Apple to
+vouch for it, not that anything is wrong with the app.
+
+<br>
 
 <img src="images/guide/fig-gate-dialog.png" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin" width="300">
 
-1. Press **Done**. **Not** Move to Bin, however blue that button is.
-2. Open **System Settings → Privacy & Security** and scroll down to **Security**.
-3. Beside *"Ulanzi Deck" was blocked to protect your Mac*, press **Open Anyway**.
+<br>
+<br>
+
+**3. Tell your Mac you meant it.** Open **System Settings → Privacy & Security**, scroll to
+**Security**, and press **Open Anyway** beside Ulanzi Deck. It asks once more with Move to Bin in
+blue: press **Open Anyway** again, the middle button. That is it, once, forever.
 
 <br>
 
-<img src="images/guide/fig-gate-security.png" alt="The Security section of Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button" width="100%">
+<img src="images/guide/fig-gate-security.png" alt="System Settings, Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button" width="100%">
+
+<br>
+<br>
+
+**4. Press Proceed.** The app opens and finds your Home Assistant by itself. **Plug the deck in
+whenever you like** — before or after makes no difference. When both lights are green, press
+**Proceed** and it sets the deck up in a few seconds.
 
 <br>
 
-4. It asks once more, and puts **Move to Bin** in blue again. Press **Open Anyway** — the
-   middle button.
-
-<br>
-
-<img src="images/guide/fig-gate-dialog2.png" alt="The second macOS dialog: Open Ulanzi Deck, with Move to Bin, Open Anyway and Done" width="300">
-
-<br>
-
-That is it, once, forever. Every Mac shows this for software not sold through Apple's
-own store — it means nobody has paid Apple to vouch for it, not that anything is wrong
-with it.
-
-<br>
-
-One window, and it finds Home Assistant by itself. **Plug the deck in whenever you
-like** — before or after opening the app makes no difference. A deck already plugged in
-is picked up the moment it starts.
-
-If your deck is still running the software it came with, the app says so and offers one
-button, *Set up my deck*. Press it once and it takes a few seconds. After that there is
-never anything to press.
-
-<br>
-
-<p align="center"><img src="images/guide/fig-step4.png" alt="The companion app: Everything is working, with Home Assistant and Deck both showing a green dot" width="440"></p>
+<p align="center"><img src="images/guide/fig-step5-ready.png" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button" width="460"></p>
 
 <br>
 
