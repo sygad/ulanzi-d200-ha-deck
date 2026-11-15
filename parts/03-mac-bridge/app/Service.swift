@@ -17,6 +17,7 @@ final class Service: ObservableObject {
         case noHomeAssistant             // give up, ask for the address
         case waitingToBeAllowed          // Home Assistant has it, somebody must press Allow
         case noDeck                      // nothing plugged in
+        case checkingDeck                // plugged in, working out what it is running
         case deckNeedsSettingUp          // plugged in, still running the app it came with
         case settingUpDeck(String)       // doing it, with a line to show
         case ready                       // all of it working
@@ -209,8 +210,13 @@ final class Service: ObservableObject {
         // Plugged in but silent for long enough means it is still running the app it
         // came with: ours answers every ping. Six seconds is three pings.
         if !deckAlive {
+            // Ours answers every ping; the software it came with never does. So a
+            // few seconds of silence is the test — and it has to be said out loud,
+            // because a window with two green lights and a dead button looks broken.
             if let seen = deckSeenAt, Date().timeIntervalSince(seen) > 6 {
                 step = .deckNeedsSettingUp
+            } else {
+                step = .checkingDeck
             }
             return
         }

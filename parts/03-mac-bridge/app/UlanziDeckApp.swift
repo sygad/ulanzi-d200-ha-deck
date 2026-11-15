@@ -182,6 +182,7 @@ struct MainView: View {
 
     private var deckColour: Color {
         if service.deckAnswering { return .green }
+        if case .checkingDeck = service.step { return .orange }
         if service.deckPluggedIn { return .green }
         return .secondary.opacity(0.35)
     }
@@ -190,6 +191,7 @@ struct MainView: View {
         if service.deckAnswering { return "connected" }
         guard service.deckPluggedIn else { return "not plugged in" }
         if case .settingUpDeck = service.step { return "setting up…" }
+        if case .checkingDeck = service.step { return "checking…" }
         return "connected"
     }
 
@@ -199,6 +201,7 @@ struct MainView: View {
         case .noHomeAssistant: return "Where is Home Assistant?"
         case .waitingToBeAllowed: return "Waiting for Home Assistant"
         case .noDeck: return "Plug in your deck"
+        case .checkingDeck: return "Checking your deck"
         case .deckNeedsSettingUp: return "Ready to set up your deck"
         case .settingUpDeck: return "Setting up your deck"
         case .ready: return "Everything is working"
@@ -216,6 +219,8 @@ struct MainView: View {
                  + "This only happens the first time."
         case .noDeck:
             return "Plug the deck into this Mac with the cable it came with."
+        case .checkingDeck:
+            return "Seeing what it is running. A few seconds."
         case .deckNeedsSettingUp:
             return "Press Proceed and it takes a few seconds. Ulanzi's own software is "
                  + "kept on the deck, so it can be put back."
