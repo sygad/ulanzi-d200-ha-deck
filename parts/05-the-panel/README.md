@@ -30,6 +30,7 @@ pickers and switches as the card editor.
 | Change when the screen turns off | The gear in the top bar, under **Turn the screen off after** |
 | Try a key before sending it | **Preview**, at the right of the screen tabs. Keys then do what they say |
 | Put it on the deck | **Send to device**, top right. It reads "Sent" when there is nothing waiting |
+| Set the brightness | The slider under the gear. The deck changes as you drag |
 | Get the companion app | **Get the companion app**, on the card shown until a Mac is connected |
 | Update the companion app | **Update now**, in the banner under the panel when a newer one exists |
 | Pair a Mac that has no key | **Allow**, which appears in the top bar. A Mac set up from the download

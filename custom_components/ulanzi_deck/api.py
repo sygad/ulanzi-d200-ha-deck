@@ -72,6 +72,20 @@ async def ws_press(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
         connection.send_result(msg["id"])
 
 
+@websocket_api.websocket_command({
+    vol.Required("type"): "ulanzi_deck/brightness",
+    vol.Required("value"): vol.All(int, vol.Range(min=0, max=255)),
+})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_brightness(hass: HomeAssistant, connection: websocket_api.ActiveConnection,
+                        msg: dict) -> None:
+    """The brightness slider, while it is being dragged."""
+    if hub := _hub(hass, connection, msg):
+        await hub.async_set_brightness(msg["value"])
+        connection.send_result(msg["id"], None)
+
+
 @websocket_api.websocket_command({vol.Required("type"): "ulanzi_deck/update_app"})
 @websocket_api.require_admin
 @websocket_api.async_response
@@ -113,5 +127,5 @@ async def ws_allow(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
 def async_register(hass: HomeAssistant) -> None:
     """Registering again replaces the handlers, which is what a reload wants."""
     for command in (ws_get, ws_save, ws_publish, ws_press, ws_subscribe, ws_allow,
-                    ws_update_app):
+                    ws_update_app, ws_brightness):
         websocket_api.async_register_command(hass, command)

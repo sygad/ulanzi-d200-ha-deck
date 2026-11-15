@@ -29,7 +29,7 @@ typedef short i16;
 typedef int i32;
 
 #define FW_MAJOR 1
-#define FW_MINOR 1
+#define FW_MINOR 2
 #define PROTO 1
 
 /* ---------- syscalls (ARM EABI) ---------- */
@@ -591,6 +591,14 @@ static void fire(int k, int hold)
     }
 }
 
+/* The brightness somebody chose, kept on the deck so a power cut does not
+   throw it away and nothing has to tell it again at every start. */
+static void bright_save(void)
+{
+    long fd = s_open(DIR "/brightness", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd >= 0) { u8 b = (u8)bright; s_write(fd, &b, 1); s_close(fd); }
+}
+
 static void keymap_save(void)
 {
     long fd = s_open(DIR "/keymap", O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -637,6 +645,7 @@ static void on_message(const u8 *m, u32 n)
         v = b[0];
         if (!v) { screen_off(); break; }     /* zero is the host turning it off */
         bright = v;
+        bright_save();
         if (asleep) screen_on();            /* any other brightness is also a wake */
         else { bl_write(v); t_act = now_ms(); }
         break;
@@ -718,11 +727,11 @@ int cmain(long *sp)
     char **argv = (char **)(sp + 1);
 
     if (sp[0] > 1 && seq(argv[1], "--version")) {
-        s_write(1, "deckd 1.1\n", 10);
+        s_write(1, "deckd 1.2\n", 10);
         return 0;
     }
     logfd = s_open("/tmp/deck.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
-    logs("deckd 1.1 starting\n");
+    logs("deckd 1.2 starting\n");
 
     fbfd = s_open("/dev/fb0", O_RDWR, 0);
     fb = fbfd >= 0 ? s_mmap(FBW * FBH * 4, 3, 1 /* SHARED */, fbfd) : 0;
@@ -731,6 +740,9 @@ int cmain(long *sp)
     sys(SYS_mkdir, (long)DIR, 0755, 0, 0, 0, 0);
     fd = s_open(DIR "/keymap", O_RDONLY, 0);
     if (fd >= 0) { u8 t[NKEYS]; if (s_read(fd, t, NKEYS) == NKEYS) memcpy(keymap, t, NKEYS); s_close(fd); }
+    fd = s_open(DIR "/brightness", O_RDONLY, 0);
+    if (fd >= 0) { u8 t; if (s_read(fd, &t, 1) == 1 && t) bright = t; s_close(fd); }
+    bl_write(bright);                       /* whatever was chosen, from the first frame */
 
     clear_screen();
     layout_load();

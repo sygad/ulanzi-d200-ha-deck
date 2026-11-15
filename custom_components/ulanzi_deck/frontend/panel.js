@@ -275,6 +275,10 @@ input[type=text]:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0
   box-shadow:0 12px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;max-height:86vh}
 .dlg h3{margin:0;font-size:19px;font-weight:400;padding:22px 24px 4px}
 .dlgbody{padding:8px 24px 18px;overflow-y:auto}
+.brirow{display:flex;align-items:center;gap:12px}
+.brirow input[type=range]{flex:1;min-width:0;accent-color:var(--primary)}
+.brirow .mi{font-size:20px;color:var(--fg2);flex:none}
+.brirow output{font-size:13px;color:var(--fg2);min-width:3ch;text-align:right;font-variant-numeric:tabular-nums}
 .dlgfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 18px 16px;
   border-top:1px solid var(--divider)}
 .dlgspacer{flex:1}
@@ -588,6 +592,17 @@ const MARKUP=`
         <p class="hint">With nothing happening for this long the deck’s screen goes dark, to save it.
           Any key wakes it, and that first press does nothing else.</p>
       </div>
+      <div class="field">
+        <span class="lab">Brightness</span>
+        <div class="brirow">
+          <span class="mi" id="bri-dim"></span>
+          <input type="range" id="set-bright" min="10" max="255" step="1">
+          <span class="mi" id="bri-bright"></span>
+          <output id="bri-out"></output>
+        </div>
+        <p class="hint">The deck changes as you drag, so you can set it by eye. It keeps this
+          itself, so a power cut does not forget it.</p>
+      </div>
     </div>
     <div class="dlgfoot">
       <span class="dlgspacer"></span>
@@ -737,7 +752,7 @@ const rangeFor=ent=>{const e=SEN(ent);return (e&&RANGES[e[4]])||[0,100]};
 const levelsFor=(lo,hi)=>({warn:+(lo+(hi-lo)*0.5).toFixed(2), alert:+(lo+(hi-lo)*0.75).toFixed(2)});
 const pages=init.pages;
 // the deck's own settings, as against any one screen's
-const SET_DEFAULTS={sleep:20};
+const SET_DEFAULTS={sleep:20,brightness:220};
 const settings=Object.assign({},SET_DEFAULTS,init.settings||{});
 let pi=0, sel=null;
 const $=s=>root.querySelector(s);
@@ -1404,14 +1419,44 @@ $("#btn-settings").addEventListener("click",()=>{
     dd.appendChild(o);
   }
   dd.value=want;
+  const br=$("#set-bright");
+  br.value=settings.brightness;
+  $("#bri-out").textContent=Math.round(settings.brightness/255*100)+"%";
+  $("#bri-dim").textContent=ico("brightness-5");
+  $("#bri-bright").textContent=ico("brightness-7");
+  briWas=settings.brightness;
   $("#setDlg").hidden=false;
   dd.focus();
 });
-$("#set-cancel").addEventListener("click",closeSetDlg);
+
+/* The deck is a few milliseconds down a cable, so the light can follow the
+   finger. Sending on every pixel of travel would still be wasteful, so it is
+   held to one message every 60ms with the last value always sent. */
+let briWas=220, briTimer=null, briPending=null;
+function sendBrightness(v){
+  briPending=v;
+  if(briTimer)return;
+  briTimer=setTimeout(()=>{
+    briTimer=null;
+    const value=briPending; briPending=null;
+    hass().callWS({type:"ulanzi_deck/brightness",value}).catch(()=>{});
+    if(briPending!==null)sendBrightness(briPending);
+  },60);
+}
+$("#set-bright").addEventListener("input",e=>{
+  const v=+e.target.value;
+  $("#bri-out").textContent=Math.round(v/255*100)+"%";
+  sendBrightness(v);
+});
+$("#set-cancel").addEventListener("click",()=>{
+  sendBrightness(briWas);          // put the light back where it was
+  closeSetDlg();
+});
 $("#setDlg").addEventListener("mousedown",e=>{if(e.target===$("#setDlg"))closeSetDlg()});
 root.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#setDlg").hidden)closeSetDlg()});
 $("#set-save").addEventListener("click",()=>{
   settings.sleep=+$("#set-sleep").value||0;
+  settings.brightness=+$("#set-bright").value||220;
   closeSetDlg(); markDraft();
 });
 

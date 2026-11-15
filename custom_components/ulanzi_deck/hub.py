@@ -64,6 +64,8 @@ HISTORY_HOURS = 24
 # this module and const.py is not re-imported (see _reload_code in __init__.py).
 DEFAULT_SLEEP = 20
 MAX_SLEEP = 255
+DEFAULT_BRIGHT = 220          # what the deck itself starts at
+MIN_BRIGHT = 10               # dark, but never off: off is what the sleep timer is for
 
 
 def clean_pages(pages: Any) -> list[dict]:
@@ -89,7 +91,12 @@ def clean_settings(settings: Any) -> dict:
         sleep = int(settings.get("sleep", DEFAULT_SLEEP))
     except (TypeError, ValueError):
         sleep = DEFAULT_SLEEP
-    return {"sleep": max(0, min(MAX_SLEEP, sleep))}
+    try:
+        bright = int(settings.get("brightness", DEFAULT_BRIGHT))
+    except (TypeError, ValueError):
+        bright = DEFAULT_BRIGHT
+    return {"sleep": max(0, min(MAX_SLEEP, sleep)),
+            "brightness": max(MIN_BRIGHT, min(255, bright))}
 
 
 def _is_nav(action: str) -> bool:
@@ -520,6 +527,16 @@ class DeckHub:
         await self._store.async_save(self.data)
         return {"bridgeId": bridge_id, "secret": secret}
 
+    async def async_set_brightness(self, value: int) -> None:
+        """Set the deck's backlight now, while somebody is dragging the slider.
+
+        The deck keeps whatever it is told, so this is the whole of it: no
+        layout to rebuild, nothing to republish, and the light changes while
+        the finger is still moving.
+        """
+        value = max(MIN_BRIGHT, min(255, int(value)))
+        await self._send(bytes([5, value]))
+
     async def _send(self, data: bytes) -> None:
         bridge = self._bridge
         if not bridge:
@@ -550,6 +567,7 @@ class DeckHub:
             await self._load_history()
             await self._push(None)
         self._notify()
+        await self.async_set_brightness(self.published_settings["brightness"])
 
     @callback
     def _deck_left(self) -> None:
