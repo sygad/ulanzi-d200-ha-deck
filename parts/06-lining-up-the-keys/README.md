@@ -1,6 +1,11 @@
-[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md#the-parts)
+[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md)
 
 # Part 6 · Lining up the keys
+
+
+> **Nobody setting a deck up does this.** The key positions are measured once and
+> shipped with the software; the companion app installs them. This page is how they
+> were measured, for anyone changing the hardware or curious about it.
 
 ![The measured grid: where each key's window sits on the 1280 × 720 screen, with its size in pixels](grid.png)
 
@@ -135,4 +140,4 @@ positions.
 
 ---
 
-[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md#the-parts)
+[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md)

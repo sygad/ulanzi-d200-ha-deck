@@ -1,9 +1,15 @@
-[← Part 2](../02-deck-app/README.md) · [All parts](../../README.md#the-parts) · [Part 4 →](../04-home-assistant/README.md)
+[← Part 2](../02-deck-app/README.md) · [All parts](../../README.md) · [Part 4 →](../04-home-assistant/README.md)
 
-# Part 3 · Mac bridge
+# Part 3 · The companion app
 
-A small program that runs in the background on the Mac the deck is plugged into. The
-deck has no network, so this carries its messages to Home Assistant and back.
+The Mac app the deck plugs into. The deck has no network, so this carries its messages
+to Home Assistant and back.
+
+To a user it is an ordinary app: Home Assistant hands it over, it puts itself in
+Applications, and it lives in the menu bar by the clock with its version in its window
+and Quit in its menu. Closing the window does not stop it. **Nothing on this page is
+part of setting one up** — [the setup guide](../../README.md) is. What follows is how
+it works and how to build it yourself.
 
 It doesn't understand the messages. It passes them on. The two things it does for
 itself are the two the deck can't: tell it the time, and tell it whether anyone is
@@ -14,8 +20,8 @@ listening.
 | | |
 |---|---|
 | **Built from** | One Swift file. No packages, no drivers |
-| **Files in this folder** | `main.swift` (the source) · `install.sh` (builds it and sets it to start with the Mac) |
-| **Also needs** | Xcode Command Line Tools (`xcode-select --install`) |
+| **Files in this folder** | `app/` (the app's source) · `build-app.sh` (builds it) · `main.swift` and `install.sh` (the older headless bridge, kept for reference) |
+| **Also needs** | Nothing, to use it. To build it: Xcode Command Line Tools (`xcode-select --install`) |
 | **Reads** | The deck, over USB; Home Assistant, over the network |
 | **Mac only** | It uses macOS's own USB and networking. There is no Windows or Linux version |
 
@@ -35,19 +41,21 @@ deck  <-- USB, 1024 bytes at a time -->  bridge  <-- WebSocket -->  Home Assista
 
 ## Settings I chose
 
-- **No access token.** The first time it connects, the panel in Home Assistant shows
-  "*your Mac's name* wants to connect" with an **Allow** button. One click pairs it
-  for good. The bridge keeps a secret of its own in
+- **No access token.** It proves itself with a secret of its own, kept in
   `~/Library/Application Support/UlanziDeck/bridge.json`; Home Assistant keeps only a
-  fingerprint of it.
-- **It starts with the Mac**, as a login agent called `com.ulanzi-deck.bridge`, and is
-  restarted if it stops.
+  fingerprint of it. Normally that secret arrives in the pairing file beside the
+  download, so there is nothing to allow. A Mac that turns up without one is held at
+  the door until somebody presses **Allow** in the panel.
 - **It backs off.** If Home Assistant can't be reached it tries again after 3 seconds,
   then 6, up to 30.
-- **Built on your Mac, not downloaded.** A program downloaded from the internet is
-  held back by macOS. One you build yourself is not.
+- **It is downloaded, and macOS says so.** The app comes from Home Assistant, so the
+  first time it is opened macOS refuses it and you tell it once that you meant it. An
+  update fetched by the app itself is not held back, because no browser touched it.
 
-## Add just this part
+## Building it yourself
+
+*Developer notes. None of this is needed to use the app: Home Assistant hands you a
+built one.*
 
 1. Install the Command Line Tools if you haven't:
 
@@ -107,4 +115,4 @@ rm ~/Library/LaunchAgents/com.ulanzi-deck.bridge.plist
 
 ---
 
-[← Part 2](../02-deck-app/README.md) · [All parts](../../README.md#the-parts) · [Part 4 →](../04-home-assistant/README.md)
+[← Part 2](../02-deck-app/README.md) · [All parts](../../README.md) · [Part 4 →](../04-home-assistant/README.md)

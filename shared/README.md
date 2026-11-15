@@ -1,4 +1,4 @@
-[All parts](../README.md#the-parts)
+[All parts](../README.md)
 
 # Shared · how the parts talk to each other
 
@@ -177,4 +177,4 @@ the edge of a key.
 
 ---
 
-[All parts](../README.md#the-parts)
+[All parts](../README.md)

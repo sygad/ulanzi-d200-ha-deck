@@ -1,4 +1,4 @@
-[← Part 3](../03-mac-bridge/README.md) · [All parts](../../README.md#the-parts) · [Part 5 →](../05-the-panel/README.md)
+[← Part 3](../03-mac-bridge/README.md) · [All parts](../../README.md) · [Part 5 →](../05-the-panel/README.md)
 
 # Part 4 · Home Assistant integration
 
@@ -15,6 +15,12 @@ changes, and carries out what a press asks for.
 | **Also needs** | The bridge ([Part 3](../03-mac-bridge/README.md)) to reach the deck |
 | **Reads** | Whatever entities your keys point at; their history, for graph keys |
 | **Gives you** | A sidebar panel, two entities, and an event on every key press |
+
+It also hands out the companion app: the panel's **Get the companion app** button
+builds a zip holding the published app, a pairing file carrying this server's address
+and a key for that Mac, and a page explaining what macOS is about to do. When a newer
+app exists it says so in a banner under the panel, and **Update now** tells the Mac to
+fetch it from here rather than from the internet.
 
 ## How it works
 
@@ -65,13 +71,15 @@ that suits and trigger an automation from the `ulanzi_deck_key` event.
   `--`, so a deck that has just powered up never shows an old number as if it were
   current. Live values arrive when the bridge connects.
 - **The bridge is not behind Home Assistant's login.** It has no user. It proves
-  itself with its own secret, and is ignored until an admin has pressed Allow.
+  itself with its own secret, and is admitted straight away when it arrives with a key this server wrote down, which is
+what the pairing file in the download carries. One that turns up without a key waits
+until an admin presses Allow.
 - **Changes to how keys are drawn don't need a restart.** Reloading the integration
   picks up changed code.
 
 ## Add just this part
 
-The ordinary way is the Marketplace, in [step 1 of the setup guide](../../README.md#setting-it-up).
+The ordinary way is the Marketplace, in [step 1 of the setup guide](../../README.md).
 This is the same thing by hand, for working on it:
 
 1. Copy the folder `custom_components/ulanzi_deck` from this repo into the
@@ -92,4 +100,4 @@ and restart.
 
 ---
 
-[← Part 3](../03-mac-bridge/README.md) · [All parts](../../README.md#the-parts) · [Part 5 →](../05-the-panel/README.md)
+[← Part 3](../03-mac-bridge/README.md) · [All parts](../../README.md) · [Part 5 →](../05-the-panel/README.md)

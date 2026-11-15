@@ -1,4 +1,4 @@
-[All parts](../../README.md#the-parts) · [Part 2 →](../02-deck-app/README.md)
+[All parts](../../README.md) · [Part 2 →](../02-deck-app/README.md)
 
 # Part 1 · The deck
 
@@ -14,7 +14,7 @@ every D200, it says so.
 |---|---|
 | **Built from** | Ulanzi D200. The case is printed U·STUDIO |
 | **Files in this folder** | This page only |
-| **Also needs** | A Mac with `adb` to look inside it: see [What you need](../../README.md#what-you-need) |
+| **Also needs** | A Mac with `adb` to look inside it: see [What you need](../../README.md#what-you-need-and-how-it-joins-up) |
 | **Reads** | Fourteen keys |
 | **Shows** | One 1280 × 720 picture, seen through fourteen windows |
 
@@ -42,6 +42,9 @@ Over USB it presents three things at once:
 | A keyboard | How the vendor's software types shortcuts. Not used here |
 
 ## Getting in
+
+*Developer notes. None of this is part of setting a deck up — [the setup guide](../../README.md) is.*
+
 
 Plug the deck into the Mac and run:
 
@@ -78,4 +81,4 @@ So I can tell you how to put it back, but not that it will work when you do.
 
 ---
 
-[All parts](../../README.md#the-parts) · [Part 2 →](../02-deck-app/README.md)
+[All parts](../../README.md) · [Part 2 →](../02-deck-app/README.md)

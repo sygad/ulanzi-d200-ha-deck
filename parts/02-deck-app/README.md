@@ -1,4 +1,4 @@
-[← Part 1](../01-the-deck/README.md) · [All parts](../../README.md#the-parts) · [Part 3 →](../03-mac-bridge/README.md)
+[← Part 1](../01-the-deck/README.md) · [All parts](../../README.md) · [Part 3 →](../03-mac-bridge/README.md)
 
 # Part 2 · Deck app
 
@@ -58,7 +58,10 @@ This replaces the vendor's app, so "changed" here means changed on the deck:
 
 Nothing outside `/userdata` is touched.
 
-## Add just this part
+## Putting it on a deck by hand
+
+*Developer notes. None of this is part of setting a deck up — [the setup guide](../../README.md) is.*
+
 
 1. Plug the deck in and check `adb devices` lists it ([Part 1](../01-the-deck/README.md)).
 2. From the repo folder, run:
@@ -102,4 +105,4 @@ been able to check that going back gives a working deck.
 
 ---
 
-[← Part 1](../01-the-deck/README.md) · [All parts](../../README.md#the-parts) · [Part 3 →](../03-mac-bridge/README.md)
+[← Part 1](../01-the-deck/README.md) · [All parts](../../README.md) · [Part 3 →](../03-mac-bridge/README.md)

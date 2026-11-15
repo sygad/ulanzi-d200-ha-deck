@@ -198,6 +198,8 @@ It also puts itself in your **Applications** folder on that first run, so it dis
 the download folder — that is meant to happen. From then on it is an app like any other, with
 its icon in the menu bar beside the clock.
 
+The app stays in the menu bar beside the clock. Closing its window does not stop it; **Quit** is in that menu, along with the version it is running.
+
 <br>
 
 <p align="center"><img src="images/guide/fig-step5-ready.png" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button" width="460"></p>
@@ -212,6 +214,10 @@ its icon in the menu bar beside the clock.
 
 Back in the same sidebar page. Pick a key, give it something to do, and press **Send to
 device**. **Preview** lets you try a key in the browser before it ever reaches the deck.
+
+The deck's screen turns itself off after 20 minutes of nothing happening, to save the panel.
+Any key wakes it, and that waking press does nothing else. The gear in the top bar changes it,
+or turns it off.
 
 <br>
 
