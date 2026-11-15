@@ -131,6 +131,13 @@ struct MainView: View {
                 }
             }
 
+            if service.justInstalled {
+                Text("Moved to your Applications folder, so it is not in Downloads any more.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             if let error = service.lastError {
                 Text(error).font(.callout).foregroundStyle(.red)
                     .fixedSize(horizontal: false, vertical: true)

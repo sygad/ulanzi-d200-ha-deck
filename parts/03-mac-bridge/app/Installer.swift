@@ -46,7 +46,11 @@ enum Installer {
         return folders
     }
 
+    /// Remembered across the relaunch, so the window can mention it once.
+    static let movedKey = "movedToApplications"
+
     private static func relaunch(at app: URL) -> Bool {
+        UserDefaults.standard.set(true, forKey: movedKey)
         let config = NSWorkspace.OpenConfiguration()
         config.createsNewApplicationInstance = true
         NSWorkspace.shared.openApplication(at: app, configuration: config) { _, _ in

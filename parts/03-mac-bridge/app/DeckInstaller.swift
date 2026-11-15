@@ -36,8 +36,9 @@ enum DeckInstaller {
         _ = shell(adb, ["start-server"])
         let devices = shell(adb, ["devices"])
         guard devices.out.split(separator: "\n").dropFirst().contains(where: { $0.contains("device") }) else {
-            return .failure("The deck did not answer. Check it is plugged in with the cable it came with — "
-                            + "some cables carry power only — and try again.")
+            return .failure("The deck did not answer. Check it is plugged in with the cable it came "
+                            + "with — some cables carry power only. If another program is using the "
+                            + "deck, close it and try again.")
         }
 
         say("Keeping the deck's own software safe…")
@@ -109,10 +110,12 @@ enum DeckInstaller {
         let p = Process()
         p.executableURL = tool
         p.arguments = args
-        // adb writes its own files; keep them out of the way of any copy the user has
+        // Use the ordinary adb port. A second server on a port of our own cannot
+        // open a deck the user's own adb already has hold of, which shows up as
+        // the deck not answering at all. Sharing one server avoids the fight.
         var env = ProcessInfo.processInfo.environment
         env["HOME"] = NSHomeDirectory()
-        env["ANDROID_ADB_SERVER_PORT"] = "5137"
+        env.removeValue(forKey: "ANDROID_ADB_SERVER_PORT")
         p.environment = env
         let pipe = Pipe()
         p.standardOutput = pipe

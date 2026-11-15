@@ -30,6 +30,8 @@ final class Service: ObservableObject {
     @Published private(set) var deckAnswering = false
     @Published private(set) var startsWithMac = false
     @Published private(set) var lastError: String?
+    /// True for this run only, when the app has just moved itself to Applications.
+    @Published private(set) var justInstalled = false
 
     /// The one Service the app makes. Held here so the work that happens off the
     /// main thread can find its way back without passing the object around.
@@ -57,6 +59,10 @@ final class Service: ObservableObject {
 
     func start() {
         Service.current = self
+        if UserDefaults.standard.bool(forKey: Installer.movedKey) {
+            justInstalled = true
+            UserDefaults.standard.removeObject(forKey: Installer.movedKey)
+        }
         startsWithMac = (SMAppService.mainApp.status == .enabled)
         if let paired = Pairing.findBesideTheApp() {
             Pairing.write(paired)        // Home Assistant sent us its address and our key
