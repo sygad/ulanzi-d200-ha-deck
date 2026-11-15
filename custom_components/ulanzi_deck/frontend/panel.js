@@ -28,6 +28,7 @@ const STYLE=`
   --fg:var(--primary-text-color,#212121); --fg2:var(--secondary-text-color,#727272);
   --divider:var(--divider-color,rgba(0,0,0,.12)); --primary:var(--primary-color,#03a9f4);
   --bar:var(--app-header-background-color,var(--primary-color,#03a9f4)); --bar-fg:var(--app-header-text-color,#fff);
+  --amber:#ffa000;
   --ok:#43a047; --deck-shell:#1f2124; --deck-face:#0b0c0d;
   /* A black key is shown a shade off black here, so its shape can be seen against
      the deck's face; on the deck itself it is true black (BACKGROUND in render.py).
@@ -69,7 +70,15 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .gear:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:#9e9e9e;box-shadow:0 0 0 3px rgba(158,158,158,.3)}
 .dot.ok{background:var(--ok);box-shadow:0 0 0 3px rgba(67,160,71,.3)}
-.dot.warn{background:#ffa000;box-shadow:0 0 0 3px rgba(255,160,0,.3)}
+.dot.warn{background:var(--amber);box-shadow:0 0 0 3px rgba(255,160,0,.3)}
+/* One permanent line saying what every part is running. Grey means nothing to
+   do; amber means that part is behind this release, and the bar above says how
+   to fix it. Nothing to go looking for, and nothing to remember. */
+.verline{grid-column:1/-1;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:4px 10px;
+  margin:2px 2px 0;font-size:12.5px;color:var(--fg2)}
+.verline .vsep{opacity:.45}
+.verline .vpart{white-space:nowrap}
+.verline .vpart.old{color:var(--amber);font-weight:500}
 
 .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-block:20px 40px;max-width:1240px;margin:0 auto;
@@ -77,8 +86,8 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 @media (max-width:960px){.wrap{grid-template-columns:minmax(0,1fr)}}
 .updbar{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin-top:4px;padding:16px 18px;
   border-radius:12px;background:var(--card);box-shadow:0 2px 2px rgba(0,0,0,.06),0 1px 5px rgba(0,0,0,.08);
-  border-left:4px solid var(--primary)}
-.updbar .mi.dl{font-size:22px;color:var(--primary);flex:0 0 auto}
+  border-left:4px solid var(--amber)}
+.updbar .mi.dl{font-size:22px;color:var(--amber);flex:0 0 auto}
 .updbar .updtext{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .updbar .updtext b{font-size:14.5px;font-weight:500}
 .updbar .updtext span{font-size:13px;color:var(--fg2)}
@@ -279,7 +288,7 @@ input[type=text]:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0
 .vers .vrow:first-of-type{border-top:0}
 .vers .vname{flex:1;min-width:0;font-size:13.5px}
 .vers .vval{font-size:13px;color:var(--fg2);white-space:nowrap}
-.vers .vval.old{color:var(--primary);font-weight:500}
+.vers .vval.old{color:var(--amber);font-weight:500}
 .vers .vbtn{padding:5px 12px;font-size:12px}
 .brirow{display:flex;align-items:center;gap:12px}
 .brirow input[type=range]{flex:1;min-width:0;accent-color:var(--primary)}
@@ -384,12 +393,12 @@ const MARKUP=`
     <div class="card-b">
       <h2>Connect a Mac</h2>
       <p>Your deck has no network of its own. It plugs into a Mac over USB, and a small
-         companion app on that Mac carries it to Home Assistant.</p>
+         connector app on that Mac carries it to Home Assistant.</p>
       <p>The app arrives knowing this server, so there is nothing to type and nothing to
          allow. Set it up once and your keys appear here.</p>
-      <button class="btn" id="btn-getapp">Get the companion app</button>
+      <button class="btn" id="btn-getapp">Get the connector app</button>
       <p class="getapp-err" id="getAppErr" hidden></p>
-      <p class="getapp-note"><a href="https://github.com/sygad/ulanzi-d200-ha-deck#what-the-companion-app-is-before-you-run-it" target="_blank" rel="noreferrer">What it does, and what it never does</a></p>
+      <p class="getapp-note"><a href="https://github.com/sygad/ulanzi-d200-ha-deck#what-the-connector-app-is-before-you-run-it" target="_blank" rel="noreferrer">What it does, and what it never does</a></p>
     </div>
   </div>
   <div class="card" id="configCard">
@@ -571,6 +580,11 @@ const MARKUP=`
     </span>
     <button class="btn" id="btn-update">Update now</button>
   </div>
+  <div class="verline" id="verLine" hidden>
+    <span class="vpart" id="vp-int"></span><span class="vsep">·</span>
+    <span class="vpart" id="vp-app"></span><span class="vsep">·</span>
+    <span class="vpart" id="vp-deck"></span>
+  </div>
 </div>
 
 <div class="dlgwrap" id="setDlg" hidden>
@@ -606,14 +620,14 @@ const MARKUP=`
           <span class="mi" id="bri-bright"></span>
           <output id="bri-out"></output>
         </div>
-        <p class="hint">The deck changes as you drag, so you can set it by eye. A deck running
-          1.2 or newer keeps it itself, so a power cut does not forget it.</p>
+        <p class="hint">The deck changes as you drag, so you can set it by eye. A deck on this
+          release keeps it itself, so a power cut does not forget it.</p>
       </div>
       <div class="field vers">
         <span class="lab">Versions</span>
-        <div class="vrow" id="v-int"><span class="vname">Home Assistant integration</span>
+        <div class="vrow" id="v-int"><span class="vname">Integration</span>
           <span class="vval"></span><button class="btn ghost vbtn" hidden></button></div>
-        <div class="vrow" id="v-app"><span class="vname">Companion app</span>
+        <div class="vrow" id="v-app"><span class="vname">Connector app</span>
           <span class="vval"></span><button class="btn ghost vbtn" hidden></button></div>
         <div class="vrow" id="v-deck"><span class="vname">Deck software</span>
           <span class="vval"></span><button class="btn ghost vbtn" hidden></button></div>
@@ -1438,17 +1452,19 @@ function vrow(id,have,want,label,action){
 }
 function showVersions(){
   const st=lastStatus||{};
-  vrow("v-int", st.app_version, st.latest_release, "Marketplace", ()=>{
-    window.open("/marketplace","_blank");   // where this came from
-  });
+  const ps=parts(st);
   const macOld=st.bridge_version&&cmpVer(st.bridge_version,"3.5")<0;
-  vrow("v-app", st.bridge_version, st.app_version, "Update",
+  vrow("v-int", ps[0].have, ps[0].want,
+       st.restart_pending?"Restart":"Marketplace",
+       st.restart_pending?restartHa:()=>window.open("/marketplace","_blank"));
+  vrow("v-app", ps[1].have, ps[1].want, "Update",
        macOld?null:()=>hass().callWS({type:"ulanzi_deck/update_app"}).catch(()=>{}));
-  vrow("v-deck", st.deck_firmware, st.deckd_available, "Update",
+  vrow("v-deck", ps[2].have, ps[2].want, "Update",
        ()=>hass().callWS({type:"ulanzi_deck/update_deck"}).catch(()=>{}));
   $("#v-note").textContent = macOld
     ? "This Mac is too old to be told from here: open Ulanzi Deck on it and press Update."
-    : "The integration updates from the Marketplace; the other two from here.";
+    : "All three carry the same number. The integration comes from the Marketplace and "
+      + "needs a restart; it then hands the other two their new version.";
 }
 
 /* ---------- the deck's own settings ---------- */
@@ -1564,22 +1580,7 @@ function showStatus(st){
   allow.hidden=!st.pending;
   // Until a Mac is connected there is nothing worth configuring, so the setup
   // card is the whole page rather than one card beside the editor.
-  // An update waiting on the Mac, said where people are already looking.
-  const want=st.app_version, got=st.bridge_version;
-  const behind=want && got && cmpVer(want,got)>0;
-  const bar=$("#updBar");
-  bar.hidden=!behind;
-  if(behind){
-    // Macs older than 3.5 cannot be told from here; they have their own button.
-    const canBeTold=cmpVer(got,"3.5")>=0;
-    bar.querySelector(".mi").textContent=ico("tray-arrow-down");
-    $("#updTitle").textContent="Companion app "+want+" is ready to install";
-    $("#updSub").textContent=canBeTold
-      ? "Running "+got+" on "+(st.bridge_name||"your Mac")+"."
-      : "Running "+got+" on "+(st.bridge_name||"your Mac")+
-        ". Open Ulanzi Deck on that Mac and press Update: this button needs 3.5 or newer.";
-    $("#btn-update").hidden=!canBeTold;
-  }
+  paintVersions(st);
 
   const setup=st.bridge==="none";
   $("#getApp").hidden=!setup;
@@ -1588,6 +1589,91 @@ function showStatus(st){
   $("#btn-publish").hidden=setup;
   $("#btn-settings").hidden=setup;
 }
+/* ---------- one release, three parts ----------
+   The integration, the connector app and the deck software ship together and
+   carry the same number, so a part showing a lower one is simply behind this
+   release. The line under the panel always says where all three are; the bar
+   above it carries the single next thing to do, never a list of them. */
+function parts(st){
+  const run=st.app_version||"";
+  const intWant = st.restart_pending ? (st.on_disk_version||"")
+    : (run && st.latest_release && cmpVer(st.latest_release,run)>0 ? st.latest_release : "");
+  return [
+    {el:"vp-int",  name:"Integration",   have:run,              want:intWant},
+    {el:"vp-app",  name:"Connector app", have:st.bridge_version||"", want:run},
+    {el:"vp-deck", name:"Deck software", have:st.deck_firmware||"",  want:st.deckd_available||""},
+  ].map(p=>({...p, old: !!(p.have && p.want && cmpVer(p.want,p.have)>0)}));
+}
+function paintVersions(st){
+  const ps=parts(st);
+  // Before a Mac is connected the setup card is the whole page: a line saying
+  // three things are not connected is noise in front of somebody who has not
+  // started yet.
+  const setup=st.bridge==="none";
+  $("#verLine").hidden=setup;
+  for(const p of ps){
+    const el=$("#"+p.el);
+    el.textContent = p.have
+      ? p.name+" "+p.have+(p.old?" \u2192 "+p.want:"")
+      : p.name+" not connected";
+    el.classList.toggle("old",p.old);
+  }
+  if(setup){ $("#updBar").hidden=true; return; }
+
+  // One job at a time, in the order they have to happen: a restart finishes an
+  // integration that is already downloaded, and the other two are handed their
+  // new version by the integration, so they come after it.
+  const bar=$("#updBar"), run=st.app_version||"";
+  const mac=st.bridge_version||"", macCanBeTold=mac&&cmpVer(mac,"3.5")>=0;
+  const job =
+    st.restart_pending
+      ? {icon:"restart", title:"Integration "+(st.on_disk_version||"")+" is downloaded",
+         sub:"Home Assistant is still running "+run+". Restart to finish.",
+         label:"Restart Home Assistant", confirm:"Restart now?", act:restartHa}
+    : ps[0].old
+      ? {icon:"tray-arrow-down", title:"Integration "+ps[0].want+" is ready in the Marketplace",
+         sub:"Running "+run+". Download it there, then restart.",
+         label:"Open Marketplace", act:()=>window.open("/marketplace","_blank")}
+    : ps[1].old
+      ? {icon:"tray-arrow-down", title:"Connector app "+ps[1].want+" is ready to install",
+         sub:macCanBeTold
+           ? "Running "+mac+" on "+(st.bridge_name||"your Mac")+"."
+           : "Running "+mac+" on "+(st.bridge_name||"your Mac")+
+             ". Open Ulanzi Deck on that Mac and press Update: this button needs 3.5 or newer.",
+         label:"Update now", act:macCanBeTold?()=>hass().callWS({type:"ulanzi_deck/update_app"}):null}
+    : ps[2].old
+      ? {icon:"tray-arrow-down", title:"Deck software "+ps[2].want+" is ready to install",
+         sub:"The deck is running "+ps[2].have+". It takes a few seconds and the deck restarts.",
+         label:"Update now", act:()=>hass().callWS({type:"ulanzi_deck/update_deck"})}
+    : null;
+
+  bar.hidden=!job;
+  if(!job)return;
+  bar.querySelector(".mi").textContent=ico(job.icon);
+  $("#updTitle").textContent=job.title;
+  $("#updSub").textContent=job.sub;
+  const b=$("#btn-update");
+  b.hidden=!job.act;
+  if(!job.act)return;
+  b.disabled=false; b.dataset.armed=""; b.textContent=job.label;
+  b.onclick=()=>{
+    // Anything that interrupts the server asks once more before it does it.
+    if(job.confirm && b.dataset.armed!=="1"){
+      b.dataset.armed="1"; b.textContent=job.confirm;
+      setTimeout(()=>{if(b.dataset.armed==="1"){b.dataset.armed="";b.textContent=job.label}},5000);
+      return;
+    }
+    b.disabled=true; b.textContent="Working\u2026";
+    Promise.resolve(job.act()).catch(()=>{});
+    setTimeout(()=>{b.disabled=false;b.dataset.armed="";b.textContent=job.label},8000);
+  };
+}
+function restartHa(){
+  const h=hass();
+  if(h&&h.callService)return h.callService("homeassistant","restart",{});
+  window.open("/config/system","_blank");
+}
+
 $("#btn-getapp").addEventListener("click",async()=>{
   const b=$("#btn-getapp"), err=$("#getAppErr");
   b.disabled=true; b.textContent="Preparing\u2026"; err.hidden=true;
@@ -1600,13 +1686,7 @@ $("#btn-getapp").addEventListener("click",async()=>{
     err.textContent=(e&&e.message)||"It could not be prepared. Try again.";
     err.hidden=false;
   }
-  b.disabled=false; b.textContent="Get the companion app";
-});
-$("#btn-update").addEventListener("click",async()=>{
-  const b=$("#btn-update");
-  b.disabled=true; b.textContent="Updating\u2026";
-  try{ await hass().callWS({type:"ulanzi_deck/update_app"}); }catch(e){}
-  setTimeout(()=>{ b.disabled=false; b.textContent="Update now"; }, 8000);
+  b.disabled=false; b.textContent="Get the connector app";
 });
 $("#btn-allow").addEventListener("click",()=>{
   if(pendingBridge)hass().callWS({type:"ulanzi_deck/allow",bridge_id:pendingBridge.bridge_id}).catch(()=>{});

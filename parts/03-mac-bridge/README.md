@@ -1,6 +1,6 @@
 [← Part 2](../02-deck-app/README.md) · [All parts](../../README.md) · [Part 4 →](../04-home-assistant/README.md)
 
-# Part 3 · The companion app
+# Part 3 · The connector app
 
 The Mac app the deck plugs into. The deck has no network, so this carries its messages
 to Home Assistant and back.

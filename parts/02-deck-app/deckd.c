@@ -28,7 +28,7 @@ typedef signed char i8;
 typedef short i16;
 typedef int i32;
 
-#define FW_MAJOR 1
+#define FW_MAJOR 4
 #define FW_MINOR 2
 #define PROTO 1
 

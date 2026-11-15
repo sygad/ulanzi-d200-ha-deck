@@ -4,7 +4,7 @@
 
 
 > **Nobody setting a deck up does this.** The key positions are measured once and
-> shipped with the software; the companion app installs them. This page is how they
+> shipped with the software; the connector app installs them. This page is how they
 > were measured, for anyone changing the hardware or curious about it.
 
 ![The measured grid: where each key's window sits on the 1280 × 720 screen, with its size in pixels](grid.png)

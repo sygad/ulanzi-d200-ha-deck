@@ -113,9 +113,34 @@ class _Bridge:
         self.id = bridge_id
         self.name = name
         self.digest = digest
-        self.version = ""            # which companion app it is
+        self.version = ""            # which connector app it is
         self.deckd = ""              # the deck software it carries
         self.allowed = False
+
+
+def _cmp_ver(a: str, b: str) -> int:
+    """Compare two dotted versions. 1 if a is newer, -1 if older, 0 if the same."""
+    def parts(v: str) -> list[int]:
+        out = []
+        for bit in str(v).lstrip("vV").split("."):
+            digits = "".join(c for c in bit if c.isdigit())
+            out.append(int(digits) if digits else 0)
+        return out
+    pa, pb = parts(a), parts(b)
+    while len(pa) < len(pb):
+        pa.append(0)
+    while len(pb) < len(pa):
+        pb.append(0)
+    return (pa > pb) - (pa < pb)
+
+
+def _manifest_version() -> str:
+    """The version written in manifest.json, as it is on disk right now."""
+    try:
+        path = Path(__file__).parent / "manifest.json"
+        return str(json.loads(path.read_text()).get("version") or "")
+    except Exception:  # noqa: BLE001 - a missing version is not worth failing for
+        return ""
 
 
 class DeckHub:
@@ -126,6 +151,13 @@ class DeckHub:
         self.entry = entry
         self._store: Store = Store(hass, 1, DOMAIN)
         self.latest_release = ""        # newest release on GitHub, as it says itself
+        # Read once, here, at setup: this is the version Home Assistant actually
+        # loaded. The files on disk can be replaced under a running server by a
+        # download from the shop, and then the two differ until a restart — which
+        # is the whole reason somebody can press Update, see nothing change, and
+        # be told again to update.
+        self.running_version = _manifest_version()
+        self.on_disk_version = self.running_version
         self.data: dict[str, Any] = {
             "pages": clean_pages(None), "published": None, "bridges": {},
             "settings": clean_settings(None), "published_settings": None,
@@ -168,13 +200,16 @@ class DeckHub:
         self._unsub_timer = async_track_time_interval(self.hass, self._history_tick, timedelta(minutes=5))
         self._unsub_rel = async_track_time_interval(
             self.hass, self._check_releases, timedelta(hours=6))
+        self._unsub_disk = async_track_time_interval(
+            self.hass, self._check_on_disk, timedelta(minutes=1))
         self.hass.async_create_task(self._check_releases())
         self._notify()
 
     async def async_stop(self) -> None:
-        if getattr(self, "_unsub_rel", None):
-            self._unsub_rel()
-            self._unsub_rel = None
+        for name in ("_unsub_rel", "_unsub_disk"):
+            if getattr(self, name, None):
+                getattr(self, name)()
+                setattr(self, name, None)
         for unsub in (self._unsub_states, self._unsub_flush, self._unsub_timer):
             if unsub:
                 unsub()
@@ -216,6 +251,8 @@ class DeckHub:
             "bridge_version": self._bridge.version if self._bridge else None,
             "app_version": self.app_version,
             "latest_release": self.latest_release,
+            "on_disk_version": self.on_disk_version,
+            "restart_pending": self.restart_pending,
             "deck_firmware": self.firmware if self.deck_online else None,
             "deckd_available": self._bridge.deckd if self._bridge else None,
             "pending": {"bridge_id": self._pending.id, "name": self._pending.name} if self._pending else None,
@@ -462,14 +499,25 @@ class DeckHub:
 
     @property
     def app_version(self) -> str:
-        """The version of the app this integration goes with."""
-        if not hasattr(self, "_app_version"):
-            try:
-                path = Path(__file__).parent / "manifest.json"
-                self._app_version = str(json.loads(path.read_text()).get("version") or "")
-            except Exception:  # noqa: BLE001 - a missing version is not worth failing for
-                self._app_version = ""
-        return self._app_version
+        """The release this running integration belongs to.
+
+        Every part of the Ulanzi Deck carries this same number, so a connector
+        app or a deck reporting something lower is simply behind this release.
+        """
+        return self.running_version
+
+    @property
+    def restart_pending(self) -> bool:
+        """A newer release is on disk but is not what is running."""
+        a, b = self.running_version, self.on_disk_version
+        return bool(a and b and _cmp_ver(b, a) > 0)
+
+    async def _check_on_disk(self, _now: Any = None) -> None:
+        """Notice a download that has landed but has not been restarted into."""
+        found = await self.hass.async_add_executor_job(_manifest_version)
+        if found and found != self.on_disk_version:
+            self.on_disk_version = found
+            self._notify()
 
     async def async_tell_mac_to_update(self) -> bool:
         """Ask the connected Mac to fetch the app this integration goes with."""

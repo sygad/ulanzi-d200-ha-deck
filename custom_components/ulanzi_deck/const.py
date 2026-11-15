@@ -9,7 +9,7 @@ BRIDGE_URL = "/api/ulanzi_deck/bridge"
 APP_URL = "/api/ulanzi_deck/companion-app"
 APP_UPDATE_URL = "/api/ulanzi_deck/companion-app/{token}"
 
-# Where the companion app is published. Home Assistant fetches this when somebody
+# Where the connector app is published. Home Assistant fetches this when somebody
 # presses the download button, puts a pairing file beside the app, and hands the
 # pair over as one zip — so the app arrives already knowing this server.
 # Where to ask what the newest release is. The Marketplace only looks every

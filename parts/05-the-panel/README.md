@@ -31,9 +31,9 @@ pickers and switches as the card editor.
 | Try a key before sending it | **Preview**, at the right of the screen tabs. Keys then do what they say |
 | Put it on the deck | **Send to device**, top right. It reads "Sent" when there is nothing waiting |
 | Set the brightness | The slider under the gear. The deck changes as you drag |
-| Get the companion app | **Get the companion app**, on the card shown until a Mac is connected |
-| Update the companion app | **Update now**, in the banner under the panel when a newer one exists |
-| See what is up to date | The gear, under **Versions**: the integration, the companion app and the deck software, each with what it is running and what is ready |
+| Get the connector app | **Get the connector app**, on the card shown until a Mac is connected |
+| Update the connector app | **Update now**, in the banner under the panel when a newer one exists |
+| See what is up to date | The gear, under **Versions**: the integration, the connector app and the deck software, each with what it is running and what is ready |
 | Update the deck software | **Update** beside **Deck software**, under the gear |
 | Pair a Mac that has no key | **Allow**, which appears in the top bar. A Mac set up from the download
   arrives with a key and never asks |

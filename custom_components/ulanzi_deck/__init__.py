@@ -120,7 +120,7 @@ class BridgeView(HomeAssistantView):
 
 
 class CompanionAppView(HomeAssistantView):
-    """Hands over the companion app with this server's details already inside it.
+    """Hands over the connector app with this server's details already inside it.
 
     The app is not kept here — it is fetched from where it is published and a
     small pairing file is put beside it in the same zip. That file says which
@@ -160,7 +160,7 @@ class CompanionAppView(HomeAssistantView):
                 if response.status != 200:
                     return web.Response(
                         status=502,
-                        text="The companion app could not be downloaded "
+                        text="The connector app could not be downloaded "
                              f"({response.status}). Try again in a moment.",
                     )
                 app_zip = await response.read()
@@ -168,7 +168,7 @@ class CompanionAppView(HomeAssistantView):
             return web.Response(
                 status=502,
                 text="Home Assistant could not reach the internet to fetch the "
-                     "companion app. Check its connection and try again.",
+                     "connector app. Check its connection and try again.",
             )
 
         pairing = await hub.async_new_pairing()
@@ -251,7 +251,7 @@ def _readme(version: str) -> str:
   .after{{margin:34px 0 0;color:var(--soft)}}
 </style>
 <main>
-  <h1>Setting up the companion app</h1>
+  <h1>Setting up the connector app</h1>
   <p class="lede">{title} &middot; three things, and the only awkward one is macOS asking whether
     you meant it.</p>
 
@@ -298,7 +298,7 @@ def _readme(version: str) -> str:
     <p>It also puts itself in your <b>Applications</b> folder on that first run, so it disappears
        from this folder — that is meant to happen. From then on it is an app like any other, with
        its icon in the menu bar beside the clock.</p>
-    <figure class="mid"><img src="data:image/png;base64,{picture('ready.png')}" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button"></figure>
+    <figure class="mid"><img src="data:image/png;base64,{picture('ready.png')}" alt="The connector app: Home Assistant and Deck both connected, with a Proceed button"></figure>
   </div>
 
   <p class="after">That is everything. Your keys are set up in the Ulanzi Deck panel in Home

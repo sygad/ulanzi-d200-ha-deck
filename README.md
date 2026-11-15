@@ -105,7 +105,7 @@ A new item appears down the left. Open it and press the one button on the page.
 
 <br>
 
-<img src="images/guide/fig-step3.png" alt="The Ulanzi Deck page in Home Assistant, offering to get the companion app" width="100%">
+<img src="images/guide/fig-step3.png" alt="The Ulanzi Deck page in Home Assistant, offering to get the connector app" width="100%">
 
 <br>
 
@@ -113,7 +113,7 @@ A new item appears down the left. Open it and press the one button on the page.
 
 <br>
 
-## What the companion app is, before you run it
+## What the connector app is, before you run it
 
 Downloading a program from someone you have never met is a fair thing to be wary of.
 So here is exactly what it is, and why it has to exist at all.
@@ -150,7 +150,7 @@ it, change it, or build the app yourself rather than download it.
 
 <br>
 
-## 5 &nbsp; Open the companion app
+## 5 &nbsp; Open the connector app
 
 Open the zip. Three things are inside: the app, **Start here.html** — the same four steps as
 below, with a button that opens System Settings where macOS wants you — and a small pairing
@@ -202,7 +202,7 @@ The app stays in the menu bar beside the clock. Closing its window does not stop
 
 <br>
 
-<p align="center"><img src="images/guide/fig-step5-ready.png" alt="The companion app: Home Assistant and Deck both connected, with a Proceed button" width="460"></p>
+<p align="center"><img src="images/guide/fig-step5-ready.png" alt="The connector app: Home Assistant and Deck both connected, with a Proceed button" width="460"></p>
 
 <br>
 
@@ -231,17 +231,26 @@ or turns it off.
 
 ## Keeping it up to date
 
-The integration updates from the Marketplace like anything else there.
+There are three parts — the **integration** inside Home Assistant, the **connector app** on
+your Mac, and the **deck software** on the deck itself. They are released together and all
+carry the same number, so any part showing a lower one is simply behind.
 
-The companion app is handed to you by Home Assistant, so Home Assistant is what tells you a
-newer one exists: a banner appears under the panel, and **Update now** tells the Mac to fetch
-it. The app offers it in its own window and in the menu bar too, whichever you happen to be
-looking at.
+A line under the panel always says where all three are. Grey means there is nothing to do;
+amber means that part is behind, and a bar appears above the line with the one thing to do
+next — never a list of them, and always in the order they have to happen:
 
-It comes from your Home Assistant rather than the internet, over the connection the Mac is
-already on, so macOS does not ask about it again — the warning and the two Open Anyways happen
-once in the life of the app.
+1. **Integration** — comes from the Marketplace, and Home Assistant has to restart before the
+   new one is the one running. Until it has, the panel says so rather than letting you chase
+   the other two.
+2. **Connector app** — the integration hands it over. **Update now** tells the Mac to fetch it.
+   The app offers it in its own window and in the menu bar too.
+3. **Deck software** — the connector app copies it across. The deck restarts, which takes a few
+   seconds.
+
+The app's update comes from your Home Assistant rather than the internet, over the connection
+the Mac is already on, so macOS does not ask about it again — the warning and the two Open
+Anyways happen once in the life of the app.
 
 **Licence** — [MIT](LICENSE). Fonts and icons keep their own licences, listed in [NOTICE.md](NOTICE.md).
 
-**Credits** — **Roboto** by Google, Apache 2.0. **Material Design Icons** by [Pictogrammers](https://pictogrammers.com/library/mdi/). `adb`, carried inside the companion app, Apache 2.0. Ulanzi's own software is not included here. Not affiliated with Ulanzi or with Home Assistant.
+**Credits** — **Roboto** by Google, Apache 2.0. **Material Design Icons** by [Pictogrammers](https://pictogrammers.com/library/mdi/). `adb`, carried inside the connector app, Apache 2.0. Ulanzi's own software is not included here. Not affiliated with Ulanzi or with Home Assistant.

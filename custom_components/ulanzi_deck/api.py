@@ -101,7 +101,7 @@ async def ws_brightness(hass: HomeAssistant, connection: websocket_api.ActiveCon
 @websocket_api.async_response
 async def ws_update_app(hass: HomeAssistant, connection: websocket_api.ActiveConnection,
                         msg: dict) -> None:
-    """The panel asking the Mac to update its companion app."""
+    """The panel asking the Mac to update its connector app."""
     if hub := _hub(hass, connection, msg):
         connection.send_result(msg["id"], {"asked": await hub.async_tell_mac_to_update()})
 

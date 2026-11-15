@@ -16,7 +16,7 @@ changes, and carries out what a press asks for.
 | **Reads** | Whatever entities your keys point at; their history, for graph keys |
 | **Gives you** | A sidebar panel, two entities, and an event on every key press |
 
-It also hands out the companion app: the panel's **Get the companion app** button
+It also hands out the connector app: the panel's **Get the connector app** button
 builds a zip holding the published app, a pairing file carrying this server's address
 and a key for that Mac, and a page explaining what macOS is about to do. When a newer
 app exists it says so in a banner under the panel, and **Update now** tells the Mac to
@@ -88,7 +88,7 @@ This is the same thing by hand, for working on it:
 2. Restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**, search for
    **Ulanzi Deck**, and add it. It asks no questions.
-4. **Ulanzi Deck** appears in the sidebar. Until the companion app is running its chip
+4. **Ulanzi Deck** appears in the sidebar. Until the connector app is running its chip
    reads "Bridge not connected".
 
 The repo carries a `hacs.json` and is laid out the way the Marketplace expects, so it

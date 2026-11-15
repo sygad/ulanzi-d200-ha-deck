@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="4.1"
+VERSION="4.2"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -80,6 +80,20 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </dict></plist>
 PLIST
 
-codesign --force --deep --sign - "$APP" >/dev/null 2>&1 || true
+# Sign last: signing seals the bundle, so anything written afterwards breaks it.
+# This used to be "|| true", which quietly shipped an unsigned app when signing
+# failed — and on a network volume it does fail now and then, then works on a
+# second go. So: try, retry, verify, and stop the build if it still is not signed.
+for try in 1 2 3; do
+  codesign --force --deep --sign - "$APP" 2>"$TMP/codesign.err" || true
+  codesign --verify --deep --strict "$APP" >/dev/null 2>&1 && break
+  sleep 1
+done
+if ! codesign --verify --deep --strict "$APP" >/dev/null 2>&1; then
+  echo "FAILED: could not sign $APP" >&2
+  cat "$TMP/codesign.err" >&2 2>/dev/null || true
+  codesign --verify --deep --strict "$APP" >&2
+  exit 1
+fi
 echo "Built: $APP"
 du -sh "$APP" | sed 's/^/  /'
