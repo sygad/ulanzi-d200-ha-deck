@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="2.0"
+VERSION="2.1"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -36,6 +36,7 @@ cp "$TMP/UlanziDeck" "$APP/Contents/MacOS/UlanziDeck"
 
 # what it needs to set a deck up
 cp app/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+cp app/menubar.png app/menubar@2x.png "$APP/Contents/Resources/"
 cp "$ROOT/parts/02-deck-app/deckd" "$APP/Contents/Resources/deckd"
 cp "$ROOT/parts/02-deck-app/default-layout.bin" "$APP/Contents/Resources/default-layout.bin"
 

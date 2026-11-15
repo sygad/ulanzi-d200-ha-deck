@@ -40,6 +40,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         return true
     }
 
+    /// The menu bar glyph: a template image, so macOS tints it for light, dark
+    /// and whatever the wallpaper is doing behind it. 16pt square with a 2x
+    /// alongside; the bar allows 22pt and asks for no padding of our own.
+    static let menuIcon: NSImage = {
+        let img = Bundle.main.image(forResource: "menubar") ?? NSImage(size: NSSize(width: 16, height: 16))
+        img.isTemplate = true
+        img.size = NSSize(width: 16, height: 16)
+        return img
+    }()
+
     func comeBack() {
         NSApp.activate(ignoringOtherApps: true)
         NSApp.windows.first(where: { $0.canBecomeMain })?.makeKeyAndOrderFront(nil)
@@ -58,11 +68,13 @@ struct UlanziDeckApp: App {
         .windowResizability(.contentSize)
         .commands { CommandGroup(replacing: .newItem) {} }
 
-        MenuBarExtra("Ulanzi Deck", systemImage: "square.grid.3x3.fill") {
+        MenuBarExtra {
             MenuContents(service: delegate.service) {
                 openWindow(id: "main")
                 delegate.comeBack()
             }
+        } label: {
+            Image(nsImage: AppDelegate.menuIcon)
         }
     }
 }
