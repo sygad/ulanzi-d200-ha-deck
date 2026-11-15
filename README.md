@@ -136,7 +136,8 @@ job.
 
 - ❌ &nbsp;No account, no sign-in, no cloud service. Nothing of yours leaves your network.
 - ❌ &nbsp;Talks to one address only: the Home Assistant you pointed it at.
-- ❌ &nbsp;No analytics, no telemetry, no automatic updates, nothing else running in the background.
+- ❌ &nbsp;No analytics, no telemetry, nothing else running in the background.
+- ❌ &nbsp;Never updates itself behind your back. Home Assistant offers a new version; you press the button.
 
 <br>
 
@@ -221,6 +222,19 @@ device**. **Preview** lets you try a key in the browser before it ever reaches t
 ---
 
 <br>
+
+## Keeping it up to date
+
+The integration updates from the Marketplace like anything else there.
+
+The companion app is handed to you by Home Assistant, so Home Assistant is what tells you a
+newer one exists: a banner appears under the panel, and **Update now** tells the Mac to fetch
+it. The app offers it in its own window and in the menu bar too, whichever you happen to be
+looking at.
+
+It comes from your Home Assistant rather than the internet, over the connection the Mac is
+already on, so macOS does not ask about it again — the warning and the two Open Anyways happen
+once in the life of the app.
 
 **Licence** — [MIT](LICENSE). Fonts and icons keep their own licences, listed in [NOTICE.md](NOTICE.md).
 
