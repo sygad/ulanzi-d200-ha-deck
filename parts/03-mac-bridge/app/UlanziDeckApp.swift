@@ -8,39 +8,85 @@
 import SwiftUI
 import ServiceManagement
 
+/// Where the app lives.
+///
+/// It is a menu bar app, but SwiftUI will not open a window at all for one that
+/// is marked menu-bar-only in its Info.plist — which is why the first attempt
+/// launched to a blank screen. So it starts as an ordinary app with its window
+/// on screen, and drops out of the Dock and the app switcher the moment that
+/// window is closed. Open it again from the menu bar and it comes back.
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+    let service = Service()
+
+    func applicationDidFinishLaunching(_ note: Notification) {
+        service.start()
+        // macOS remembers how the window was left and restores it. A version of
+        // this app closed its own window at startup, so every launch afterwards
+        // restored a closed window and the app looked dead. It does not get to
+        // remember any more, and the window is shown on purpose at every launch.
+        DispatchQueue.main.async { [weak self] in
+            for w in NSApp.windows { w.isRestorable = false }
+            self?.comeBack()
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification, object: nil, queue: .main) { _ in
+            Task { @MainActor in
+                // Only the deck window counts; the menu's own panels close too.
+                if NSApp.windows.filter({ $0.isVisible && $0.canBecomeMain }).count <= 1 {
+                    NSApp.setActivationPolicy(.accessory)
+                }
+            }
+        }
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ app: NSApplication) -> Bool { false }
+
+    func applicationShouldHandleReopen(_ app: NSApplication, hasVisibleWindows visible: Bool) -> Bool {
+        comeBack()
+        return true
+    }
+
+    /// Put the app back in the Dock and bring its window to the front.
+    func comeBack() {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.windows.first(where: { $0.canBecomeMain })?.makeKeyAndOrderFront(nil)
+    }
+}
+
 @main
 struct UlanziDeckApp: App {
-    @StateObject private var service = Service()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
         Window("Ulanzi Deck", id: "main") {
-            MainView(service: service)
+            MainView(service: delegate.service)
                 .frame(width: 420)
                 .fixedSize(horizontal: false, vertical: true)
-                .onAppear {
-                    service.start()
-                    // Opened by hand, the window should stay. Started with the Mac,
-                    // nobody asked for it: a login launch does not make the app
-                    // active, so that is the difference to go on.
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        if !NSApplication.shared.isActive {
-                            NSApplication.shared.windows.first { $0.isVisible }?.close()
-                        }
-                    }
-                }
         }
         .windowResizability(.contentSize)
         .commands { CommandGroup(replacing: .newItem) {} }
 
-        MenuBarExtra("Ulanzi Deck", systemImage: service.menuIcon) {
-            Text(service.menuSummary)
-            Divider()
-            Button("Open Ulanzi Deck") {
-                NSApp.activate(ignoringOtherApps: true)
-                NSApp.windows.first?.makeKeyAndOrderFront(nil)
+        MenuBarExtra("Ulanzi Deck", systemImage: "square.grid.3x3.fill") {
+            MenuContents(service: delegate.service) {
+                openWindow(id: "main")
+                delegate.comeBack()
             }
-            Button("Quit") { NSApplication.shared.terminate(nil) }
         }
+    }
+}
+
+struct MenuContents: View {
+    @ObservedObject var service: Service
+    let open: () -> Void
+
+    var body: some View {
+        Text(service.menuSummary)
+        Divider()
+        Button("Open Ulanzi Deck", action: open)
+        Button("Quit") { NSApplication.shared.terminate(nil) }
     }
 }
 
@@ -49,7 +95,13 @@ struct MainView: View {
     @State private var typedAddress = ""
 
     var body: some View {
-        if setupTime { setUp } else { everyday }
+        // Wrapped, because a bare if/else gives the window nothing to measure
+        // and it opens at zero by zero — which looks exactly like not opening.
+        VStack(spacing: 0) {
+            if setupTime { setUp } else { everyday }
+        }
+        .frame(width: 420)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     // ---------------------------------------------------------- the one decision

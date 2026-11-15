@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="1.8"
+VERSION="1.9"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -70,8 +70,6 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
-  <!-- lives in the menu bar by the clock: no Dock icon, not in the app switcher -->
-  <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSHumanReadableCopyright</key><string>MIT. Includes adb, Apache License 2.0.</string>
   <key>NSLocalNetworkUsageDescription</key><string>Ulanzi Deck looks for Home Assistant on your network so you do not have to type its address.</string>
