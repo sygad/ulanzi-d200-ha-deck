@@ -61,7 +61,6 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .getapp .getapp-note a{color:var(--fg2)}
 .getapp .getapp-err{color:#c62828;font-size:13px}
   box-shadow:0 2px 10px rgba(0,0,0,.14);margin:2px 0 4px}
-.chip.upd{background:rgba(255,160,0,.18);color:inherit}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
   background:rgba(127,127,127,.16);white-space:nowrap}
 .gear{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:8px;border-radius:50%;
@@ -77,6 +76,13 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
   padding-block:20px 40px;max-width:1240px;margin:0 auto;
   display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
 @media (max-width:960px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.updbar{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin-top:4px;padding:16px 18px;
+  border-radius:12px;background:var(--card);box-shadow:0 2px 2px rgba(0,0,0,.06),0 1px 5px rgba(0,0,0,.08);
+  border-left:4px solid var(--primary)}
+.updbar .mi.dl{font-size:22px;color:var(--primary);flex:0 0 auto}
+.updbar .updtext{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.updbar .updtext b{font-size:14.5px;font-weight:500}
+.updbar .updtext span{font-size:13px;color:var(--fg2)}
 .card{background:var(--card);border-radius:12px;box-shadow:0 2px 2px rgba(0,0,0,.06),0 1px 5px rgba(0,0,0,.08);min-width:0}
 .card-h{padding:16px 18px 0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .card-h h2{font-size:16px}.card-h .sub{font-size:12.5px;color:var(--fg2)}
@@ -359,7 +365,6 @@ const MARKUP=`
   <button class="dots" id="menuBtn" title="Menu" aria-label="Menu" hidden><i></i><i></i><i></i></button>
   <h1>Ulanzi Deck</h1>
   <span class="chip"><span class="dot" id="chipDot"></span> <span id="chipText">Connecting…</span></span>
-  <span class="chip upd" id="updChip" hidden></span>
   <button class="gear" id="btn-settings" title="Deck settings" aria-label="Deck settings"><span class="mi"></span></button>
   <button class="btn pub" id="btn-allow" hidden>Allow</button>
   <button class="btn pub" id="btn-publish">Send to device</button>
@@ -611,6 +616,14 @@ const MARKUP=`
   </div>
 </div>
 
+  <div class="updbar" id="updBar" hidden>
+    <span class="mi dl"></span>
+    <span class="updtext">
+      <b id="updTitle"></b>
+      <span id="updSub"></span>
+    </span>
+    <button class="btn" id="btn-update">Update now</button>
+  </div>
 `;
 
 function build(host,init){
@@ -1457,9 +1470,13 @@ function showStatus(st){
   // An update waiting on the Mac, said where people are already looking.
   const want=st.app_version, got=st.bridge_version;
   const behind=want && got && cmpVer(want,got)>0;
-  const upd=$("#updChip");
-  upd.hidden=!behind;
-  if(behind) upd.textContent="Companion app "+want+" ready to install on "+(st.bridge_name||"your Mac");
+  const bar=$("#updBar");
+  bar.hidden=!behind;
+  if(behind){
+    bar.querySelector(".mi").textContent=ico("tray-arrow-down");
+    $("#updTitle").textContent="Companion app "+want+" is ready to install";
+    $("#updSub").textContent="Running "+got+" on "+(st.bridge_name||"your Mac")+".";
+  }
 
   const setup=st.bridge==="none";
   $("#getApp").hidden=!setup;
@@ -1481,6 +1498,12 @@ $("#btn-getapp").addEventListener("click",async()=>{
     err.hidden=false;
   }
   b.disabled=false; b.textContent="Get the companion app";
+});
+$("#btn-update").addEventListener("click",async()=>{
+  const b=$("#btn-update");
+  b.disabled=true; b.textContent="Updating\u2026";
+  try{ await hass().callWS({type:"ulanzi_deck/update_app"}); }catch(e){}
+  setTimeout(()=>{ b.disabled=false; b.textContent="Update now"; }, 8000);
 });
 $("#btn-allow").addEventListener("click",()=>{
   if(pendingBridge)hass().callWS({type:"ulanzi_deck/allow",bridge_id:pendingBridge.bridge_id}).catch(()=>{});

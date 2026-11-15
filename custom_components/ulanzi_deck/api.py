@@ -72,6 +72,16 @@ async def ws_press(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
         connection.send_result(msg["id"])
 
 
+@websocket_api.websocket_command({vol.Required("type"): "ulanzi_deck/update_app"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_update_app(hass: HomeAssistant, connection: websocket_api.ActiveConnection,
+                        msg: dict) -> None:
+    """The panel asking the Mac to update its companion app."""
+    if hub := _hub(hass, connection, msg):
+        connection.send_result(msg["id"], {"asked": await hub.async_tell_mac_to_update()})
+
+
 @websocket_api.websocket_command({vol.Required("type"): "ulanzi_deck/subscribe"})
 @websocket_api.require_admin
 @callback
@@ -102,5 +112,6 @@ async def ws_allow(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
 @callback
 def async_register(hass: HomeAssistant) -> None:
     """Registering again replaces the handlers, which is what a reload wants."""
-    for command in (ws_get, ws_save, ws_publish, ws_press, ws_subscribe, ws_allow):
+    for command in (ws_get, ws_save, ws_publish, ws_press, ws_subscribe, ws_allow,
+                    ws_update_app):
         websocket_api.async_register_command(hass, command)

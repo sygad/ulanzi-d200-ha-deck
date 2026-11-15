@@ -450,6 +450,14 @@ class DeckHub:
                 self._app_version = ""
         return self._app_version
 
+    async def async_tell_mac_to_update(self) -> bool:
+        """Ask the connected Mac to fetch the app this integration goes with."""
+        bridge = self._bridge
+        if not bridge:
+            return False
+        await bridge.ws.send_json({"type": "update_now"})
+        return True
+
     def new_download_token(self) -> str:
         """A one-time address for the app to fetch its own update from."""
         token = secrets.token_urlsafe(24)

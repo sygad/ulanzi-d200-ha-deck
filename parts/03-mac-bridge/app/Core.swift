@@ -197,6 +197,8 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
     var onVersion: ((String) -> Void)?
     /// Home Assistant handing over a one-time address to fetch that version from.
     var onAppAt: ((String) -> Void)?
+    /// Somebody pressing Update in the Home Assistant panel.
+    var onUpdateNow: (() -> Void)?
     var onDown: (() -> Void)?
     var onDeckMessage: ((Data) -> Void)?
 
@@ -291,6 +293,8 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
             saidPending = false
             onReady?()
             if let want = obj["app_version"] as? String, !want.isEmpty { onVersion?(want) }
+        case "update_now":
+            onUpdateNow?()
         case "app_at":
             if let token = obj["token"] as? String, !token.isEmpty { onAppAt?(token) }
         default:

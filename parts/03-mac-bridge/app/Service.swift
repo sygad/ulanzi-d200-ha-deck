@@ -124,6 +124,9 @@ final class Service: ObservableObject {
                 self.updateTo = Service.newer(want, than: bridgeVersion) ? want : nil
             }
         }
+        link.onUpdateNow = { [weak self] in
+            Task { @MainActor in self?.update() }
+        }
         link.onAppAt = { [weak self] token in
             Task { @MainActor in self?.fetchUpdate(token: token) }
         }
