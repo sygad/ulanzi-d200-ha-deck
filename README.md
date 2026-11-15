@@ -1,6 +1,6 @@
 # Setting up your Ulanzi deck
 
-Six steps, and four of them happen inside Home Assistant. Nothing is typed into a
+Six steps, and only one of them happens outside Home Assistant. Nothing is typed into a
 terminal and no files are copied by hand.
 
 <br>

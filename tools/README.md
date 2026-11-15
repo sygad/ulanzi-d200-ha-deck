@@ -1,4 +1,4 @@
-[All parts](../README.md#the-parts)
+[The guide](../README.md)
 
 # Tools
 

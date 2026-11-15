@@ -1,6 +1,6 @@
 [← Part 3](../03-mac-bridge/README.md) · [All parts](../../README.md) · [Part 5 →](../05-the-panel/README.md)
 
-# Part 4 · Home Assistant integration
+# Part 4 · The integration
 
 The part that does the thinking. It keeps your key settings, draws every key as a
 picture, sends the pictures to the deck, redraws a key when the thing it shows
@@ -12,15 +12,15 @@ changes, and carries out what a press asks for.
 |---|---|
 | **Built from** | A custom integration in Python. Pictures are drawn with Pillow, which Home Assistant already has |
 | **Files** | Not in this folder: in [`custom_components/ulanzi_deck/`](../../custom_components/ulanzi_deck) at the top of the repo, where Home Assistant and HACS look for it |
-| **Also needs** | The bridge ([Part 3](../03-mac-bridge/README.md)) to reach the deck |
+| **Also needs** | The connector app ([Part 3](../03-mac-bridge/README.md)) to reach the deck |
 | **Reads** | Whatever entities your keys point at; their history, for graph keys |
 | **Gives you** | A sidebar panel, two entities, and an event on every key press |
 
 It also hands out the connector app: the panel's **Get the connector app** button
 builds a zip holding the published app, a pairing file carrying this server's address
-and a key for that Mac, and a page explaining what macOS is about to do. When a newer
-app exists it says so in a banner under the panel, and **Update now** tells the Mac to
-fetch it from here. Home Assistant downloads it, pinned to the version this integration goes with, and passes it on; the Mac never talks to anywhere but your server.
+and a key for that Mac, and a page explaining what macOS is about to do. When a newer app exists it says so in an amber bar above the version line under the
+panel, and **Update now** tells the Mac to fetch it from here. Only one part can be
+updated at a time, in the order they depend on each other. Home Assistant downloads it, pinned to the version this integration goes with, and passes it on; the Mac never talks to anywhere but your server.
 
 ## How it works
 

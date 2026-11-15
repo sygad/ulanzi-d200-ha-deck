@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="4.7"
+VERSION="4.8"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"
@@ -103,7 +103,15 @@ if ! codesign --verify --deep --strict "$APP" >/dev/null 2>&1; then
   codesign --verify --deep --strict "$APP" >&2
   exit 1
 fi
+# The zip is what people actually download, and it was being made by hand with
+# a ditto command nobody had written down. A release should not depend on
+# somebody remembering the right flags.
+ZIP="$(dirname "$APP")/Ulanzi-Deck.zip"
+rm -f "$ZIP"
+ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
+
 echo "Built: $APP"
+echo "Zipped: $ZIP"
 echo
 echo "Before publishing this, run:  sh tools/check-release.sh"
 du -sh "$APP" | sed 's/^/  /'

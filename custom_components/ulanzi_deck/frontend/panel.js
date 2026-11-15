@@ -1484,7 +1484,7 @@ function showVersions(){
        wait(2));
 
   $("#v-note").textContent = macOld
-    ? "This Mac is too old to be told from here: open Ulanzi Deck on it and press Update."
+    ? "This Mac is too old to be told from here: open the connector app on it and press Update."
     : "All three carry the same number, and they go in order: Home Assistant hands over the "
       + "connector app, and the connector app carries the deck software. Updating one out of "
       + "turn puts the old version back, so only the next one can be pressed.";
@@ -1547,6 +1547,11 @@ $("#set-save").addEventListener("click",()=>{
 /* ---------- draft, kept by itself ----------
    Every edit is written to Home Assistant's storage as you make it, so closing
    the page or restarting loses nothing. Only Send to device reaches the deck. */
+/* One line shown where the update button is, for anything that went wrong and
+   has nowhere else to appear: a refused update, a draft that will not save.
+   Declared up here because both of those are written long before the panel
+   is first painted. */
+let refusedNote=null;   // {title, line} when there is something to say
 const snap=()=>JSON.stringify([pages,settings]);
 /* What still needs sending. Brightness is not in it: it reaches the deck as the
    slider moves and the deck keeps it itself, so there is nothing left to send
@@ -1561,7 +1566,18 @@ function persist(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
     const s=snap();
-    hass().callWS({type:"ulanzi_deck/save",pages,settings}).then(()=>{savedSnap=s}).catch(()=>{});
+    // The guide promises every change is kept as you make it. A save that
+    // failed used to say nothing at all, so the promise quietly stopped being
+    // true and you only found out by closing the page.
+    hass().callWS({type:"ulanzi_deck/save",pages,settings})
+      .then(()=>{savedSnap=s;
+        if(refusedNote&&refusedNote.what==="save"){refusedNote=null; if(lastStatus)paintVersions(lastStatus);}})
+      .catch(e=>{
+        refusedNote={what:"save", title:"Your changes are not being saved",
+          line:((e&&e.message)||"Home Assistant did not answer")
+            +". Keep this page open until it works again."};
+        if(lastStatus)paintVersions(lastStatus);
+      });
   },400);
 }
 function markDraft(){
@@ -1599,7 +1615,8 @@ function showStatus(st){
   dot.className="dot"+(st.deck?" ok":st.pending?" warn":"");
   text.textContent=st.deck?"Deck connected"
     :st.pending?"\u201c"+st.pending.name+"\u201d wants to connect"
-    :st.bridge==="connected"?"Bridge connected, no deck":"Bridge not connected";
+    // "Bridge" was this app's old name and appears nowhere else any more.
+    :st.bridge==="connected"?"Mac connected, no deck":"No Mac connected";
   allow.hidden=!st.pending;
   // Until a Mac is connected there is nothing worth configuring, so the setup
   // card is the whole page rather than one card beside the editor.
@@ -1653,9 +1670,9 @@ function paintVersions(st){
   const doing=st.job;
   const job =
     refusedNote
-      ? {icon:"alert-circle-outline", title:"That could not be done yet",
-         sub:refusedNote, label:"OK",
-         act:()=>{refusedNote=""; if(lastStatus) paintVersions(lastStatus);}}
+      ? {icon:"alert-circle-outline", title:refusedNote.title,
+         sub:refusedNote.line, label:"OK",
+         act:()=>{refusedNote=null; if(lastStatus) paintVersions(lastStatus);}}
     :
     doing && doing.state==="running"
       ? {icon:"progress-download", title:"Setting up the deck", sub:doing.line||"Working\u2026", act:null}
@@ -1679,7 +1696,7 @@ function paintVersions(st){
          sub:macCanBeTold
            ? "Running "+mac+" on "+(st.bridge_name||"your Mac")+"."
            : "Running "+mac+" on "+(st.bridge_name||"your Mac")+
-             ". Open Ulanzi Deck on that Mac and press Update: this button needs 3.5 or newer.",
+             ". Open the connector app on that Mac and press Update: this button needs 3.5 or newer.",
          label:"Update now", act:macCanBeTold?()=>ask("ulanzi_deck/update_app"):null}
     : ps[2].old
       ? {icon:"tray-arrow-down", title:"Deck software "+ps[2].want+" is ready to install",
@@ -1711,13 +1728,16 @@ function paintVersions(st){
 /* Asking for an update used to be fire-and-forget: a refusal, or no Mac at
    all, came back as {asked:false} and was thrown away, so the button simply
    went quiet. Now the reason is put where the button is. */
-let refusedNote="";
 function ask(type){
   return hass().callWS({type:type}).then(r=>{
-    refusedNote = (r && r.asked===false) ? (r.why || "Nothing answered the request.") : "";
+    refusedNote = (r && r.asked===false)
+      ? {what:"ask", title:"That could not be done yet",
+         line:(r.why || "Nothing answered the request.")}
+      : null;
     if(refusedNote && lastStatus) paintVersions(lastStatus);
   }).catch(e=>{
-    refusedNote = (e && e.message) || "The request could not be sent.";
+    refusedNote = {what:"ask", title:"That could not be done yet",
+      line:((e && e.message) || "The request could not be sent.")};
     if(lastStatus) paintVersions(lastStatus);
   });
 }

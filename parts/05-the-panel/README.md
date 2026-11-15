@@ -32,9 +32,9 @@ pickers and switches as the card editor.
 | Put it on the deck | **Send to device**, top right. It reads "Sent" when there is nothing waiting |
 | Set the brightness | The slider under the gear. The deck changes as you drag |
 | Get the connector app | **Get the connector app**, on the card shown until a Mac is connected |
-| Update the connector app | **Update now**, in the banner under the panel when a newer one exists |
-| See what is up to date | The gear, under **Versions**: the integration, the connector app and the deck software, each with what it is running and what is ready |
-| Update the deck software | **Update** beside **Deck software**, under the gear |
+| See what is up to date | The line under the panel, always on screen. Grey means nothing to do; amber means that part is behind |
+| Update any of the three | **Update now** in the amber bar above that line. It carries one job at a time, in the order the parts depend on each other |
+| See all three at once | The gear, under **Versions**. A part whose turn it is not has no button and says what it is waiting for |
 | Pair a Mac that has no key | **Allow**, which appears in the top bar. A Mac set up from the download
   arrives with a key and never asks |
 
@@ -64,7 +64,7 @@ back, and that first press does nothing else, so waking the deck cannot switch a
 on by accident.
 
 The deck does this itself rather than being told to by Home Assistant, so it still
-happens if the bridge or Home Assistant is down. The time travels in the layout
+happens if the connector app or Home Assistant is down. The time travels in the layout
 ([shared](../../shared/README.md#the-layout-file), byte 15), so the deck keeps it over
 a power cut.
 

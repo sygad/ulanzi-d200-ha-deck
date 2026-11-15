@@ -67,7 +67,14 @@ enum DeckInstaller {
             let has = shell(adb, ["shell", "ls /userdata/deck/layout.bin 2>/dev/null"])
             if has.out.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 say("Giving it something to show…")
-                _ = shell(adb, ["push", layout.path, "/userdata/deck/layout.bin"])
+                // Not fatal: the deck works, it just has nothing on screen until
+                // Home Assistant sends a layout. But it was being thrown away
+                // entirely, so a deck that came up blank looked like a success.
+                let pushed = shell(adb, ["push", layout.path, "/userdata/deck/layout.bin"])
+                if pushed.status != 0 {
+                    say("The starter screen did not copy across — the deck will be blank "
+                        + "until Home Assistant sends your keys.")
+                }
             }
         }
 
@@ -75,12 +82,18 @@ enum DeckInstaller {
         let start = shell(adb, ["shell", """
             killall UlanziDeckKey 2>/dev/null
             chmod 755 /userdata/UlanziDeckKey.new
-            mv /userdata/UlanziDeckKey.new /userdata/UlanziDeckKey
+            mv /userdata/UlanziDeckKey.new /userdata/UlanziDeckKey || echo MOVEFAILED
             sync
             (setsid /userdata/UlanziDeckKey -platform linuxfb >/dev/null 2>&1 &)
             sleep 1
             ps | grep "[U]lanziDeckKey" >/dev/null && echo running || echo stopped
             """])
+        // "running" on its own is not enough: if the move failed, the OLD app is
+        // what started, and it would report success while changing nothing.
+        if start.out.contains("MOVEFAILED") {
+            return .failure("The new deck software could not be put in place, so the deck is "
+                            + "still running the old one. Unplug it, plug it back in, and try again.")
+        }
         guard start.out.contains("running") else {
             return .failure("The deck took the app but would not start it. Unplug it, plug it back in, and try again.")
         }

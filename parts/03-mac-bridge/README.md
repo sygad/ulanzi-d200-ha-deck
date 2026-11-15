@@ -90,7 +90,10 @@ those only if that is what you want.*
    `waiting to be allowed`, and after you press Allow, `Home Assistant connected` and
    `deck online`.
 
-### Other things it can do
+### Other things the older headless bridge can do
+
+These are commands of `main.swift`, not of the app you downloaded. They exist for
+measuring and development work, and you have to build that older program to use them.
 
 Stop the login agent first for the ones marked *, so two programs aren't talking to
 the deck at once:

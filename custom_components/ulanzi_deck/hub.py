@@ -565,6 +565,11 @@ class DeckHub:
         bridge = self._bridge
         if not bridge:
             return False
+        # Remember what it was on, so that when it comes back we can tell an
+        # update that worked from one that reinstalled the same thing. The deck
+        # software already had this check; the app did not, and an app that
+        # relaunched unchanged looked exactly like one that had not been asked.
+        self._mac_was = bridge.version
         await bridge.ws.send_json({"type": "update_now"})
         return True
 
@@ -673,6 +678,18 @@ class DeckHub:
         if self._pending is bridge:
             self._pending = None
         await bridge.ws.send_json({"type": "ready", "app_version": self.app_version})
+        was = getattr(self, "_mac_was", "")
+        if was:
+            self._mac_was = ""
+            if bridge.version == was:
+                self.job = {
+                    "what": "update_app", "state": "failed",
+                    "line": ("The connector app restarted still running " + was
+                             + ". The download it was given was not "
+                             + self.app_version + ", so nothing changed."),
+                }
+            elif bridge.version:
+                self.job = None
         self._notify()
 
     async def async_allow(self, bridge_id: str) -> bool:

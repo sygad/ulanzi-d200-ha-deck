@@ -6,6 +6,11 @@
 > **Nobody setting a deck up does this.** The key positions are measured once and
 > shipped with the software; the connector app installs them. This page is how they
 > were measured, for anyone changing the hardware or curious about it.
+>
+> The commands below belong to `main.swift`, the older headless bridge kept beside the
+> app for exactly this kind of work ([Part 3](../03-mac-bridge/README.md)). They are not
+> in the connector app you downloaded, and you have to build that older program to use
+> them.
 
 ![The measured grid: where each key's window sits on the 1280 × 720 screen, with its size in pixels](grid.png)
 
@@ -24,9 +29,9 @@ vary from one to the next.
 
 | | |
 |---|---|
-| **Built from** | Two modes of the bridge program ([Part 3](../03-mac-bridge/README.md)), and one small Python script |
+| **Built from** | Two modes of the older headless bridge ([Part 3](../03-mac-bridge/README.md)), and one small Python script |
 | **Files in this folder** | `grid.json` (my deck's measurements) · `grid.png` (the same, as a picture) |
-| **Also needs** | The deck app ([Part 2](../02-deck-app/README.md)) and the bridge ([Part 3](../03-mac-bridge/README.md)) installed. Python 3 for the last step |
+| **Also needs** | The deck software ([Part 2](../02-deck-app/README.md)) installed, and the older headless bridge built ([Part 3](../03-mac-bridge/README.md)). Python 3 for the last step |
 | **Reads** | Your key presses |
 | **Shows** | Lines on the deck that you move onto the key edges |
 

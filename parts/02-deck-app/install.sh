@@ -9,7 +9,14 @@
 set -e
 cd "$(dirname "$0")"
 # use a build made here if there is one, otherwise the ready-made binary in this folder
+# Prefer a fresh build, but only if it IS fresh: build/ is not tracked, so an
+# old one left lying here would otherwise beat the published binary beside the
+# source and quietly install something older than deckd.c.
 BIN=build/deckd
+if [ -f "$BIN" ] && [ ! "$BIN" -nt deckd.c ]; then
+  echo "Ignoring $BIN: it is older than deckd.c. Run ./build.sh, or delete it." >&2
+  BIN=deckd
+fi
 [ -f "$BIN" ] || BIN=deckd
 adb get-state >/dev/null
 
