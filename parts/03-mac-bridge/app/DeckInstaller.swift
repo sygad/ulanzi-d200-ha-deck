@@ -31,6 +31,10 @@ enum DeckInstaller {
         }
 
         say("Looking for the deck…")
+        // Versions up to 2.8 ran an adb server of their own on port 5137. One of
+        // those left running still holds the deck, and nothing else can open it
+        // while it does. That port was only ever ours, so it is safe to end it.
+        _ = shell(adb, ["-P", "5137", "kill-server"])
         // adb keeps a server process of its own; start it where it cannot clash with
         // a copy the user may have installed themselves
         _ = shell(adb, ["start-server"])
