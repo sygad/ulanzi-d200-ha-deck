@@ -171,8 +171,14 @@ input[type=text]:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0
 .opt:hover,.opt.hi{background:var(--hover)}
 .opt .mi{font-size:22px;color:var(--fg2);flex:none;width:24px;text-align:center}
 .opt .txt{min-width:0;flex:1}
-.opt .p{font-size:14px;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.opt .s{font-size:11.5px;color:var(--fg2);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Both of these are blocks, so the name sits above the entity id rather than
+   running on from it. As inline spans they shared one line, which also made
+   their ellipsis do nothing — an inline box does not clip — so a long id ran
+   under the state on the right instead of being cut short. */
+.opt .p{display:block;font-size:14px;line-height:1.35;color:var(--fg);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opt .s{display:block;font-size:11.5px;line-height:1.35;color:var(--fg2);font-family:var(--mono);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .opt .st{font-size:11px;color:var(--fg2);flex:none;text-transform:uppercase;letter-spacing:.3px}
 .pop .none{padding:16px 10px;color:var(--fg2);font-size:13px;text-align:center}
 .pop .grp{padding:9px 10px 4px;font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:var(--fg2)}
