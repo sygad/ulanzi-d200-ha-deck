@@ -110,6 +110,29 @@ final class Deck {
         onAttach?()
     }
 
+    /// Let go of the deck for a moment.
+    ///
+    /// Putting our software on the deck restarts it while this end still has the
+    /// channel open, and the deck comes back deaf: it talks, we listen, and
+    /// nothing we say arrives. Closing first and opening again afterwards gives
+    /// both ends a fresh channel.
+    func letGo() {
+        guard let d = device else { return }
+        device = nil
+        IOHIDDeviceClose(d, IOOptionBits(kIOHIDOptionsTypeNone))
+        rx.removeAll()
+        rxLive = false
+        log("deck let go for setting up")
+        onDetach?()
+    }
+
+    /// Look for it again after letting go.
+    func lookAgain() {
+        guard device == nil else { return }
+        guard let set = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> else { return }
+        for dev in set { found(dev) }
+    }
+
     private func lost(_ dev: IOHIDDevice) {
         guard let d = device, d == dev else { return }
         device = nil

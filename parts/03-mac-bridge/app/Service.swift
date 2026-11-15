@@ -233,6 +233,9 @@ final class Service: ObservableObject {
 
     func setUpDeck() {
         step = .settingUpDeck("Looking for the deck…")
+        // The deck restarts in the middle of this. Let go of the channel first,
+        // or it comes back able to talk but not to listen.
+        deck.letGo()
         let say: @Sendable (String) -> Void = { line in
             Task { @MainActor in Service.current?.step = .settingUpDeck(line) }
         }
@@ -247,9 +250,11 @@ final class Service: ObservableObject {
         case .success:
             lastError = nil
             deckSeenAt = Date()
+            deck.lookAgain()             // fresh channel, both ways
             step = .noDeck               // it restarts its app; the next ping finds it
         case .failure(let why):
             lastError = why
+            deck.lookAgain()             // whatever went wrong, take the deck back
             step = .deckNeedsSettingUp
         }
     }
