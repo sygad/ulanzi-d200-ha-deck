@@ -19,6 +19,7 @@ import hashlib
 import hmac
 import json
 import logging
+from pathlib import Path
 import secrets
 import struct
 from typing import Any
@@ -416,6 +417,9 @@ class DeckHub:
                         await self._deck_arrived(base64.b64decode(obj.get("status") or ""))
                     elif obj.get("type") == "deck_gone":
                         self._deck_left()
+                    elif obj.get("type") == "want_app":
+                        await bridge.ws.send_json(
+                            {"type": "app_at", "token": self.new_download_token()})
         finally:
             if self._pending is bridge:
                 self._pending = None
@@ -423,6 +427,38 @@ class DeckHub:
                 self._bridge = None
                 self._deck_left()
             self._notify()
+
+    # ------------------------------------------------------------ keeping the Mac current
+    #
+    # The Mac app is handed out by this integration, so this is the only thing
+    # that knows a newer one exists. It says so when a bridge is admitted, and
+    # hands over a one-time address to fetch it from — this server, not the
+    # internet, which is the only address the app has ever been told to trust.
+
+    @property
+    def app_version(self) -> str:
+        """The version of the app this integration goes with."""
+        if not hasattr(self, "_app_version"):
+            try:
+                path = Path(__file__).parent / "manifest.json"
+                self._app_version = str(json.loads(path.read_text()).get("version") or "")
+            except Exception:  # noqa: BLE001 - a missing version is not worth failing for
+                self._app_version = ""
+        return self._app_version
+
+    def new_download_token(self) -> str:
+        """A one-time address for the app to fetch its own update from."""
+        token = secrets.token_urlsafe(24)
+        self._tokens = {t: when for t, when in getattr(self, "_tokens", {}).items()
+                        if when > dt_util.utcnow()}
+        self._tokens[token] = dt_util.utcnow() + timedelta(minutes=5)
+        return token
+
+    def spend_download_token(self, token: str) -> bool:
+        """True once, for a token that has not expired."""
+        tokens = getattr(self, "_tokens", {})
+        when = tokens.pop(token, None)
+        return bool(when and when > dt_util.utcnow())
 
     async def _admit(self, bridge: _Bridge) -> None:
         if self._bridge and self._bridge is not bridge:
@@ -433,7 +469,7 @@ class DeckHub:
         self._bridge = bridge
         if self._pending is bridge:
             self._pending = None
-        await bridge.ws.send_json({"type": "ready"})
+        await bridge.ws.send_json({"type": "ready", "app_version": self.app_version})
         self._notify()
 
     async def async_allow(self, bridge_id: str) -> bool:

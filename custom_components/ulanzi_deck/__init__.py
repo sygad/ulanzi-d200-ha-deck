@@ -29,6 +29,7 @@ from homeassistant.helpers.network import NoURLAvailableError, get_url
 from . import api, const as const_module, hub as hub_module, render
 from .const import (
     APP_RELEASE_URL,
+    APP_UPDATE_URL,
     APP_URL,
     BRIDGE_URL,
     DOMAIN,
@@ -70,6 +71,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             [StaticPathConfig(STATIC_URL, str(_FRONTEND), cache_headers=False)])
         hass.http.register_view(BridgeView())
         hass.http.register_view(CompanionAppView())
+        hass.http.register_view(AppUpdateView())
 
     stamp = await hass.async_add_executor_job(lambda: int((_FRONTEND / "panel.js").stat().st_mtime))
     await panel_custom.async_register_panel(
@@ -304,3 +306,36 @@ def _readme(version: str) -> str:
 </main>
 </html>
 """
+
+
+class AppUpdateView(HomeAssistantView):
+    """The app fetching its own update.
+
+    Not behind Home Assistant's login, because the app has no user: it proves
+    itself with the one-time address it was handed down the bridge connection,
+    which only an admitted Mac ever sees. What comes back is the published app
+    and nothing else — no pairing file, because the Mac asking is already
+    paired.
+    """
+
+    url = APP_UPDATE_URL
+    name = "api:ulanzi_deck:companion-app-update"
+    requires_auth = False
+
+    async def get(self, request: web.Request, token: str) -> web.StreamResponse:
+        hass = request.app[KEY_HASS]
+        hub = hass.data.get(DOMAIN)
+        if hub is None or not hub.spend_download_token(token):
+            return web.Response(status=404)
+
+        session = async_get_clientsession(hass)
+        try:
+            async with asyncio.timeout(120):
+                response = await session.get(APP_RELEASE_URL)
+                if response.status != 200:
+                    return web.Response(status=502)
+                body = await response.read()
+        except (ClientError, TimeoutError):
+            return web.Response(status=502)
+
+        return web.Response(body=body, content_type="application/zip")

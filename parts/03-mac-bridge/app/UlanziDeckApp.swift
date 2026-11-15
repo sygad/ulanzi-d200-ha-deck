@@ -150,6 +150,18 @@ struct MainView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
+            if let updating = service.updating {
+                Text(updating).font(.callout).foregroundStyle(.secondary)
+            } else if let newer = service.updateTo {
+                HStack(spacing: 10) {
+                    Text("Version \(newer) is available.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Button("Update") { service.update() }
+                        .controlSize(.small)
+                }
+            }
+
             if let error = service.lastError {
                 Text(error).font(.callout).foregroundStyle(.red)
                     .fixedSize(horizontal: false, vertical: true)

@@ -7,6 +7,7 @@ PANEL_URL = "ulanzi-deck"
 STATIC_URL = "/ulanzi_deck_static"
 BRIDGE_URL = "/api/ulanzi_deck/bridge"
 APP_URL = "/api/ulanzi_deck/companion-app"
+APP_UPDATE_URL = "/api/ulanzi_deck/companion-app/{token}"
 
 # Where the companion app is published. Home Assistant fetches this when somebody
 # presses the download button, puts a pairing file beside the app, and hands the

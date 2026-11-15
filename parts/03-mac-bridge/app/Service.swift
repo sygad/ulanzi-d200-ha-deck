@@ -32,6 +32,9 @@ final class Service: ObservableObject {
     @Published private(set) var lastError: String?
     /// True for this run only, when the app has just moved itself to Applications.
     @Published private(set) var justInstalled = false
+    /// The version Home Assistant goes with, when it is not the one running.
+    @Published private(set) var updateTo: String?
+    @Published private(set) var updating: String?
 
     /// The one Service the app makes. Held here so the work that happens off the
     /// main thread can find its way back without passing the object around.
@@ -115,6 +118,15 @@ final class Service: ObservableObject {
     private func connect() {
         link = Link(settings: settings)
         link.onReady = { [weak self] in Task { @MainActor in self?.linkReady() } }
+        link.onVersion = { [weak self] want in
+            Task { @MainActor in
+                guard let self = self else { return }
+                self.updateTo = (want == bridgeVersion) ? nil : want
+            }
+        }
+        link.onAppAt = { [weak self] token in
+            Task { @MainActor in self?.fetchUpdate(token: token) }
+        }
         link.onDown = { [weak self] in Task { @MainActor in self?.linkDown() } }
         link.onDeckMessage = { [weak self] m in
             Task { @MainActor in
@@ -256,6 +268,29 @@ final class Service: ObservableObject {
             lastError = why
             deck.lookAgain()             // whatever went wrong, take the deck back
             step = .deckNeedsSettingUp
+        }
+    }
+
+    // ------------------------------------------------------------ keeping itself current
+
+    /// Ask Home Assistant for somewhere to fetch the new app from.
+    func update() {
+        guard updating == nil else { return }
+        updating = "Asking Home Assistant…"
+        link?.sendJSON(["type": "want_app"])
+    }
+
+    private func fetchUpdate(token: String) {
+        guard updating != nil, let base = URL(string: settings.url) else { return }
+        let url = base.appendingPathComponent("api/ulanzi_deck/companion-app").appendingPathComponent(token)
+        Updater.apply(from: url) { line in
+            Task { @MainActor in Service.current?.updating = line }
+        } done: { result in
+            Task { @MainActor in
+                guard let self = Service.current else { return }
+                self.updating = nil
+                if case .failure(let why) = result { self.lastError = why }
+            }
         }
     }
 

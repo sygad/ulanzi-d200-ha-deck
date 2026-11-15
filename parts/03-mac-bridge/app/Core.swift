@@ -9,7 +9,7 @@ import CoreText
 import CoreGraphics
 
 
-let bridgeVersion = "1.0"
+let bridgeVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0"
 let stamp: DateFormatter = {
     let f = DateFormatter()
     f.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -193,6 +193,10 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
     private var failures = 0                // consecutive, for backing off
 
     var onReady: (() -> Void)?
+    /// Home Assistant saying which version of this app it goes with.
+    var onVersion: ((String) -> Void)?
+    /// Home Assistant handing over a one-time address to fetch that version from.
+    var onAppAt: ((String) -> Void)?
     var onDown: (() -> Void)?
     var onDeckMessage: ((Data) -> Void)?
 
@@ -286,6 +290,9 @@ final class Link: NSObject, URLSessionWebSocketDelegate {
             ready = true
             saidPending = false
             onReady?()
+            if let want = obj["app_version"] as? String, !want.isEmpty { onVersion?(want) }
+        case "app_at":
+            if let token = obj["token"] as? String, !token.isEmpty { onAppAt?(token) }
         default:
             break
         }
