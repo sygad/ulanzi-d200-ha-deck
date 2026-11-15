@@ -121,7 +121,7 @@ final class Service: ObservableObject {
         link.onVersion = { [weak self] want in
             Task { @MainActor in
                 guard let self = self else { return }
-                self.updateTo = (want == bridgeVersion) ? nil : want
+                self.updateTo = Service.newer(want, than: bridgeVersion) ? want : nil
             }
         }
         link.onAppAt = { [weak self] token in
@@ -272,6 +272,23 @@ final class Service: ObservableObject {
     }
 
     // ------------------------------------------------------------ keeping itself current
+
+    /// Is `offered` a later version than `running`?
+    ///
+    /// Home Assistant counts in threes (3.2.0) and the app in twos (3.2), so
+    /// they are compared a number at a time with the missing ones taken as
+    /// nought. Anything unreadable counts as no update rather than a loop of
+    /// offering one.
+    static func newer(_ offered: String, than running: String) -> Bool {
+        let a = offered.split(separator: ".").map { Int($0) ?? -1 }
+        let b = running.split(separator: ".").map { Int($0) ?? -1 }
+        if a.contains(-1) || b.contains(-1) { return false }
+        for i in 0..<max(a.count, b.count) {
+            let x = i < a.count ? a[i] : 0, y = i < b.count ? b[i] : 0
+            if x != y { return x > y }
+        }
+        return false
+    }
 
     /// Ask Home Assistant for somewhere to fetch the new app from.
     func update() {
