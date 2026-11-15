@@ -15,6 +15,7 @@ APP_RELEASE_URL = (
     "https://github.com/sygad/ulanzi-d200-ha-deck/releases/latest/download/Ulanzi-Deck.zip"
 )
 PAIRING_FILE = "ulanzi-deck-pairing.json"
+README_FILE = "Read me first.txt"
 EVENT_KEY = "ulanzi_deck_key"
 
 # What a button key may ask Home Assistant to do. The panel offers exactly these.

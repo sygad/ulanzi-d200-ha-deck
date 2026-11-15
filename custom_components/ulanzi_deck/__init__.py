@@ -12,6 +12,7 @@ import importlib
 import io
 import json
 from pathlib import Path
+import re
 import zipfile
 
 from aiohttp import ClientError, web
@@ -32,6 +33,7 @@ from .const import (
     DOMAIN,
     PAIRING_FILE,
     PANEL_URL,
+    README_FILE,
     STATIC_URL,
 )
 
@@ -177,7 +179,7 @@ class CompanionAppView(HomeAssistantView):
 
 
 def _with_pairing(app_zip: bytes, pairing: dict) -> bytes:
-    """Copy the published zip and drop the pairing file in beside the app.
+    """Copy the published zip, and add the pairing file and a note beside the app.
 
     Everything is copied entry by entry, permissions included, because the app
     will not run if the executable bit is lost. Nothing inside the app bundle
@@ -186,7 +188,42 @@ def _with_pairing(app_zip: bytes, pairing: dict) -> bytes:
     out = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(app_zip)) as src, \
             zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as dst:
+        version = ""
         for item in src.infolist():
-            dst.writestr(item, src.read(item.filename))
+            data = src.read(item.filename)
+            if item.filename.endswith(".app/Contents/Info.plist"):
+                version = _version_in(data)
+            dst.writestr(item, data)
         dst.writestr(PAIRING_FILE, json.dumps(pairing, indent=2, sort_keys=True))
+        dst.writestr(README_FILE, _readme(version))
     return out.getvalue()
+
+
+def _version_in(plist: bytes) -> str:
+    """The app's own version, read out of its Info.plist."""
+    m = re.search(rb"<key>CFBundleShortVersionString</key>\s*<string>([^<]+)</string>", plist)
+    return m.group(1).decode() if m else ""
+
+
+def _readme(version: str) -> str:
+    """The note that opens with the download. Three steps, nothing else."""
+    title = f"Ulanzi Deck {version}".strip()
+    return (
+        f"{title}\n"
+        f"{'-' * len(title)}\n"
+        "\n"
+        "1. Double-click \"Ulanzi Deck\".\n"
+        "\n"
+        "2. macOS will say it cannot check the app. Press Done — not Move to Bin.\n"
+        "   Then open System Settings > Privacy & Security, scroll down to\n"
+        "   Security, and press Open Anyway. It asks a second time: press\n"
+        "   Open Anyway again, the middle button.\n"
+        "\n"
+        "3. Leave ulanzi-deck-pairing.json next to the app. It is what tells the\n"
+        "   app which Home Assistant is yours, so there is nothing to type and\n"
+        "   nothing to allow. Once the app has opened you can delete it.\n"
+        "\n"
+        "Everything else happens in Home Assistant, in the Ulanzi Deck panel.\n"
+        "\n"
+        "https://github.com/sygad/ulanzi-d200-ha-deck\n"
+    )
