@@ -244,8 +244,8 @@ next — never a list of them, and always in the order they have to happen:
    the other two.
 2. **Connector app** — the integration hands it over. **Update now** tells the Mac to fetch it.
    The app offers it in its own window and in the menu bar too.
-3. **Deck software** — the connector app copies it across. The deck restarts, which takes a few
-   seconds.
+3. **Deck software** — the connector app copies it across, so it can only install the version
+   that app is carrying. That is why it comes last. The deck restarts, which takes a few seconds.
 
 The app's update comes from your Home Assistant rather than the internet, over the connection
 the Mac is already on, so macOS does not ask about it again — the warning and the two Open
