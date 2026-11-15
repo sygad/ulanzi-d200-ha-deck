@@ -61,7 +61,7 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .getapp .getapp-note a{color:var(--fg2)}
 .getapp .getapp-err{color:#c62828;font-size:13px}
   box-shadow:0 2px 10px rgba(0,0,0,.14);margin:2px 0 4px}
-.chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
   background:rgba(127,127,127,.16);white-space:nowrap}
 .gear{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:8px;border-radius:50%;
   line-height:1;display:inline-flex;opacity:.9}
@@ -553,6 +553,15 @@ const MARKUP=`
     </div>
   </div>
 
+
+  <div class="updbar" id="updBar" hidden>
+    <span class="mi dl"></span>
+    <span class="updtext">
+      <b id="updTitle"></b>
+      <span id="updSub"></span>
+    </span>
+    <button class="btn" id="btn-update">Update now</button>
+  </div>
 </div>
 
 <div class="dlgwrap" id="setDlg" hidden>
@@ -615,15 +624,6 @@ const MARKUP=`
     </div>
   </div>
 </div>
-
-  <div class="updbar" id="updBar" hidden>
-    <span class="mi dl"></span>
-    <span class="updtext">
-      <b id="updTitle"></b>
-      <span id="updSub"></span>
-    </span>
-    <button class="btn" id="btn-update">Update now</button>
-  </div>
 `;
 
 function build(host,init){
