@@ -1625,8 +1625,20 @@ function paintVersions(st){
   // new version by the integration, so they come after it.
   const bar=$("#updBar"), run=st.app_version||"";
   const mac=st.bridge_version||"", macCanBeTold=mac&&cmpVer(mac,"3.5")>=0;
+  // Something the Mac is doing right now outranks anything waiting to be done:
+  // it is the answer to the button that was just pressed.
+  const doing=st.job;
   const job =
-    st.restart_pending
+    doing && doing.state==="running"
+      ? {icon:"progress-download", title:"Setting up the deck", sub:doing.line||"Working\u2026", act:null}
+    : doing && doing.state==="failed"
+      ? {icon:"alert-circle-outline", title:"The deck software could not be installed",
+         sub:doing.line||"", label:"Try again",
+         act:()=>hass().callWS({type:"ulanzi_deck/update_deck"})}
+    : doing && doing.state==="done"
+      ? {icon:"check-circle-outline", title:"Deck software installed",
+         sub:doing.line||"The deck is restarting\u2026", act:null}
+    : st.restart_pending
       ? {icon:"restart", title:"Integration "+(st.on_disk_version||"")+" is downloaded",
          sub:"Home Assistant is still running "+run+". Restart to finish.",
          label:"Restart Home Assistant", confirm:"Restart now?", act:restartHa}

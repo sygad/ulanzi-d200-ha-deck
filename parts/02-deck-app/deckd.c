@@ -29,7 +29,7 @@ typedef short i16;
 typedef int i32;
 
 #define FW_MAJOR 4
-#define FW_MINOR 2
+#define FW_MINOR 3
 #define PROTO 1
 
 /* ---------- syscalls (ARM EABI) ---------- */

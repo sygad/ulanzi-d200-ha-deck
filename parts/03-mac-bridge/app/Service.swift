@@ -254,8 +254,14 @@ final class Service: ObservableObject {
         // The deck restarts in the middle of this. Let go of the channel first,
         // or it comes back able to talk but not to listen.
         deck.letGo()
+        // Home Assistant asked for this, and whoever pressed the button is
+        // looking at the panel, not at this window. Say the same thing there.
+        tellHomeAssistant(state: "running", line: "Looking for the deck…")
         let say: @Sendable (String) -> Void = { line in
-            Task { @MainActor in Service.current?.step = .settingUpDeck(line) }
+            Task { @MainActor in
+                Service.current?.step = .settingUpDeck(line)
+                Service.current?.tellHomeAssistant(state: "running", line: line)
+            }
         }
         Task {
             let result = await Task.detached { DeckInstaller.run(say: say) }.value
@@ -270,11 +276,18 @@ final class Service: ObservableObject {
             deckSeenAt = Date()
             deck.lookAgain()             // fresh channel, both ways
             step = .noDeck               // it restarts its app; the next ping finds it
+            tellHomeAssistant(state: "done", line: "The deck is restarting…")
         case .failure(let why):
             lastError = why
             deck.lookAgain()             // whatever went wrong, take the deck back
             step = .deckNeedsSettingUp
+            tellHomeAssistant(state: "failed", line: why)
         }
+    }
+
+    /// Say how the deck setup is going, for the panel that asked for it.
+    func tellHomeAssistant(state: String, line: String) {
+        link.sendJSON(["type": "job", "what": "setup_deck", "state": state, "line": line])
     }
 
     // ------------------------------------------------------------ keeping itself current

@@ -156,7 +156,11 @@ class DeckHub:
         # download from the shop, and then the two differ until a restart — which
         # is the whole reason somebody can press Update, see nothing change, and
         # be told again to update.
-        self.running_version = _manifest_version()
+        self.running_version = ""        # filled in async_start, off the event loop
+        # What the Mac is doing on our behalf right now, if anything. The panel
+        # asks for the deck software to be replaced and the Mac does it; without
+        # this the panel asked into silence and the button looked broken.
+        self.job: dict[str, Any] | None = None
         self.on_disk_version = self.running_version
         self.data: dict[str, Any] = {
             "pages": clean_pages(None), "published": None, "bridges": {},
@@ -198,6 +202,10 @@ class DeckHub:
                 clean_settings(stored["published_settings"]) if stored.get("published_settings") else None)
         await self._rebuild()
         self._unsub_timer = async_track_time_interval(self.hass, self._history_tick, timedelta(minutes=5))
+        # Read off the event loop: it is a file on disk, and Home Assistant
+        # rightly complains about opening one here.
+        self.running_version = await self.hass.async_add_executor_job(_manifest_version)
+        self.on_disk_version = self.running_version
         self._unsub_rel = async_track_time_interval(
             self.hass, self._check_releases, timedelta(hours=6))
         self._unsub_disk = async_track_time_interval(
@@ -252,6 +260,7 @@ class DeckHub:
             "app_version": self.app_version,
             "latest_release": self.latest_release,
             "on_disk_version": self.on_disk_version,
+            "job": self.job,
             "restart_pending": self.restart_pending,
             "deck_firmware": self.firmware if self.deck_online else None,
             "deckd_available": self._bridge.deckd if self._bridge else None,
@@ -479,6 +488,8 @@ class DeckHub:
                         await self._deck_arrived(base64.b64decode(obj.get("status") or ""))
                     elif obj.get("type") == "deck_gone":
                         self._deck_left()
+                    elif obj.get("type") == "job":
+                        self._job_update(obj)
                     elif obj.get("type") == "want_app":
                         await bridge.ws.send_json(
                             {"type": "app_at", "token": self.new_download_token()})
@@ -489,6 +500,24 @@ class DeckHub:
                 self._bridge = None
                 self._deck_left()
             self._notify()
+
+    @callback
+    def _job_update(self, obj: dict[str, Any]) -> None:
+        """The Mac saying how a job it was asked to do is going.
+
+        Only three things matter to the panel: what is being done, whether it
+        is still going, and what to say if it stopped. Anything longer than a
+        line is the Mac's problem, not something to show.
+        """
+        state = str(obj.get("state") or "")[:12]
+        if state not in ("running", "done", "failed"):
+            return
+        self.job = {
+            "what": str(obj.get("what") or "")[:20],
+            "state": state,
+            "line": str(obj.get("line") or "")[:200],
+        }
+        self._notify()
 
     # ------------------------------------------------------------ keeping the Mac current
     #
@@ -651,6 +680,11 @@ class DeckHub:
         self._read_status(status)
         self.deck_online = True
         _LOGGER.info("Deck connected (firmware %s)", self.firmware)
+        # A deck that has just come back is the proof a finished setup worked:
+        # the version it now reports is the answer, so the message about doing
+        # it has nothing left to say.
+        if self.job and self.job.get("state") == "done":
+            self.job = None
         if self._blob is not None and self._device_layout != render.layout_id(self._blob):
             await self._send_layout()          # the deck is holding something older
         else:
