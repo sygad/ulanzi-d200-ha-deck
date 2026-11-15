@@ -29,7 +29,7 @@ typedef short i16;
 typedef int i32;
 
 #define FW_MAJOR 4
-#define FW_MINOR 5
+#define FW_MINOR 6
 /* The same two numbers as words, so --version and the log can never drift from
    what the status message reports. They used to be typed out by hand, and said
    1.2 for every release after it. */

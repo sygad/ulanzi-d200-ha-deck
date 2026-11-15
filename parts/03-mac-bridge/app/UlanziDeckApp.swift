@@ -107,7 +107,10 @@ struct MenuContents: View {
     let open: () -> Void
 
     var body: some View {
-        Text("Ulanzi Deck — \(appVersion.replacingOccurrences(of: "Version ", with: ""))")
+        // "Ulanzi Deck" is the deck, the Home Assistant panel and this app all at
+        // once, so a version beside it says nothing about which of the three it
+        // belongs to. The panel calls this part the connector app; so does this.
+        Text("Connector app — \(appVersion.replacingOccurrences(of: "Version ", with: ""))")
         Text(service.menuSummary)
         if let newer = service.updateTo {
             Divider()
@@ -117,7 +120,7 @@ struct MenuContents: View {
             }
         }
         Divider()
-        Button("Open Ulanzi Deck", action: open)
+        Button("Open connector app", action: open)
         Button("Quit") { NSApplication.shared.terminate(nil) }
     }
 }
@@ -140,7 +143,7 @@ struct MainView: View {
                     .font(.system(size: 26))
                     .foregroundStyle(.tint)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Ulanzi Deck").font(.title2.weight(.medium))
+                    Text("Ulanzi Deck connector").font(.title2.weight(.medium))
                     Text(headline).font(.callout).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -269,7 +272,7 @@ struct MainView: View {
         case .noHomeAssistant:
             return "It was not found on this network, so it needs typing in once."
         case .waitingToBeAllowed:
-            return "Open Ulanzi Deck in the Home Assistant sidebar and press Allow. "
+            return "Open the Ulanzi Deck panel in Home Assistant and press Allow. "
                  + "This only happens the first time."
         case .noDeck:
             return "Plug the deck into this Mac with the cable it came with."
