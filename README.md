@@ -151,7 +151,9 @@ it, change it, or build the app yourself rather than download it.
 
 ## 5 &nbsp; Open the companion app
 
-Open the zip. There are two things inside it: the app, and a small file beside it.
+Open the zip. Three things are inside: the app, **Start here.html** — a page with these
+same steps and a button that opens System Settings where macOS wants you — and a small
+pairing file.
 
 **Double-click Ulanzi Deck.** Leave `ulanzi-deck-pairing.json` where it is — the app
 reads it the first time it runs. That file is what tells the app where your Home

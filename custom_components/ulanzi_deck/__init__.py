@@ -207,18 +207,19 @@ def _version_in(plist: bytes) -> str:
 
 
 def _readme(version: str) -> str:
-    """The page that opens with the download.
+    """The page that opens with the download: step 5 of the guide, on the Mac.
 
     It cannot be the app that says this. macOS refuses to run a program nobody
     has paid Apple to vouch for, so at the moment somebody needs telling what
     to do, our app is the one thing that cannot speak. A page can: it is a
-    document, not a program, so it opens.
-
-    It says what will happen before it happens, and carries a button that opens
-    System Settings at the Security section, so nobody goes hunting.
+    document, not a program, so it opens — and it can carry a button that opens
+    System Settings at the right section, which is the part that otherwise
+    means hunting.
     """
-    shot = (_FRONTEND / "blocked.png").read_bytes()
-    picture = base64.b64encode(shot).decode()
+
+    def picture(name: str) -> str:
+        return base64.b64encode((_FRONTEND / name).read_bytes()).decode()
+
     title = f"Ulanzi Deck {version}".strip()
     return f"""<!doctype html>
 <html lang="en"><meta charset="utf-8">
@@ -227,56 +228,63 @@ def _readme(version: str) -> str:
 <style>
   :root{{--ink:#1d1d1f;--soft:#6e6e73;--line:#e3e3e5;--blue:#2f7fe0}}
   *{{box-sizing:border-box}}
-  body{{margin:0;padding:48px 24px;background:#f2f2f4;color:var(--ink);
-       font:400 15px/1.55 -apple-system,"SF Pro Text",system-ui,sans-serif}}
-  main{{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px}}
-  h1{{margin:0;font-size:26px;font-weight:600;letter-spacing:-.01em}}
-  .lede{{margin:0;color:var(--soft);max-width:62ch}}
-  .pair{{display:grid;grid-template-columns:1fr 280px;gap:32px;align-items:center;
-        background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}}
-  .pair img{{width:100%;height:auto;border-radius:10px;display:block}}
-  .flow{{display:flex;flex-direction:column;gap:12px;align-items:stretch}}
-  .step{{background:#ececef;border-radius:28px;padding:13px 18px;text-align:center;font-size:17px}}
-  .arrow{{text-align:center;color:var(--soft);font-size:18px;line-height:1}}
-  .go{{display:block;background:var(--blue);color:#fff;text-align:center;text-decoration:none;
-      font-size:17px;font-weight:500;padding:15px 18px;border-radius:28px;margin-top:8px}}
-  ol{{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px;max-width:68ch}}
-  .after{{margin:0;color:var(--soft);max-width:68ch}}
-  code{{background:#ececef;border-radius:5px;padding:1px 6px;font-size:14px}}
-  @media (max-width:760px){{.pair{{grid-template-columns:1fr}}}}
+  body{{margin:0;padding:52px 24px 80px;background:#f2f2f4;color:var(--ink);
+       font:400 16px/1.55 -apple-system,"SF Pro Text",system-ui,sans-serif}}
+  main{{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}}
+  h1{{margin:0;font-size:28px;font-weight:600;letter-spacing:-.012em}}
+  .lede{{margin:0 0 10px;color:var(--soft)}}
+  .step{{display:grid;grid-template-columns:30px 1fr;gap:4px 14px;align-items:baseline;margin-top:26px}}
+  .n{{font-size:19px;font-weight:600}}
+  .step h2{{margin:0;font-size:19px;font-weight:600;letter-spacing:-.01em}}
+  .step p{{margin:12px 0 0;grid-column:2;color:var(--soft)}}
+  .step p b{{color:var(--ink);font-weight:600}}
+  figure{{margin:16px 0 0;grid-column:2}}
+  figure img{{display:block;width:100%;height:auto;border-radius:10px}}
+  figure.small img{{max-width:300px}}
+  hr{{border:0;border-top:1px solid var(--line);margin:34px 0 0}}
+  .go{{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-size:16px;
+      font-weight:500;padding:13px 24px;border-radius:9px;margin-top:16px;grid-column:2}}
+  code{{background:#e7e7ea;border-radius:5px;padding:1px 6px;font-size:14.5px}}
+  .after{{margin:34px 0 0;color:var(--soft)}}
 </style>
 <main>
-  <div>
-    <h1>macOS will block Ulanzi Deck the first time</h1>
-    <p class="lede">Nothing is wrong with it. Every Mac does this for software not sold through
-      Apple's own store — it means nobody has paid Apple to vouch for it, not that anything is
-      wrong with the app. You tell your Mac once that you want it, and never again.</p>
+  <h1>Setting up the companion app</h1>
+  <p class="lede">Three things, and the only awkward one is macOS asking whether you meant it.</p>
+
+  <div class="step">
+    <span class="n">1</span>
+    <h2>Double-click Ulanzi Deck</h2>
+    <p>It is in the folder this page is in. Leave <code>ulanzi-deck-pairing.json</code> where it
+       is — that is what tells the app which Home Assistant is yours, so there is nothing to type
+       and nothing to allow.</p>
+    <figure><img src="data:image/png;base64,{picture('finder.png')}" alt="The Downloads folder: the unzipped folder, and the app inside it"></figure>
   </div>
 
-  <div class="pair">
-    <img src="data:image/png;base64,{picture}" alt="System Settings, Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button">
-    <div class="flow">
-      <div class="step">System Settings</div>
-      <div class="arrow">&#8595;</div>
-      <div class="step">Privacy &amp; Security</div>
-      <div class="arrow">&#8595;</div>
-      <div class="step">Security</div>
-      <a class="go" href="x-apple.systempreferences:com.apple.preference.security?General">Open Settings</a>
-    </div>
+  <hr>
+
+  <div class="step">
+    <span class="n">2</span>
+    <h2>macOS will stop you. Press Done.</h2>
+    <p><b>Not</b> Move to Bin, however blue that button is. Every Mac shows this for software not
+       sold through Apple's own store — it means nobody has paid Apple to vouch for it, not that
+       anything is wrong with the app.</p>
+    <figure class="small"><img src="data:image/png;base64,{picture('dialog.png')}" alt="The macOS warning: Ulanzi Deck Not Opened, with Done and Move to Bin"></figure>
   </div>
 
-  <ol>
-    <li>Double-click <b>Ulanzi Deck</b>. macOS says it cannot check it: press <b>Done</b> —
-        not Move to Bin.</li>
-    <li>Press <b>Open Settings</b> above, and in the <b>Security</b> section press
-        <b>Open Anyway</b> beside Ulanzi Deck.</li>
-    <li>It asks once more, with Move to Bin in blue. Press <b>Open Anyway</b> — the middle
-        button.</li>
-  </ol>
+  <hr>
 
-  <p class="after">Leave <code>ulanzi-deck-pairing.json</code> next to the app. It is what tells
-    the app which Home Assistant is yours, so there is nothing to type and nothing to allow.
-    Once the app has opened you can delete it, and this page.</p>
+  <div class="step">
+    <span class="n">3</span>
+    <h2>Tell your Mac you meant it</h2>
+    <p>Open Privacy &amp; Security and, in the <b>Security</b> section, press <b>Open Anyway</b>
+       beside Ulanzi Deck. It asks once more with Move to Bin in blue: press <b>Open Anyway</b>
+       again, the middle button. That is it, once, forever.</p>
+    <a class="go" href="x-apple.systempreferences:com.apple.preference.security?General">Open Privacy &amp; Security</a>
+    <figure><img src="data:image/png;base64,{picture('blocked.png')}" alt="System Settings, Privacy and Security, with Ulanzi Deck blocked and an Open Anyway button"></figure>
+  </div>
+
+  <p class="after">The app opens, finds your Home Assistant by itself, and sets your deck up when
+    you press Proceed. You can delete this page and the pairing file afterwards.</p>
 </main>
 </html>
 """
