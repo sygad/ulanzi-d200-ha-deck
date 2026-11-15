@@ -1464,8 +1464,13 @@ $("#set-save").addEventListener("click",()=>{
    Every edit is written to Home Assistant's storage as you make it, so closing
    the page or restarting loses nothing. Only Send to device reaches the deck. */
 const snap=()=>JSON.stringify([pages,settings]);
-let publishedSnap=init.published?JSON.stringify([init.published,
-  Object.assign({},SET_DEFAULTS,init.published_settings||{})]):null;
+/* What still needs sending. Brightness is not in it: it reaches the deck as the
+   slider moves and the deck keeps it itself, so there is nothing left to send
+   and nothing to nag about. */
+const forSending=(p,st)=>{const {brightness,...rest}=st||{};return JSON.stringify([p,rest])};
+const sendSnap=()=>forSending(pages,settings);
+let publishedSnap=init.published?forSending(init.published,
+  Object.assign({},SET_DEFAULTS,init.published_settings||{})):null;
 let savedSnap=snap(), saveTimer=null;
 function persist(){
   if(snap()===savedSnap)return;
@@ -1476,16 +1481,17 @@ function persist(){
   },400);
 }
 function markDraft(){
-  const dirty=snap()!==publishedSnap, btn=$("#btn-publish");
+  const dirty=sendSnap()!==publishedSnap, btn=$("#btn-publish");
   btn.disabled=!dirty;
   btn.textContent=dirty?"Send to device":"Sent";
   persist();
 }
 $("#btn-publish").addEventListener("click",()=>{
-  const s=snap(), btn=$("#btn-publish");
+  const s=snap(), sent=sendSnap(), btn=$("#btn-publish");
   clearTimeout(saveTimer);
   btn.disabled=true;
-  hass().callWS({type:"ulanzi_deck/publish",pages,settings}).then(()=>{savedSnap=publishedSnap=s;markDraft()})
+  hass().callWS({type:"ulanzi_deck/publish",pages,settings})
+    .then(()=>{savedSnap=s;publishedSnap=sent;markDraft()})
     .catch(()=>{btn.disabled=false;btn.textContent="Could not send \u2014 try again"});
 });
 
