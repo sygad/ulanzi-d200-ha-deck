@@ -250,7 +250,8 @@ def _readme(version: str) -> str:
 </style>
 <main>
   <h1>Setting up the companion app</h1>
-  <p class="lede">Three things, and the only awkward one is macOS asking whether you meant it.</p>
+  <p class="lede">{title} &middot; three things, and the only awkward one is macOS asking whether
+    you meant it.</p>
 
   <div class="step">
     <span class="n">1</span>

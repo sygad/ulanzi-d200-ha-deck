@@ -15,6 +15,13 @@ import ServiceManagement
 /// a window for one at all, closing the last window ends it, and moving its
 /// Dock presence in and out at runtime made the window vanish when focus
 /// moved. Being ordinary is duller and it works.
+/// What this copy of the app is, for the window and the menu. Nobody should have
+/// to look in Get Info to find out which one they are running.
+let appVersion: String = {
+    let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    return v.map { "Version \($0)" } ?? ""
+}()
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     let service = Service()
@@ -85,6 +92,7 @@ struct MenuContents: View {
     let open: () -> Void
 
     var body: some View {
+        Text("Ulanzi Deck — \(appVersion.replacingOccurrences(of: "Version ", with: ""))")
         Text(service.menuSummary)
         Divider()
         Button("Open Ulanzi Deck", action: open)
@@ -113,6 +121,10 @@ struct MainView: View {
                     Text("Ulanzi Deck").font(.title2.weight(.medium))
                     Text(headline).font(.callout).foregroundStyle(.secondary)
                 }
+                Spacer()
+                Text(appVersion)
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
 
             Text(detail)
