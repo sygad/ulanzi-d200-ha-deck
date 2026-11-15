@@ -15,7 +15,7 @@ is given.
 
 | | |
 |---|---|
-| **Built from** | One C file with no libraries at all, not even the C library. 21 KB when built |
+| **Built from** | One C file with no libraries at all, not even the C library. 23 KB when built |
 | **Files in this folder** | `deckd` (ready to install) · `deckd.c` (the source) · `build.sh` (rebuilds it) · `install.sh` (puts it on the deck) · `default-layout.bin` (the starter screen) |
 | **Also needs** | `adb` on the Mac. The `lld` linker only if you rebuild it |
 | **Reads** | The fourteen keys; messages from the bridge |
@@ -70,8 +70,10 @@ Nothing outside `/userdata` is touched.
    ./parts/02-deck-app/install.sh
    ```
 
-3. It should finish with `deckd 1.1` and `running`, and the wide key should read
-   "Waiting for Home Assistant" with a red dot.
+3. It should finish with `deckd` and the release number, and `running`, and the wide key
+   should read "Waiting for Home Assistant" with a red dot. That number comes from
+   `FW_MAJOR`/`FW_MINOR` in `deckd.c`, the same two values the deck reports over USB, so
+   the two can never disagree.
 
 That is as far as this part goes by itself. The dot clears once the bridge
 ([Part 3](../03-mac-bridge/README.md)) and Home Assistant ([Part 4](../04-home-assistant/README.md))

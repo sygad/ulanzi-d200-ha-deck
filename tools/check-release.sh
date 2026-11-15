@@ -51,15 +51,28 @@ same "the deck version the app advertises"   "$CLAIMS"   "$MANIFEST"
 
 # ---------------------------------------------------------------- and what it carries
 # The one that bit: the number above is read out of deckd.c, so it is right
-# even when the binary beside it is three releases old. Build deckd again and
-# compare the bytes.
+# even when the binary beside it is releases old. Build deckd again and compare
+# the bytes.
+#
+# Both hashes are taken BEFORE building, because build.sh publishes its own
+# output over parts/02-deck-app/deckd. Comparing after the build compared that
+# file with itself and could never fail — which is how the first version of
+# this check passed the very fault it was written for. The original bytes are
+# put back afterwards so a check never edits the tree.
+PUB="$ROOT/parts/02-deck-app/deckd"
+WAS_PUB=$(md5 -q "$PUB" 2>/dev/null || echo "missing")
+WAS_APP=$(md5 -q "$APP/Contents/Resources/deckd" 2>/dev/null || echo "missing")
+KEEP=$(mktemp); [ -f "$PUB" ] && cp "$PUB" "$KEEP"
+
 sh "$ROOT/parts/02-deck-app/build.sh" >/dev/null 2>&1 \
   || { bad "the deck app builds" "build.sh failed"; echo; echo "FAILED"; exit 1; }
 FRESH=$(md5 -q "$ROOT/parts/02-deck-app/build/deckd")
-same "the published deck binary is that build" \
-     "$(md5 -q "$ROOT/parts/02-deck-app/deckd")"            "$FRESH"
-same "the deck binary inside the app is that build" \
-     "$(md5 -q "$APP/Contents/Resources/deckd")"            "$FRESH"
+
+[ -s "$KEEP" ] && cp "$KEEP" "$PUB"
+rm -f "$KEEP"
+
+same "the published deck binary is that build"       "$WAS_PUB"   "$FRESH"
+same "the deck binary inside the app is that build"  "$WAS_APP"   "$FRESH"
 
 # ---------------------------------------------------------------- signed, really
 if codesign --verify --deep --strict "$APP" >/dev/null 2>&1; then

@@ -130,7 +130,7 @@ job.
 
 - ✅ &nbsp;Holds the USB connection and passes messages between the deck and your Home Assistant.
 - ✅ &nbsp;Tells the deck the time, because the deck has no clock of its own.
-- ✅ &nbsp;Copies the deck software across. Once, at the start, keeping Ulanzi's own copy so you can go back.
+- ✅ &nbsp;Copies the deck software across: at the start, and again whenever you update it. Ulanzi's own copy is kept the first time, so you can go back.
 
 **What it never does**
 
@@ -247,7 +247,7 @@ next — never a list of them, and always in the order they have to happen:
 3. **Deck software** — the connector app copies it across, so it can only install the version
    that app is carrying. That is why it comes last. The deck restarts, which takes a few seconds.
 
-The app's update comes from your Home Assistant rather than the internet, over the connection
+The app's update is fetched by your Home Assistant and handed to the Mac over the connection
 the Mac is already on, so macOS does not ask about it again — the warning and the two Open
 Anyways happen once in the life of the app.
 

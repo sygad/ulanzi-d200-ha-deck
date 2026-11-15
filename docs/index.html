@@ -341,7 +341,7 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
         <ul>
           <li>Holds the USB connection and passes messages between the deck and your Home Assistant.</li>
           <li>Tells the deck the time, because the deck has no clock of its own.</li>
-          <li>Copies the deck software across. Once, at the start, keeping Ulanzi's own copy so you can go back.</li>
+          <li>Copies the deck software across: at the start, and again whenever you update it. Ulanzi's own copy is kept the first time, so you can go back.</li>
         </ul>
       </div>
       <div class="doesnt">
@@ -451,7 +451,7 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
         <h3>Keeping it up to date</h3>
         <p>There are three parts — the <strong>integration</strong> inside Home Assistant, the <strong>connector app</strong> on your Mac, and the <strong>deck software</strong> on the deck itself. They are released together and all carry the same number, so any part showing a lower one is simply behind.</p>
         <p>A line under the panel always says where all three are. Grey means there is nothing to do; amber means that part is behind, and a bar appears above the line with the one thing to do next — never a list of them, and always in the order they have to happen: the <strong>integration</strong> first, from the Marketplace, which needs Home Assistant to restart before the new one is the one running; then the <strong>connector app</strong>, which the integration hands over when you press <strong>Update now</strong>; then the <strong>deck software</strong>, which the connector app copies across — so it can only install the version that app is carrying, which is why it comes last.</p>
-        <p>The app's update comes from your Home Assistant rather than the internet, over the connection the Mac is already on, so macOS does not ask about it again — the warning and the two Open Anyways happen once in the life of the app.</p>
+        <p>The app's update is fetched by your Home Assistant and handed to the Mac over the connection it is already on, so macOS does not ask about it again — the warning and the two Open Anyways happen once in the life of the app.</p>
       </div>
     </div>
   </article>

@@ -19,7 +19,7 @@ listening.
 
 | | |
 |---|---|
-| **Built from** | One Swift file. No packages, no drivers |
+| **Built from** | 7 Swift files in `app/`. No packages, no drivers |
 | **Files in this folder** | `app/` (the app's source) · `build-app.sh` (builds it) · `main.swift` and `install.sh` (the older headless bridge, kept for reference) |
 | **Also needs** | Nothing, to use it. To build it: Xcode Command Line Tools (`xcode-select --install`) |
 | **Reads** | The deck, over USB; Home Assistant, over the network |
@@ -63,17 +63,27 @@ built one.*
    xcode-select --install
    ```
 
-2. Build and start the bridge, with your own Home Assistant address:
+2. Build the app:
 
    ```bash
-   ./parts/03-mac-bridge/install.sh http://homeassistant.local:8123
+   ./parts/03-mac-bridge/build-app.sh
    ```
 
-3. Check its log:
+   It lands in `parts/03-mac-bridge/build/Ulanzi Deck.app`. Open it the way you would
+   the downloaded one — step 5 of the [guide](../../README.md) covers what macOS asks.
+
+3. Check what you built before trusting it:
 
    ```bash
-   tail ~/Library/Logs/UlanziDeck/bridge.log
+   sh tools/check-release.sh
    ```
+
+   It opens the app and compares every version it claims against the bytes inside it.
+
+*`main.swift` and `install.sh` beside it are the older headless bridge, kept for
+reference. They build a different, much smaller program that reports itself as
+version 1.0 and has none of the setting-up, updating or menu bar behaviour. Build
+those only if that is what you want.*
 
    With the deck plugged in you should see `deck attached`. Once Home Assistant has the
    integration ([Part 4](../04-home-assistant/README.md)) you will see

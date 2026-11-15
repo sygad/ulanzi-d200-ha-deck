@@ -1441,30 +1441,53 @@ root.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#viewDlg").hidden)c
    Three separate things carry their own version, and before this was here the
    only way to know was to look in three different places. */
 let lastStatus=null;
-function vrow(id,have,want,label,action){
+
+/* The order is not a convention, it is how the parts are carried:
+   Home Assistant hands over the connector app, and the connector app carries
+   the deck software. Updating the deck from an old app installs that app's old
+   copy, which is exactly how a banner came to be pressable for ever without
+   ever clearing. So a part behind the one in front of it cannot be pressed,
+   and says what it is waiting for. */
+const WAITING=["", "after the integration", "after the connector app"];
+
+function vrow(id,have,want,label,action,waitingFor){
   const row=$("#"+id), val=row.querySelector(".vval"), btn=row.querySelector(".vbtn");
   const behind=have&&want&&cmpVer(want,have)>0;
-  val.textContent=!have?"not connected":behind?have+" \u2192 "+want+" ready":have;
+  val.textContent=!have ? "not connected"
+    : behind ? have+" \u2192 "+want+(waitingFor?" \u00b7 "+waitingFor:" ready")
+    : have;
   val.classList.toggle("old",!!behind);
-  btn.hidden=!(behind&&action);
+  btn.hidden=!(behind&&action&&!waitingFor);
   btn.textContent=label;
   btn.onclick=action?()=>{btn.disabled=true;btn.textContent="Asking\u2026";action()}:null;
 }
+
 function showVersions(){
   const st=lastStatus||{};
   const ps=parts(st);
   const macOld=st.bridge_version&&cmpVer(st.bridge_version,"3.5")<0;
+  // Only the first part that is behind may be acted on. A restart owed on the
+  // integration counts as the integration still being behind.
+  let turn=ps.findIndex(p=>p.old);
+  if(st.restart_pending)turn=0;
+  const wait=i=>(i>turn&&turn>=0)?WAITING[i]:"";
+
   vrow("v-int", ps[0].have, ps[0].want,
        st.restart_pending?"Restart":"Marketplace",
-       st.restart_pending?restartHa:()=>window.open("/marketplace","_blank"));
+       st.restart_pending?restartHa:()=>window.open("/marketplace","_blank"),
+       wait(0));
   vrow("v-app", ps[1].have, ps[1].want, "Update",
-       macOld?null:()=>hass().callWS({type:"ulanzi_deck/update_app"}).catch(()=>{}));
+       macOld?null:()=>ask("ulanzi_deck/update_app"),
+       wait(1));
   vrow("v-deck", ps[2].have, ps[2].want, "Update",
-       ()=>hass().callWS({type:"ulanzi_deck/update_deck"}).catch(()=>{}));
+       ()=>ask("ulanzi_deck/update_deck"),
+       wait(2));
+
   $("#v-note").textContent = macOld
     ? "This Mac is too old to be told from here: open Ulanzi Deck on it and press Update."
-    : "All three carry the same number. The integration comes from the Marketplace and "
-      + "needs a restart; it then hands the other two their new version.";
+    : "All three carry the same number, and they go in order: Home Assistant hands over the "
+      + "connector app, and the connector app carries the deck software. Updating one out of "
+      + "turn puts the old version back, so only the next one can be pressed.";
 }
 
 /* ---------- the deck's own settings ---------- */
@@ -1629,12 +1652,17 @@ function paintVersions(st){
   // it is the answer to the button that was just pressed.
   const doing=st.job;
   const job =
+    refusedNote
+      ? {icon:"alert-circle-outline", title:"That could not be done yet",
+         sub:refusedNote, label:"OK",
+         act:()=>{refusedNote=""; if(lastStatus) paintVersions(lastStatus);}}
+    :
     doing && doing.state==="running"
       ? {icon:"progress-download", title:"Setting up the deck", sub:doing.line||"Working\u2026", act:null}
     : doing && doing.state==="failed"
       ? {icon:"alert-circle-outline", title:"The deck software could not be installed",
          sub:doing.line||"", label:"Try again",
-         act:()=>hass().callWS({type:"ulanzi_deck/update_deck"})}
+         act:()=>ask("ulanzi_deck/update_deck")}
     : doing && doing.state==="done"
       ? {icon:"check-circle-outline", title:"Deck software installed",
          sub:doing.line||"The deck is restarting\u2026", act:null}
@@ -1652,11 +1680,11 @@ function paintVersions(st){
            ? "Running "+mac+" on "+(st.bridge_name||"your Mac")+"."
            : "Running "+mac+" on "+(st.bridge_name||"your Mac")+
              ". Open Ulanzi Deck on that Mac and press Update: this button needs 3.5 or newer.",
-         label:"Update now", act:macCanBeTold?()=>hass().callWS({type:"ulanzi_deck/update_app"}):null}
+         label:"Update now", act:macCanBeTold?()=>ask("ulanzi_deck/update_app"):null}
     : ps[2].old
       ? {icon:"tray-arrow-down", title:"Deck software "+ps[2].want+" is ready to install",
          sub:"The deck is running "+ps[2].have+". It takes a few seconds and the deck restarts.",
-         label:"Update now", act:()=>hass().callWS({type:"ulanzi_deck/update_deck"})}
+         label:"Update now", act:()=>ask("ulanzi_deck/update_deck")}
     : null;
 
   bar.hidden=!job;
@@ -1680,6 +1708,20 @@ function paintVersions(st){
     setTimeout(()=>{b.disabled=false;b.dataset.armed="";b.textContent=job.label},8000);
   };
 }
+/* Asking for an update used to be fire-and-forget: a refusal, or no Mac at
+   all, came back as {asked:false} and was thrown away, so the button simply
+   went quiet. Now the reason is put where the button is. */
+let refusedNote="";
+function ask(type){
+  return hass().callWS({type:type}).then(r=>{
+    refusedNote = (r && r.asked===false) ? (r.why || "Nothing answered the request.") : "";
+    if(refusedNote && lastStatus) paintVersions(lastStatus);
+  }).catch(e=>{
+    refusedNote = (e && e.message) || "The request could not be sent.";
+    if(lastStatus) paintVersions(lastStatus);
+  });
+}
+
 function restartHa(){
   const h=hass();
   if(h&&h.callService)return h.callService("homeassistant","restart",{});

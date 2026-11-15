@@ -13,6 +13,7 @@ import importlib
 import io
 import json
 from pathlib import Path
+from typing import Any
 import re
 import zipfile
 
@@ -28,6 +29,7 @@ from homeassistant.helpers.network import NoURLAvailableError, get_url
 
 from . import api, const as const_module, hub as hub_module, render
 from .const import (
+    APP_RELEASE_AT,
     APP_RELEASE_URL,
     APP_UPDATE_URL,
     APP_URL,
@@ -156,7 +158,7 @@ class CompanionAppView(HomeAssistantView):
         session = async_get_clientsession(hass)
         try:
             async with asyncio.timeout(120):
-                response = await session.get(APP_RELEASE_URL)
+                response = await session.get(_app_zip_url(hub))
                 if response.status != 200:
                     return web.Response(
                         status=502,
@@ -308,6 +310,17 @@ def _readme(version: str) -> str:
 """
 
 
+def _app_zip_url(hub: Any) -> str:
+    """Where to fetch the app that goes with this integration.
+
+    Named by version, so what is handed over is what the panel said was ready.
+    Falls back to the newest published one only if this integration cannot say
+    what version it is, which would mean its own files are unreadable.
+    """
+    version = getattr(hub, "app_version", "") or ""
+    return APP_RELEASE_AT.format(version=version) if version else APP_RELEASE_URL
+
+
 class AppUpdateView(HomeAssistantView):
     """The app fetching its own update.
 
@@ -331,7 +344,7 @@ class AppUpdateView(HomeAssistantView):
         session = async_get_clientsession(hass)
         try:
             async with asyncio.timeout(120):
-                response = await session.get(APP_RELEASE_URL)
+                response = await session.get(_app_zip_url(hub))
                 if response.status != 200:
                     return web.Response(status=502)
                 body = await response.read()

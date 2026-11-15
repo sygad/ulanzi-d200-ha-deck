@@ -20,7 +20,7 @@ It also hands out the connector app: the panel's **Get the connector app** butto
 builds a zip holding the published app, a pairing file carrying this server's address
 and a key for that Mac, and a page explaining what macOS is about to do. When a newer
 app exists it says so in a banner under the panel, and **Update now** tells the Mac to
-fetch it from here rather than from the internet.
+fetch it from here. Home Assistant downloads it, pinned to the version this integration goes with, and passes it on; the Mac never talks to anywhere but your server.
 
 ## How it works
 

@@ -569,9 +569,19 @@ class DeckHub:
             async with asyncio.timeout(20):
                 r = await session.get(RELEASES_URL, headers={"Accept": "application/vnd.github+json"})
                 if r.status != 200:
+                    # Unauthenticated GitHub allows 60 requests an hour. Silence
+                    # here meant the panel simply never offered an update and
+                    # never said why.
+                    _LOGGER.warning(
+                        "Could not ask GitHub what the newest release is (HTTP %s). "
+                        "The panel will not offer an integration update until this works.",
+                        r.status)
                     return
                 tag = str((await r.json()).get("tag_name") or "")
-        except (ClientError, TimeoutError, ValueError):
+        except (ClientError, TimeoutError, ValueError) as err:
+            _LOGGER.warning(
+                "Could not ask GitHub what the newest release is: %s. "
+                "The panel will not offer an integration update until this works.", err)
             return
         tag = tag.lstrip("vV")
         if tag and tag != self.latest_release:
@@ -639,6 +649,31 @@ class DeckHub:
                 del bridges[old]
         await self._store.async_save(self.data)
         return {"bridgeId": bridge_id, "secret": secret}
+
+    @callback
+    def why_not_yet(self, part: str) -> str:
+        """Why this part cannot be updated yet, or "" if it can.
+
+        The order is a real dependency, not a house style: this integration
+        hands over the connector app, and the connector app carries the deck
+        software. Updating the deck from an older app installs that app's older
+        copy, which looks exactly like an update that does nothing. The panel
+        hides the button, and this refuses the request even if something else
+        asks for it.
+        """
+        if self.restart_pending:
+            return ("Home Assistant is still running " + self.running_version
+                    + " and " + self.on_disk_version + " is waiting. Restart first.")
+        mac = self._bridge.version if self._bridge else ""
+        if part == "app":
+            return ""
+        if part == "deck":
+            if not self._bridge:
+                return "No Mac is connected."
+            if mac and _cmp_ver(self.running_version, mac) > 0:
+                return ("The connector app on this Mac is " + mac + ", so it is still "
+                        + "carrying that version of the deck software. Update it first.")
+        return ""
 
     async def async_tell_mac_to_set_up_deck(self) -> bool:
         """Ask the Mac to put its copy of the deck software on the deck."""

@@ -17,6 +17,13 @@ APP_UPDATE_URL = "/api/ulanzi_deck/companion-app/{token}"
 # shop that has not noticed yet.
 RELEASES_URL = "https://api.github.com/repos/sygad/ulanzi-d200-ha-deck/releases/latest"
 
+# The app that goes with THIS integration, named by version rather than
+# "whatever is newest". Handing out latest meant the panel could offer 4.3 and
+# deliver 4.4: a Mac then runs a version its Home Assistant knows nothing
+# about, and the three parts are out of step again for no reason.
+APP_RELEASE_AT = (
+    "https://github.com/sygad/ulanzi-d200-ha-deck/releases/download/v{version}/Ulanzi-Deck.zip"
+)
 APP_RELEASE_URL = (
     "https://github.com/sygad/ulanzi-d200-ha-deck/releases/latest/download/Ulanzi-Deck.zip"
 )

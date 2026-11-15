@@ -29,7 +29,13 @@ typedef short i16;
 typedef int i32;
 
 #define FW_MAJOR 4
-#define FW_MINOR 4
+#define FW_MINOR 5
+/* The same two numbers as words, so --version and the log can never drift from
+   what the status message reports. They used to be typed out by hand, and said
+   1.2 for every release after it. */
+#define VSTR_(x) #x
+#define VSTR(x) VSTR_(x)
+#define FW_TEXT VSTR(FW_MAJOR) "." VSTR(FW_MINOR)
 #define PROTO 1
 
 /* ---------- syscalls (ARM EABI) ---------- */
@@ -727,11 +733,11 @@ int cmain(long *sp)
     char **argv = (char **)(sp + 1);
 
     if (sp[0] > 1 && seq(argv[1], "--version")) {
-        s_write(1, "deckd 1.2\n", 10);
+        s_write(1, "deckd " FW_TEXT "\n", sizeof("deckd " FW_TEXT "\n") - 1);
         return 0;
     }
     logfd = s_open("/tmp/deck.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
-    logs("deckd 1.2 starting\n");
+    logs("deckd " FW_TEXT " starting\n");
 
     fbfd = s_open("/dev/fb0", O_RDWR, 0);
     fb = fbfd >= 0 ? s_mmap(FBW * FBH * 4, 3, 1 /* SHARED */, fbfd) : 0;

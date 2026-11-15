@@ -79,6 +79,9 @@ async def ws_update_deck(hass: HomeAssistant, connection: websocket_api.ActiveCo
                          msg: dict) -> None:
     """The panel asking for the deck's own software to be brought up to date."""
     if hub := _hub(hass, connection, msg):
+        if why := hub.why_not_yet("deck"):
+            connection.send_result(msg["id"], {"asked": False, "why": why})
+            return
         connection.send_result(msg["id"], {"asked": await hub.async_tell_mac_to_set_up_deck()})
 
 
@@ -103,6 +106,9 @@ async def ws_update_app(hass: HomeAssistant, connection: websocket_api.ActiveCon
                         msg: dict) -> None:
     """The panel asking the Mac to update its connector app."""
     if hub := _hub(hass, connection, msg):
+        if why := hub.why_not_yet("app"):
+            connection.send_result(msg["id"], {"asked": False, "why": why})
+            return
         connection.send_result(msg["id"], {"asked": await hub.async_tell_mac_to_update()})
 
 
