@@ -14,7 +14,7 @@ HERE="$(pwd)"
 ROOT="$(cd ../.. && pwd)"
 OUT="${1:-$HERE/build}"
 APP="$OUT/Ulanzi Deck.app"
-VERSION="3.8"
+VERSION="3.9"
 
 # swiftc on a network drive can see the source move under it, so build from a copy
 TMP="$(mktemp -d)"

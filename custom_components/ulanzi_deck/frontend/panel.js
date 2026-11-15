@@ -1517,9 +1517,15 @@ function showStatus(st){
   const bar=$("#updBar");
   bar.hidden=!behind;
   if(behind){
+    // Macs older than 3.5 cannot be told from here; they have their own button.
+    const canBeTold=cmpVer(got,"3.5")>=0;
     bar.querySelector(".mi").textContent=ico("tray-arrow-down");
     $("#updTitle").textContent="Companion app "+want+" is ready to install";
-    $("#updSub").textContent="Running "+got+" on "+(st.bridge_name||"your Mac")+".";
+    $("#updSub").textContent=canBeTold
+      ? "Running "+got+" on "+(st.bridge_name||"your Mac")+"."
+      : "Running "+got+" on "+(st.bridge_name||"your Mac")+
+        ". Open Ulanzi Deck on that Mac and press Update: this button needs 3.5 or newer.";
+    $("#btn-update").hidden=!canBeTold;
   }
 
   const setup=st.bridge==="none";
