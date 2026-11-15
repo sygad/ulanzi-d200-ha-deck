@@ -17,3 +17,16 @@ The Python ones need Python 3. Those that draw need Pillow (`pip install pillow`
 | `make_default_layout.py` | Rebuilds the starter screen in `parts/02-deck-app/default-layout.bin` | Pillow |
 | `deck_trace.py` | Records the deck's health to a log on the Mac every 30 seconds, to catch what happens before a freeze | `adb`, the deck plugged in |
 | `panel-harness/` | Runs the panel in a browser against a pretend Home Assistant. See [Part 5](../parts/05-the-panel/README.md#working-on-the-panel-itself) | Python |
+
+## `check-release.sh`
+
+Opens the built app, the published binaries and the zip, and checks every
+version claim against the bytes. Run it before publishing a release:
+
+```sh
+sh tools/check-release.sh
+```
+
+Reading the source cannot catch what this catches. Every release fault so far
+has been the same shape — something claiming a version it did not have, while
+the source it was built from was correct.

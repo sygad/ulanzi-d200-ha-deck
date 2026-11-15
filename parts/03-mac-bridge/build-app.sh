@@ -104,4 +104,6 @@ if ! codesign --verify --deep --strict "$APP" >/dev/null 2>&1; then
   exit 1
 fi
 echo "Built: $APP"
+echo
+echo "Before publishing this, run:  sh tools/check-release.sh"
 du -sh "$APP" | sed 's/^/  /'
