@@ -82,7 +82,22 @@ struct UlanziDeckApp: App {
                 delegate.comeBack()
             }
         } label: {
+            MenuLabel(service: delegate.service)
+        }
+    }
+}
+
+/// The menu bar itself. A dot beside the keys when there is an update waiting,
+/// drawn rather than baked into the icon so it stays sharp at any size.
+struct MenuLabel: View {
+    @ObservedObject var service: Service
+
+    var body: some View {
+        HStack(spacing: 3) {
             Image(nsImage: AppDelegate.menuIcon)
+            if service.updateTo != nil {
+                Circle().frame(width: 5, height: 5)
+            }
         }
     }
 }
@@ -94,6 +109,13 @@ struct MenuContents: View {
     var body: some View {
         Text("Ulanzi Deck — \(appVersion.replacingOccurrences(of: "Version ", with: ""))")
         Text(service.menuSummary)
+        if let newer = service.updateTo {
+            Divider()
+            Button("Update to \(newer)…") {
+                open()
+                service.update()
+            }
+        }
         Divider()
         Button("Open Ulanzi Deck", action: open)
         Button("Quit") { NSApplication.shared.terminate(nil) }

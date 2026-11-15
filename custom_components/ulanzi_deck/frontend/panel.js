@@ -61,14 +61,15 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 .getapp .getapp-note a{color:var(--fg2)}
 .getapp .getapp-err{color:#c62828;font-size:13px}
   box-shadow:0 2px 10px rgba(0,0,0,.14);margin:2px 0 4px}
+.chip.upd{background:rgba(255,160,0,.18);color:inherit}
 .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 11px;border-radius:14px;
-  background:rgba(255,255,255,.16);white-space:nowrap}
+  background:rgba(127,127,127,.16);white-space:nowrap}
 .gear{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:8px;border-radius:50%;
   line-height:1;display:inline-flex;opacity:.9}
 .gear .mi{font-size:20px}
 .gear:hover{background:rgba(255,255,255,.16);opacity:1}
 .gear:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-.dot{width:7px;height:7px;border-radius:50%;background:#9e9e9e;box-shadow:0 0 0 3px rgba(158,158,158,.3)}
+.dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:#9e9e9e;box-shadow:0 0 0 3px rgba(158,158,158,.3)}
 .dot.ok{background:var(--ok);box-shadow:0 0 0 3px rgba(67,160,71,.3)}
 .dot.warn{background:#ffa000;box-shadow:0 0 0 3px rgba(255,160,0,.3)}
 
@@ -358,6 +359,7 @@ const MARKUP=`
   <button class="dots" id="menuBtn" title="Menu" aria-label="Menu" hidden><i></i><i></i><i></i></button>
   <h1>Ulanzi Deck</h1>
   <span class="chip"><span class="dot" id="chipDot"></span> <span id="chipText">Connecting…</span></span>
+  <span class="chip upd" id="updChip" hidden></span>
   <button class="gear" id="btn-settings" title="Deck settings" aria-label="Deck settings"><span class="mi"></span></button>
   <button class="btn pub" id="btn-allow" hidden>Allow</button>
   <button class="btn pub" id="btn-publish">Send to device</button>
@@ -1431,6 +1433,16 @@ $("#btn-publish").addEventListener("click",()=>{
 });
 
 /* ---------- the bridge, and the deck behind it ---------- */
+/* Home Assistant counts in threes, the app in twos: compare a number at a time. */
+function cmpVer(a,b){
+  const x=String(a).split(".").map(Number), y=String(b).split(".").map(Number);
+  if(x.some(isNaN)||y.some(isNaN))return 0;
+  for(let i=0;i<Math.max(x.length,y.length);i++){
+    const p=x[i]||0,q=y[i]||0;
+    if(p!==q)return p>q?1:-1;
+  }
+  return 0;
+}
 let pendingBridge=null;
 function showStatus(st){
   const dot=$("#chipDot"), text=$("#chipText"), allow=$("#btn-allow");
@@ -1442,6 +1454,13 @@ function showStatus(st){
   allow.hidden=!st.pending;
   // Until a Mac is connected there is nothing worth configuring, so the setup
   // card is the whole page rather than one card beside the editor.
+  // An update waiting on the Mac, said where people are already looking.
+  const want=st.app_version, got=st.bridge_version;
+  const behind=want && got && cmpVer(want,got)>0;
+  const upd=$("#updChip");
+  upd.hidden=!behind;
+  if(behind) upd.textContent="Companion app "+want+" ready to install on "+(st.bridge_name||"your Mac");
+
   const setup=st.bridge==="none";
   $("#getApp").hidden=!setup;
   $("#configCard").hidden=setup;

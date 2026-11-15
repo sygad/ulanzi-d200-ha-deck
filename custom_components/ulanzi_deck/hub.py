@@ -104,6 +104,7 @@ class _Bridge:
         self.id = bridge_id
         self.name = name
         self.digest = digest
+        self.version = ""            # which companion app it is
         self.allowed = False
 
 
@@ -195,6 +196,8 @@ class DeckHub:
         return {
             "bridge": "connected" if self._bridge else "pending" if self._pending else "none",
             "bridge_name": self._bridge.name if self._bridge else None,
+            "bridge_version": self._bridge.version if self._bridge else None,
+            "app_version": self.app_version,
             "pending": {"bridge_id": self._pending.id, "name": self._pending.name} if self._pending else None,
             "deck": self.deck_online,
             "screen": self.screen,
@@ -393,6 +396,7 @@ class DeckHub:
             return
         bridge = _Bridge(ws, bridge_id, str(hello.get("name") or "Mac")[:60],
                          hashlib.sha256(secret.encode()).hexdigest())
+        bridge.version = str(hello.get("version") or "")[:20]
         known = self.data["bridges"].get(bridge_id)
         try:
             if known and hmac.compare_digest(known.get("hash", ""), bridge.digest):
