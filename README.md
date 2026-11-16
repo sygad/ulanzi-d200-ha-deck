@@ -255,28 +255,53 @@ in front of you.
 <br>
 
 Browser Mod's own install asks for **two restarts** — one after the download, one
-after you add the integration. Then two settings, once each:
-
-1. **Register the browser.** Open **Browser Mod** in the sidebar and turn **Register**
-   on. A browser that has not registered cannot be reached, and this is the only
-   setting on that page the deck needs — leave the camera ones alone.
-2. **Stop the connection dropping.** In your own **Profile settings**, turn
-   **Suspend background connections** off. Home Assistant otherwise closes a hidden
-   window's connection after five minutes, and a deck key pressed after that would
-   find nothing listening. Browser Mod's own warning calls this "Automatically close
-   connection", which is what the setting used to be called.
+after you add the integration. Then there are three things to do, once each.
 
 <br>
 
-<p align="center"><img src="images/guide/fig-navigate.png" alt="A key set to Dashboard: Go to view, with a dashboard view and a screen to move chosen" width="520"></p>
+### 1 &nbsp; Register the browser
+
+Open **Browser Mod** in the sidebar and turn **Register** on. A browser that has not
+registered cannot be reached, so this is the one setting on that page the deck needs
+— leave the camera ones alone.
 
 <br>
 
-Then it is two fields, the same as any other key. **Dashboard view** lists every view
-of every dashboard you have, by name, with the path it will use underneath — there is
-nothing to type and nothing to look up. **Screen to move** is which browser gets sent:
-one of them by name, or **All screens**, which moves every browser Browser Mod knows
-about at once.
+<img src="images/guide/fig-navigate-register.png" alt="The Browser Mod panel, with the Register switch turned on" width="100%">
+
+<br>
+<br>
+
+### 2 &nbsp; Stop the connection dropping
+
+Click your own name at the foot of the sidebar to open your profile, and turn
+**Suspend background connections** off.
+
+Home Assistant otherwise closes a hidden window's connection after five minutes, and
+a deck key pressed after that would find nothing listening. Browser Mod's own warning
+calls this "Automatically close connection", which is what the setting used to be
+called.
+
+<br>
+
+<img src="images/guide/fig-navigate-suspend.png" alt="Your own profile settings, with Suspend background connections turned off" width="100%">
+
+<br>
+<br>
+
+### 3 &nbsp; Give a key the action
+
+Back in the Ulanzi Deck panel. Pick a key, open **What it does**, and choose
+**Dashboard: Go to view…** as the tap or hold behaviour. Two fields appear.
+
+**Dashboard view** lists every view of every dashboard you have, by name, with the
+path it will use underneath — there is nothing to type and nothing to look up.
+**Screen to move** is which browser gets sent: one of them by name, or **All
+screens**, which moves every browser Browser Mod knows about at once.
+
+<br>
+
+<a href="images/guide/fig-navigate.png"><img src="images/guide/fig-navigate.png" alt="The Ulanzi Deck panel with a key set to Dashboard: Go to view, showing the dashboard view and the screen to move" width="100%"></a>
 
 <br>
 

@@ -86,8 +86,8 @@ const q = new URLSearchParams(location.search);
 if (q.has("settings") || q.has("connected") || q.has("navigate")) {
   // A settled deck: connected, everything on the same release, nothing to do.
   status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
-            app_version: "4.8", bridge_version: "4.8", deck_firmware: "4.8",
-            deckd_available: "4.8", latest_release: "4.8", on_disk_version: "4.8",
+            app_version: "4.10", bridge_version: "4.10", deck_firmware: "4.10",
+            deckd_available: "4.10", latest_release: "4.10", on_disk_version: "4.10",
             restart_pending: false};
   statusCb && statusCb(status);
   // ?navigate sets the first key to a dashboard jump, for the guide's figure.

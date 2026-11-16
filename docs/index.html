@@ -459,21 +459,39 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
           <p><strong>This one needs another integration.</strong> Everything else in this guide works with nothing but Ulanzi Deck. Jumping a dashboard needs <a href="https://github.com/thomasloven/hass-browser_mod">Browser Mod</a>, which is in the Marketplace alongside this one. It is the part that can reach into an open browser and move it; nothing in Home Assistant can do that on its own.</p>
           <p>Without it the action is simply not offered, and nothing else changes.</p>
         </div>
-        <p>Browser Mod's own install asks for <strong>two restarts</strong> &mdash; one after the download, one after you add the integration. Then two settings, once each.</p>
-        <p><strong>Register the browser.</strong> Open <strong>Browser Mod</strong> in the sidebar and turn <strong>Register</strong> on. A browser that has not registered cannot be reached, and this is the only setting on that page the deck needs &mdash; leave the camera ones alone.</p>
-        <p><strong>Stop the connection dropping.</strong> In your own <strong>Profile settings</strong>, turn <strong>Suspend background connections</strong> off. Home Assistant otherwise closes a hidden window's connection after five minutes, and a deck key pressed after that would find nothing listening. Browser Mod's own warning calls this &ldquo;Automatically close connection&rdquo;, which is what the setting used to be called.</p>
+        <p>Browser Mod’s own install asks for <strong>two restarts</strong> &mdash; one after the download, one after you add the integration. Then there are three things to do, once each.</p>
+        <h4>1 &nbsp; Register the browser</h4>
+        <p>Open <strong>Browser Mod</strong> in the sidebar and turn <strong>Register</strong> on. A browser that has not registered cannot be reached, so this is the one setting on that page the deck needs &mdash; leave the camera ones alone.</p>
       </div>
     </div>
     <figure>
-      <img src="navigate.png" alt="A key set to Dashboard: Go to view, with a dashboard view and a screen to move chosen"
-           style="display:block;width:100%;max-width:520px;margin:0 auto;border-radius:10px;border:1px solid var(--hair)">
+      <img src="navigate-register.png" alt="The Browser Mod panel, with the Register switch turned on"
+           style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
     </figure>
     <div class="step-head">
       <div class="num" style="visibility:hidden">7</div>
       <div class="txt">
-        <p>Then it is two fields, the same as any other key. <strong>Dashboard view</strong> lists every view of every dashboard you have, by name, with the path it will use underneath &mdash; there is nothing to type and nothing to look up. <strong>Screen to move</strong> is which browser gets sent: one of them by name, or <strong>All screens</strong>, which moves every browser Browser Mod knows about at once.</p>
+        <h4>2 &nbsp; Stop the connection dropping</h4>
+        <p>Click your own name at the foot of the sidebar to open your profile, and turn <strong>Suspend background connections</strong> off.</p>
+        <p>Home Assistant otherwise closes a hidden window’s connection after five minutes, and a deck key pressed after that would find nothing listening. Browser Mod’s own warning calls this &ldquo;Automatically close connection&rdquo;, which is what the setting used to be called.</p>
       </div>
     </div>
+    <figure>
+      <img src="navigate-suspend.png" alt="Your own profile settings, with Suspend background connections turned off"
+           style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
+    </figure>
+    <div class="step-head">
+      <div class="num" style="visibility:hidden">7</div>
+      <div class="txt">
+        <h4>3 &nbsp; Give a key the action</h4>
+        <p>Back in the Ulanzi Deck panel. Pick a key, open <strong>What it does</strong>, and choose <strong>Dashboard: Go to view&hellip;</strong> as the tap or hold behaviour. Two fields appear.</p>
+        <p><strong>Dashboard view</strong> lists every view of every dashboard you have, by name, with the path it will use underneath &mdash; there is nothing to type and nothing to look up. <strong>Screen to move</strong> is which browser gets sent: one of them by name, or <strong>All screens</strong>, which moves every browser Browser Mod knows about at once.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="navigate.png" alt="The Ulanzi Deck panel with a key set to Dashboard: Go to view, showing the dashboard view and the screen to move"
+           style="display:block;width:100%;border-radius:10px;border:1px solid var(--hair)">
+    </figure>
   </article>
 
   <article class="step">

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Guide figures</title>
+<!--
+  The drawn Home Assistant used in the guide's figures. These are illustrations,
+  not screenshots: a real one would carry the room names, panel names and browser
+  ids of whoever took it. Everything here is invented.
+
+  The colours and the .ha* rules are copied from docs/index.html so a figure made
+  here cannot drift from the ones already in the guide.
+
+      ?register   the Browser Mod panel, with Register ringed
+      ?suspend    your own profile, with Suspend background connections ringed
+
+  Render with tools/figures/shoot.sh.
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --sunk:#f2f1ee;
+  --ink:#1b1b19; --ink-soft:#5e5d58; --ink-faint:#908f88;
+  --line:#e2e0da; --hair:#edebe5;
+  --accent:#1668b8; --accent-soft:#e8f0f9;
+  --key:#efa52a; --screen:#0f0f11; --ok:#2f8f5b;
+  --ring:#ffa000;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6}
+.sheet{padding:18px;width:1180px}
+[hidden]{display:none!important}
+
+/* ---- the drawn Home Assistant, as docs/index.html draws it ---- */
+.ha{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel);display:flex}
+.ha-rail{flex:0 0 190px;background:var(--sunk);border-right:1px solid var(--hair);
+  padding:10px 0;display:flex;flex-direction:column;gap:1px}
+.ha-rail .brand{display:flex;align-items:center;gap:8px;padding:4px 14px 12px;font-size:13px;font-weight:600}
+.ha-rail .brand s{width:16px;height:16px;border-radius:4px;background:var(--accent);text-decoration:none;flex:0 0 auto}
+.ha-rail a{display:flex;align-items:center;gap:10px;padding:7px 14px;font-size:12.5px;color:var(--ink-soft);
+  text-decoration:none}
+.ha-rail a u{flex:0 0 auto;width:14px;height:14px;border-radius:3px;background:currentColor;opacity:.4;
+  text-decoration:none}
+.ha-rail a.on{color:var(--accent);background:var(--accent-soft);font-weight:500;box-shadow:inset 3px 0 0 var(--accent)}
+.ha-view{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.ha-top{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--panel);
+  border-bottom:1px solid var(--hair);font-size:14px;font-weight:600}
+.ha-top .back{width:15px;height:15px;border-radius:3px;background:var(--ink-faint);opacity:.5;flex:0 0 auto}
+.ha-top em{font-style:normal;font-size:12px;font-weight:400;color:var(--ink-faint);margin-left:auto}
+.ha-body{padding:26px 18px 30px;display:flex;justify-content:center}
+
+/* ---- a settings card, the shape Home Assistant uses ---- */
+.card{width:620px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:20px 22px 8px}
+.card h2{margin:0 0 4px;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.card .intro{margin:0 0 6px;font-size:13px;color:var(--ink-soft);line-height:1.5}
+.row{display:flex;align-items:flex-start;gap:20px;padding:15px 0;border-top:1px solid var(--hair)}
+.card h2+.row,.card .intro+.row{border-top:0}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:14px;font-weight:500;line-height:1.35}
+.row .t span{display:block;font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:2px}
+.row .r{flex:0 0 auto;padding-top:2px}
+
+/* a Material switch, drawn */
+.sw{width:44px;height:22px;border-radius:11px;background:#8d8c86;position:relative;display:block}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw.on{background:#7ec8f0}
+.sw.on::after{left:24px;background:var(--accent)}
+
+/* the ringed one: the single thing the step is about */
+.ring{position:relative}
+.ring::before{content:"";position:absolute;inset:-11px -13px;border:3px solid var(--ring);border-radius:999px}
+
+/* the browser id field, drawn the way Home Assistant draws a select */
+.field{width:300px;background:var(--sunk);border-radius:6px 6px 0 0;border-bottom:1px solid #8d8c86;
+  padding:7px 12px 6px}
+.field i{display:block;font-style:normal;font-size:10.5px;color:var(--ink-faint);line-height:1.4}
+.field b{display:block;font-weight:400;font-size:13px;font-family:var(--mono);letter-spacing:-.01em}
+.hint{margin:6px 0 0;font-size:11px;color:var(--ink-faint)}
+</style></head>
+<body><div class="sheet">
+
+<!-- ============================ the Browser Mod panel ============================ -->
+<div class="ha" id="s-register" hidden>
+  <nav class="ha-rail">
+    <div class="brand"><s></s>Home Assistant</div>
+    <a href="#"><u></u>Overview</a>
+    <a href="#"><u></u>Energy</a>
+    <a href="#"><u></u>Map</a>
+    <a href="#"><u></u>History</a>
+    <a class="on" href="#"><u></u>Browser Mod</a>
+    <a href="#"><u></u>Ulanzi Deck</a>
+    <a href="#"><u></u>Developer tools</a>
+    <a href="#"><u></u>Settings</a>
+  </nav>
+  <div class="ha-view">
+    <div class="ha-top"><span>Browser Mod Settings</span><em>3.4.2</em></div>
+    <div class="ha-body">
+      <div class="card">
+        <h2>This Browser</h2>
+        <div class="row">
+          <div class="t"><b>Register</b><span>Enable this browser as a Device in Home Assistant</span></div>
+          <div class="r"><span class="sw on ring"></span></div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Browser ID</b><span>A unique identifier for this browser-device combination.</span></div>
+          <div class="r">
+            <div class="field"><i>Browser ID *</i><b>browser_mod_7f3a21c9</b></div>
+            <p class="hint">Select an existing known Browser ID or enter new</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Sync Browser ID to login session</b><span>Store this Browser ID against your current login session.</span></div>
+          <div class="r"><span class="sw"></span></div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Enable camera entity</b><span>Expose this browser camera as a Home Assistant camera entity</span></div>
+          <div class="r"><span class="sw"></span></div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Enable go2rtc publishing</b><span>Publish this browser camera to go2rtc using WHIP</span></div>
+          <div class="r"><span class="sw"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ your own profile ============================ -->
+<div class="ha" id="s-suspend" hidden>
+  <nav class="ha-rail">
+    <div class="brand"><s></s>Home Assistant</div>
+    <a href="#"><u></u>Overview</a>
+    <a href="#"><u></u>Energy</a>
+    <a href="#"><u></u>Map</a>
+    <a href="#"><u></u>History</a>
+    <a href="#"><u></u>Browser Mod</a>
+    <a href="#"><u></u>Ulanzi Deck</a>
+    <a href="#"><u></u>Developer tools</a>
+    <a href="#"><u></u>Settings</a>
+  </nav>
+  <div class="ha-view">
+    <div class="ha-top"><span class="back"></span><span>This browser</span></div>
+    <div class="ha-body">
+      <div class="card">
+        <h2>This browser</h2>
+        <p class="intro">The following settings are local to this client only, and may reset to
+          defaults on logout or when local data is cleared.</p>
+        <div class="row">
+          <div class="t"><b>Always hide the sidebar</b><span>This will hide the sidebar by default, similar to the mobile experience.</span></div>
+          <div class="r"><span class="sw"></span></div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Vibrate</b><span>Enable or disable vibration on this device when controlling devices.</span></div>
+          <div class="r"><span class="sw on"></span></div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Suspend background connections</b><span>For hidden windows or background tabs, close the server connection after 5 minutes.</span></div>
+          <div class="r"><span class="sw ring"></span></div>
+        </div>
+        <div class="row">
+          <div class="t"><b>Keyboard shortcuts</b><span>Enable or disable keyboard shortcuts for performing various actions in the UI.</span></div>
+          <div class="r"><span class="sw on"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+const want = location.search.replace("?", "") || "register";
+const el = document.getElementById("s-" + want);
+if (el) el.hidden = false;
+</script>
+</body></html>
