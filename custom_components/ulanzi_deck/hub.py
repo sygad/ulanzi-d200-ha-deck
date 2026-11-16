@@ -45,6 +45,7 @@ from .const import (
     RELEASES_URL,
     ACTIONS,
     NAVIGATE,
+    REPO_ID,
     DOMAIN,
     EVENT_KEY,
     MAX_SCREENS,
@@ -283,6 +284,9 @@ class DeckHub:
             "bridge_version": self._bridge.version if self._bridge else None,
             "app_version": self.app_version,
             "latest_release": self.latest_release,
+            # so the panel can ask the Marketplace to look again before it sends
+            # anybody there; see _check_releases for why it goes stale
+            "shop_id": REPO_ID,
             "on_disk_version": self.on_disk_version,
             "job": self.job,
             "restart_pending": self.restart_pending,

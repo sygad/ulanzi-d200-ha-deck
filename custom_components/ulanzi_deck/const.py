@@ -17,6 +17,15 @@ APP_UPDATE_URL = "/api/ulanzi_deck/companion-app/{token}"
 # shop that has not noticed yet.
 RELEASES_URL = "https://api.github.com/repos/sygad/ulanzi-d200-ha-deck/releases/latest"
 
+# The same repository again, as the Marketplace knows it: GitHub's own numeric id
+# for it, which is the same number on every install because it comes from GitHub
+# rather than from anybody's local database. It is what
+# marketplace/repository/refresh wants, and asking the Marketplace for it instead
+# would mean downloading its whole catalogue — 5,167 repositories and about
+# three and a half megabytes — to read one number. If this repository is ever
+# forked or renamed, this and RELEASES_URL above both have to follow.
+REPO_ID = "1458113259"
+
 # The app that goes with THIS integration, named by version rather than
 # "whatever is newest". Handing out latest meant the panel could offer 4.3 and
 # deliver 4.4: a Mac then runs a version its Home Assistant knows nothing

@@ -1768,6 +1768,26 @@ function parts(st){
     {el:"vp-deck", name:"Deck software", have:st.deck_firmware||"",  want:st.deckd_available||""},
   ].map(p=>({...p, old: !!(p.have && p.want && cmpVer(p.want,p.have)>0)}));
 }
+/* Before sending anybody to the Marketplace, make sure it knows there is
+   something there.
+
+   We hear about a release from GitHub within seconds. The Marketplace works off
+   its own cached copy of each repository's releases and, for a custom one, only
+   re-reads GitHub every couple of days by itself. So the bar below could say
+   "ready in the Marketplace" and the Marketplace could show a green tick and no
+   button — the exact run-around this bar exists to prevent.
+
+   This is the same call its own Refresh makes. It is fire and forget: if it
+   fails, or the Marketplace is not installed at all because somebody put the
+   files in by hand, nothing here changes. Once per page load, because the bar
+   repaints on every status message and the shop does not need telling twice. */
+let shopNudged = false;
+function nudgeShop(st){
+  if(shopNudged || !st.shop_id) return;
+  shopNudged = true;
+  hass().callWS({type:"marketplace/repository/refresh", repository:st.shop_id}).catch(()=>{});
+}
+
 function paintVersions(st){
   const ps=parts(st);
   // Before a Mac is connected the setup card is the whole page: a line saying
@@ -1812,9 +1832,9 @@ function paintVersions(st){
          sub:"Home Assistant is still running "+run+". Restart to finish.",
          label:"Restart Home Assistant", confirm:"Restart now?", act:restartHa}
     : ps[0].old
-      ? {icon:"tray-arrow-down", title:"Integration "+ps[0].want+" is ready in the Marketplace",
+      ? (nudgeShop(st), {icon:"tray-arrow-down", title:"Integration "+ps[0].want+" is ready in the Marketplace",
          sub:"Running "+run+". Download it there, then restart.",
-         label:"Open Marketplace", act:()=>window.open("/marketplace","_blank")}
+         label:"Open Marketplace", act:()=>window.open("/marketplace","_blank")})
     : ps[1].old
       ? {icon:"tray-arrow-down", title:"Connector app "+ps[1].want+" is ready to install",
          sub:macCanBeTold

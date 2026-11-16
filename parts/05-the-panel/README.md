@@ -108,6 +108,16 @@ then red above another, both in the sensor's own units.
   ([shared · the sizing rule](../../shared/README.md#the-sizing-rule)).
 - **No save buttons and no "changed" markers.** You should never have to keep track
   of what you have touched.
+- **The Marketplace is told to look again before anybody is sent there.** The
+  integration hears about a release from GitHub within seconds; the Marketplace
+  works off its own cached copy and, for a custom repository, only re-reads
+  GitHub every couple of days. So the panel could say "ready in the Marketplace"
+  and the Marketplace could show a green tick and no button — the exact
+  run-around the update bar exists to prevent. The first time the panel sees the
+  integration is behind it sends `marketplace/repository/refresh`, the same call
+  the Marketplace's own Refresh makes. Once per page load, and silently: if it
+  fails, or there is no Marketplace because somebody put the files in by hand,
+  nothing changes.
 - **An action that needs something else is hidden until it is there.** The only one is
   **Dashboard: Go to view…**, which leans on
   [Browser Mod](https://github.com/thomasloven/hass-browser_mod). The picker asks

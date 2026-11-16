@@ -87,14 +87,16 @@ const el = document.createElement("ulanzi-deck-panel");
 el.hass = hass; el.narrow = false;
 document.body.appendChild(el);
 window.panel = el; window.hass = hass;
+// Push a status change from the console or a test, the way the real server would.
+window.pushStatus = patch => { status = {...status, ...patch}; statusCb && statusCb(status); };
 
 // ?settings opens the deck settings dialog, so it can be screenshotted headless.
 const q = new URLSearchParams(location.search);
-if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear")) {
+if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear") || q.has("behind")) {
   // A settled deck: connected, everything on the same release, nothing to do.
   status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
-            app_version: "4.13", bridge_version: "4.13", deck_firmware: "4.13",
-            deckd_available: "4.13", latest_release: "4.13", on_disk_version: "4.13",
+            app_version: "4.14", bridge_version: "4.14", deck_firmware: "4.14",
+            deckd_available: "4.14", latest_release: "4.14", on_disk_version: "4.14",
             restart_pending: false};
   statusCb && statusCb(status);
   // ?navigate sets the first key to a dashboard jump, for the guide's figure.
@@ -121,6 +123,12 @@ if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear"
         d.open = d.querySelector("summary").textContent.includes("What it does");
       });
     }, 600);
+  }
+  // ?behind: a release is out and this install has not taken it yet, which is
+  // the state that sends somebody to the Marketplace.
+  if (q.has("behind")) {
+    status = {...status, latest_release: "9.9", shop_id: "1458113259"};
+    statusCb && statusCb(status);
   }
   // ?gear rings the settings button, for the figure that says where it is.
   // The ring is the same vivid orange-red tools/figures uses, so every "look
