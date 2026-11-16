@@ -468,6 +468,15 @@ const MARKUP=`
             </div>
                 <p class="hint" id="f-state"></p>
               </div>
+              <div id="browserField" hidden>
+                <span class="lab sublab">Screen to move</span>
+                <div class="combo" id="c-browser">
+              <div class="box"><span class="mi lead" data-lead></span>
+                <input type="text" placeholder="All screens" autocomplete="off" role="combobox" aria-expanded="false" aria-label="Tap browser">
+                <button class="ctl" data-clear title="Clear">&times;</button>
+                <button class="ctl" data-toggle title="Show all">&#9662;</button></div>
+            </div>
+              </div>
             </div>
             <div class="field">
               <span class="lab">Hold behaviour</span>
@@ -486,6 +495,15 @@ const MARKUP=`
                 <button class="ctl" data-toggle title="Show all">&#9662;</button></div>
             </div>
                 <p class="hint" id="f-state2"></p>
+              </div>
+              <div id="browserField2" hidden>
+                <span class="lab sublab">Screen to move</span>
+                <div class="combo" id="c-browser2">
+              <div class="box"><span class="mi lead" data-lead></span>
+                <input type="text" placeholder="All screens" autocomplete="off" role="combobox" aria-expanded="false" aria-label="Hold browser">
+                <button class="ctl" data-clear title="Clear">&times;</button>
+                <button class="ctl" data-toggle title="Show all">&#9662;</button></div>
+            </div>
               </div>
             </div>
           </div>
@@ -714,13 +732,82 @@ const ACTIONS=[
  {g:"Media",id:"media_player.volume_down",label:"Media player: Volume down",dom:["media_player"],icon:"volume-minus"},
  {g:"Scripts and scenes",id:"script.turn_on",label:"Script: Run",dom:["script"],icon:"script-text-play"},
  {g:"Scripts and scenes",id:"scene.turn_on",label:"Scene: Activate",dom:["scene"],icon:"palette"},
- {g:"Screens",id:"deck.previous_page",label:"Deck: Previous screen",nav:1,icon:"chevron-left"},
- {g:"Screens",id:"deck.next_page",label:"Deck: Next screen",nav:1,icon:"chevron-right"},
- {g:"Screens",id:"deck.go_to_page",label:"Deck: Go to screen\u2026",page:1,icon:"view-grid"},
- {g:"Screens",id:"deck.back",label:"Deck: Back",nav:1,icon:"arrow-u-left-top"},
+ /* kw is searched but never shown: these are the deck's own navigation, and
+    "navigate" is what Home Assistant calls it everywhere else, so looking for
+    that word has to find them. */
+ {g:"Screens",id:"deck.previous_page",label:"Deck: Previous screen",nav:1,icon:"chevron-left",
+  kw:"navigate navigation page previous back view"},
+ {g:"Screens",id:"deck.next_page",label:"Deck: Next screen",nav:1,icon:"chevron-right",
+  kw:"navigate navigation page next forward view"},
+ {g:"Screens",id:"deck.go_to_page",label:"Deck: Go to screen\u2026",page:1,icon:"view-grid",
+  kw:"navigate navigation page view jump open"},
+ {g:"Screens",id:"deck.back",label:"Deck: Back",nav:1,icon:"arrow-u-left-top",
+  kw:"navigate navigation page back return previous"},
+/* Home Assistant's own idea of navigation: jump a browser showing a dashboard
+   to one of its views. browser_mod does the moving, so the action is only
+   offered when that integration is installed — see have() below. */
+ {g:"Dashboards",id:"browser_mod.navigate",label:"Dashboard: Go to view\u2026",path:1,
+  icon:"monitor-dashboard",needs:"browser_mod.navigate",
+  kw:"navigate navigation dashboard view lovelace page jump open browser screen"},
  {g:"Other",id:"none",label:"Nothing",icon:"minus-circle-outline"}
 ];
 const ACT=id=>ACTIONS.find(a=>a.id===id)||ACTIONS[ACTIONS.length-1];
+/* An action that leans on another integration is hidden until that integration
+   is here, so the list never offers something that would quietly do nothing.
+   A key already set to it keeps working, because ACT() still knows it. */
+const have=a=>{if(!a.needs)return true;
+  const[d,sv]=a.needs.split("."),all=hass().services;
+  return !!(all&&all[d]&&all[d][sv])};
+
+/* Every view of every dashboard, flattened to the paths browser_mod takes.
+   Fetched once, the first time a key asks for one. */
+let VIEWS=null,_viewsJob=null;
+function loadViews(){
+  if(VIEWS)return Promise.resolve(VIEWS);
+  if(!_viewsJob)_viewsJob=(async()=>{
+    const h=hass(),out=[];
+    let boards=[];
+    try{boards=await h.callWS({type:"lovelace/dashboards/list"})}catch(_){}
+    // The default dashboard is not in that list. It is always at /lovelace.
+    const all=[{url_path:"lovelace",title:"Default dashboard"},
+               ...(boards||[]).filter(b=>b&&b.url_path)];
+    for(const b of all){
+      const board=b.title||b.url_path;
+      let cfg=null;
+      // A dashboard generated from a strategy has no stored config; it still
+      // has a path, so it is offered whole rather than left out.
+      try{cfg=await h.callWS({type:"lovelace/config",
+        url_path:b.url_path==="lovelace"?null:b.url_path})}catch(_){}
+      const views=(cfg&&cfg.views)||[];
+      if(!views.length){out.push({path:"/"+b.url_path,board,name:board,icon:""});continue}
+      views.forEach((v,n)=>out.push({
+        path:"/"+b.url_path+"/"+(v.path==null?n:v.path),
+        board,name:v.title||v.path||("View "+(n+1)),
+        icon:(v.icon||"").replace(/^mdi:/,"")}));
+    }
+    VIEWS=out;return out;
+  })();
+  return _viewsJob;
+}
+
+/* The browsers browser_mod knows about. Its devices carry the browser id as
+   their identifier, which is what the service wants. */
+let BROWSERS=null,_browsersJob=null;
+function loadBrowsers(){
+  if(BROWSERS)return Promise.resolve(BROWSERS);
+  if(!_browsersJob)_browsersJob=(async()=>{
+    let devs=[];
+    try{devs=await hass().callWS({type:"config/device_registry/list"})}catch(_){}
+    BROWSERS=(devs||[]).map(d=>{
+      const id=((d.identifiers||[]).find(i=>i&&i[0]==="browser_mod")||[])[1];
+      return id?{id,name:d.name_by_user||d.name||id}:null})
+      .filter(Boolean)
+      .sort((a,b)=>a.name.localeCompare(b.name));
+    return BROWSERS;
+  })();
+  return _browsersJob;
+}
+const VIEW=p=>(VIEWS||[]).find(v=>v.path===p);
 /* ---------- Home Assistant's entities, in the shape the pickers want ---------- */
 const hass=()=>host._hass;
 const domainOf=id=>id.split(".")[0];
@@ -876,45 +963,67 @@ const iconCombo=new Combo($("#c-icon"),{max:80,
   get:()=>{const k=view();return k?k.i:""},
   onPick:v=>{const k=ensureKey();if(!k)return;k.i=v||"";drawDeck()}});
 
-function actionPair(w,actId,tgtId,fieldId,stateId,labId){
+function actionPair(w,actId,tgtId,fieldId,stateId,labId,brFieldId,brId){
   const A=new Combo($(actId),{max:30,
-    find:q=>{const ws=words(q);return ACTIONS.filter(a=>hit(ws,[a.label,a.id,a.g]))},   // kept in group order
+    find:q=>{const ws=words(q);return ACTIONS.filter(a=>have(a)&&hit(ws,[a.label,a.id,a.g,a.kw]))},  // kept in group order
     group:a=>a.g,
     row:(a,h,i)=>optRow(i,h,ico(a.icon),a.label,a.id==="none"?"":a.id),
     value:a=>a.id,label:id=>ACT(id).label,lead:id=>id?ico(ACT(id).icon):"",
     get:()=>{const a=slotOf(w);return a?a.a:""},
-    onPick:v=>{const a=slotRW(w);if(!a)return;a.a=v||"none";a.t="";refresh();drawDeck()}});
+    onPick:v=>{const a=slotRW(w);if(!a)return;a.a=v||"none";a.t="";delete a.b;refresh();drawDeck()}});
   const T=new Combo($(tgtId),{max:60,
     find:q=>{const a=slotOf(w);if(!a)return[];
       const d=ACT(a.a);
       if(d.page)return rank(q,pages.map((p,n)=>({page:n,name:p.name})),x=>[x.name,"screen "+(x.page+1)]);
+      if(d.path)return rank(q,VIEWS||[],x=>[x.name,x.board,x.path]);
       const doms=d.dom;
       return rank(q,ENTS().filter(e=>!doms||doms.includes(e[0].split(".")[0])),e=>[e[1],e[2],e[0]])},
     row:(it,h,i)=>{
       if(it.page!==undefined)return optRow(i,h,ico("view-grid"),"Screen "+(it.page+1)+" \u2014 "+it.name,"");
+      if(it.board!==undefined)return optRow(i,h,ico(it.icon||"view-dashboard"),it.name,it.board+" \u00b7 "+it.path);
       const dom=it[0].split(".")[0];
       return optRow(i,h,ico(DOMICON[dom]||"shape"),it[1],(it[2]?it[2]+" \u00b7 ":"")+it[0],
         ["on","off","open","closed","idle","unavailable"].includes(it[3])?it[3]:"")},
-    value:it=>it.page!==undefined?String(it.page):it[0],
+    value:it=>it.page!==undefined?String(it.page):it.board!==undefined?it.path:it[0],
     label:v=>{const a=slotOf(w);if(a&&ACT(a.a).page){const p=pages[+v];return p?"Screen "+(+v+1)+" \u2014 "+p.name:v}
+      if(a&&ACT(a.a).path){const vw=VIEW(v);return vw?vw.board+" \u00b7 "+vw.name:v}
       const e=ENT(v);return e?e[1]+(e[2]?" ("+e[2]+")":""):v},
     lead:v=>{const a=slotOf(w);if(!v)return"";if(a&&ACT(a.a).page)return ico("view-grid");
+      if(a&&ACT(a.a).path)return ico((VIEW(v)||{}).icon||"view-dashboard");
       const e=ENT(v);return e?ico(DOMICON[e[0].split(".")[0]]||"shape"):""},
     get:()=>{const a=slotOf(w);return a?a.t:""},
     onPick:v=>{const a=slotRW(w);if(!a)return;a.t=v;refresh();drawDeck()}});
+  const ALL={id:"",name:"All screens"};
+  const B=new Combo($(brId),{max:40,
+    find:q=>rank(q,[ALL,...(BROWSERS||[])],x=>[x.name,x.id]),
+    row:(x,h,i)=>optRow(i,h,ico(x.id?"monitor":"monitor-multiple"),x.name,x.id),
+    value:x=>x.id,
+    label:v=>{if(!v)return ALL.name;const b=(BROWSERS||[]).find(x=>x.id===v);return b?b.name:v},
+    lead:v=>ico(v?"monitor":"monitor-multiple"),
+    get:()=>{const a=slotOf(w);return a?(a.b||""):""},
+    onPick:v=>{const a=slotRW(w);if(!a)return;if(v)a.b=v;else delete a.b;refresh();drawDeck()}});
   function refresh(){
     const a=slotOf(w); if(!a)return;
     const d=ACT(a.a);
     $(fieldId).hidden=(d.id==="none"||!!d.nav);
-    $(labId).textContent=d.page?"Screen":"Entity";
-    T.sync();
+    $(labId).textContent=d.page?"Screen":d.path?"Dashboard view":"Entity";
+    $(brFieldId).hidden=!d.path;
+    // the dashboards and browsers are only worth fetching once a key wants one
+    if(d.path&&(!VIEWS||!BROWSERS))
+      Promise.all([loadViews(),loadBrowsers()]).then(()=>{T.sync();B.sync()});
+    T.sync(); B.sync();
+    if(d.path){
+      const vw=VIEW(a.t);
+      $(stateId).innerHTML=a.t?`<code>${esc(a.t)}</code>${vw?"":" &middot; not a view I can see"}`:"";
+      return;
+    }
     const e=ENT(a.t);
     $(stateId).innerHTML=e?`<code>${esc(e[0])}</code> &middot; currently <b>${esc(e[3])}</b>`:"";
   }
   return {sync:()=>{A.sync();refresh()}, refresh};
 }
-const tapPair=actionPair("tap","#c-action","#c-target","#targetField","#f-state","#targetLab");
-const holdPair=actionPair("hold","#c-action2","#c-target2","#targetField2","#f-state2","#targetLab2");
+const tapPair=actionPair("tap","#c-action","#c-target","#targetField","#f-state","#targetLab","#browserField","#c-browser");
+const holdPair=actionPair("hold","#c-action2","#c-target2","#targetField2","#f-state2","#targetLab2","#browserField2","#c-browser2");
 function refreshTargets(){tapPair.refresh();holdPair.refresh()}
 
 const entityCombo=new Combo($("#c-entity"),{max:60,

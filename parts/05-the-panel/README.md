@@ -108,6 +108,13 @@ then red above another, both in the sensor's own units.
   ([shared · the sizing rule](../../shared/README.md#the-sizing-rule)).
 - **No save buttons and no "changed" markers.** You should never have to keep track
   of what you have touched.
+- **An action that needs something else is hidden until it is there.** The only one is
+  **Dashboard: Go to view…**, which leans on
+  [Browser Mod](https://github.com/thomasloven/hass-browser_mod). The picker asks
+  `hass.services` before it offers it, so on a server without Browser Mod it is not in
+  the list at all — better than offering a key that would quietly do nothing. A key
+  already set to it keeps its setting either way, because the panel still knows what
+  the action is.
 
 ## Working on the panel itself
 
@@ -120,7 +127,10 @@ rebuilds its data after you change it:
 python3 tools/panel-harness/serve.py 8788
 ```
 
-Then open `http://127.0.0.1:8788/`.
+Then open `http://127.0.0.1:8788/`. A few query strings set a scene for screenshots:
+`?settings` opens the deck settings dialog, `?connected` shows a settled deck with
+everything on the same release, `?navigate` sets the first key to a dashboard jump,
+and `?nobm` takes Browser Mod away so the panel can be checked without it.
 
 ---
 

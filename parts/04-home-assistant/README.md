@@ -56,10 +56,27 @@ updated at a time, in the order they depend on each other. Home Assistant downlo
 | Media | Play / pause · Volume up · Volume down |
 | Scripts and scenes | Run a script · Activate a scene |
 | Screens | Previous screen · Next screen · Go to screen · Back |
+| Dashboards | Go to view — needs [Browser Mod](https://github.com/thomasloven/hass-browser_mod) |
 
-Screen changes happen on the deck itself. Everything else is a Home Assistant service
-call on the entity you picked. For anything not in the list, give the key an action
-that suits and trigger an automation from the `ulanzi_deck_key` event.
+Screen changes happen on the deck itself: the layout tells it which keys are its own,
+and it never asks Home Assistant about them. Everything else is a service call.
+
+Most of those call on the entity you picked. **Go to view** is the exception, and the
+only action here that leans on another integration. Its target is a dashboard path
+rather than an entity, and it carries the browser to move alongside it, so the key
+ends up calling `browser_mod.navigate` with `path` and `browser_id`. With no browser
+named it moves every registered one, which is browser_mod's own default and what
+**All screens** means in the panel.
+
+Browser Mod is not in `manifest.json`, under `dependencies` or `after_dependencies`.
+It is wanted by one action out of the twenty above, and every check for it happens while
+something is running rather than while the integration is loading: the panel asks
+`hass.services` before it offers the action, and the integration asks `has_service`
+before it makes the call. Naming it in the manifest would buy nothing and would tie
+this integration's loading to one that most people installing it will not have.
+
+For anything not in the list, give the key an action that suits and trigger an
+automation from the `ulanzi_deck_key` event.
 
 ## Settings I chose
 

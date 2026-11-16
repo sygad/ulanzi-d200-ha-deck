@@ -12,8 +12,25 @@ let settings = {sleep: 20}, publishedSettings = null;
 let status = {bridge: "pending", bridge_name: null, pending: {bridge_id: "b1", name: "Desk Mac"}, deck: false, screen: 0};
 let statusCb = null;
 window.calls = [];
+// browser_mod, as far as the panel needs to know it exists: the service it
+// looks for, two dashboards to navigate to, and two browsers to aim at.
+const BM = new URLSearchParams(location.search).has("nobm") ? null : {
+  dashboards: [{url_path: "admin", title: "Admin"}],
+  config: {
+    lovelace: {views: [{path: "home", title: "Home", icon: "mdi:home"},
+                       {path: "music", title: "Music", icon: "mdi:music"},
+                       {title: "Untitled"}]},
+    admin: {views: [{path: "system", title: "System", icon: "mdi:cog"}]},
+  },
+  devices: [
+    {identifiers: [["browser_mod", "browser_mod_desk_mac"]], name: "Desk Mac", name_by_user: null},
+    {identifiers: [["browser_mod", "browser_mod_wall_panel"]], name: null, name_by_user: "Hall panel"},
+    {identifiers: [["other", "not_a_browser"]], name: "Something else"},
+  ],
+};
 const hass = {
   states: data.states, entities: data.entities, devices: {}, areas: data.areas, dockedSidebar: "docked",
+  services: BM ? {browser_mod: {navigate: {}}} : {},
   async callWS(m) {
     window.calls.push(m.type);
     if (m.type === "ulanzi_deck/get") return {pages: structuredClone(draft), published,
@@ -25,6 +42,13 @@ const hass = {
       return {published, published_settings: publishedSettings, status}; }
     if (m.type === "ulanzi_deck/press") { return press(m); }
     if (m.type === "ulanzi_deck/allow") { status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true}; statusCb && statusCb(status); return {allowed: true}; }
+    if (m.type === "lovelace/dashboards/list") return BM ? structuredClone(BM.dashboards) : [];
+    if (m.type === "lovelace/config") {
+      const cfg = BM && BM.config[m.url_path || "lovelace"];
+      if (!cfg) throw new Error("config_not_found");
+      return structuredClone(cfg);
+    }
+    if (m.type === "config/device_registry/list") return BM ? structuredClone(BM.devices) : [];
     if (m.type === "history/history_during_period") {
       const id = m.entity_ids[0], h = data.hist[id] || [], t0 = Date.now() / 1000 - 24 * 3600;
       return {[id]: h.map((v, i) => ({s: String(v), lu: t0 + (i + 0.5) * 3600}))};
@@ -59,13 +83,38 @@ window.panel = el; window.hass = hass;
 
 // ?settings opens the deck settings dialog, so it can be screenshotted headless.
 const q = new URLSearchParams(location.search);
-if (q.has("settings") || q.has("connected")) {
+if (q.has("settings") || q.has("connected") || q.has("navigate")) {
   // A settled deck: connected, everything on the same release, nothing to do.
   status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
             app_version: "4.8", bridge_version: "4.8", deck_firmware: "4.8",
             deckd_available: "4.8", latest_release: "4.8", on_disk_version: "4.8",
             restart_pending: false};
   statusCb && statusCb(status);
+  // ?navigate sets the first key to a dashboard jump, for the guide's figure.
+  if (q.has("navigate")) {
+    const sr = () => el.shadowRoot;
+    const pick = async (sel, query, text) => {
+      const inp = sr().querySelector(sel + " input");
+      inp.focus(); inp.value = query;
+      inp.dispatchEvent(new Event("input", {bubbles: true}));
+      await new Promise(r => setTimeout(r, 500));
+      const row = [...sr().querySelector(sel).querySelectorAll("[data-n]")]
+        .find(o => o.textContent.includes(text));
+      if (row) row.dispatchEvent(new MouseEvent("mousedown", {bubbles: true}));
+      await new Promise(r => setTimeout(r, 500));
+    };
+    setTimeout(async () => {
+      sr().querySelector('[data-k="0"]').click();
+      await new Promise(r => setTimeout(r, 400));
+      await pick("#c-action", "dashboard", "browser_mod.navigate");
+      await pick("#c-target", "music", "/lovelace/music");
+      await pick("#c-browser", "desk", "browser_mod_desk_mac");
+      sr().querySelector("#c-browser input").blur();
+      [...sr().querySelectorAll("details.sect")].forEach(d => {
+        d.open = d.querySelector("summary").textContent.includes("What it does");
+      });
+    }, 600);
+  }
   if (q.has("settings")) {
     const open = () => {
       const b = el.shadowRoot && el.shadowRoot.getElementById("btn-settings");

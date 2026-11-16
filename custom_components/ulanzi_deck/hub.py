@@ -44,6 +44,7 @@ from . import render
 from .const import (
     RELEASES_URL,
     ACTIONS,
+    NAVIGATE,
     DOMAIN,
     EVENT_KEY,
     MAX_SCREENS,
@@ -103,6 +104,17 @@ def clean_settings(settings: Any) -> dict:
 
 def _is_nav(action: str) -> bool:
     return action.startswith("deck.")
+
+
+def _takes_entity(action: str) -> bool:
+    """Whether this action's target names an entity.
+
+    Most do. Two kinds do not: the deck's own screen changes, which carry a
+    screen number or nothing at all, and browser_mod.navigate, which carries a
+    dashboard path. A key doing either follows no entity, so it is drawn once
+    and never repainted by a state change.
+    """
+    return action != "none" and not _is_nav(action) and action != NAVIGATE
 
 
 class _Bridge:
@@ -349,8 +361,7 @@ class DeckHub:
             return key.get("ent") or None
         if key.get("type", "button") == "button":
             tap = key.get("tap") or {}
-            action = tap.get("a") or "none"
-            if action != "none" and not _is_nav(action):
+            if _takes_entity(tap.get("a") or "none"):
                 return tap.get("t") or None
         return None
 
@@ -880,7 +891,16 @@ class DeckHub:
         if not self.hass.services.has_service(domain, service):
             _LOGGER.warning("Key %s on screen %s wants %s, which does not exist here", k, screen, action)
             return
-        await self.hass.services.async_call(domain, service, {"entity_id": target}, blocking=False)
+        if action == NAVIGATE:
+            # The target is a dashboard path. "b" is the browser to move; with
+            # none, browser_mod moves every registered browser, which is what
+            # "All screens" means in the panel.
+            data: dict[str, Any] = {"path": target}
+            if browser := slot.get("b"):
+                data["browser_id"] = [browser]
+        else:
+            data = {"entity_id": target}
+        await self.hass.services.async_call(domain, service, data, blocking=False)
 
 
 def _render_tiles(jobs: list[tuple[int, int, dict, dict]]) -> list[tuple[int, int, bytes]]:

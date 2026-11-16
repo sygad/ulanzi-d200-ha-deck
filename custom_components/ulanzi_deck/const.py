@@ -31,6 +31,12 @@ PAIRING_FILE = "ulanzi-deck-pairing.json"
 README_FILE = "Start here.html"
 EVENT_KEY = "ulanzi_deck_key"
 
+# Jumping a dashboard to one of its views. Unlike every other action here, its
+# target is a path rather than an entity, and the thing it moves is a browser
+# showing Home Assistant, not something in the house. browser_mod supplies it;
+# the panel only offers this action when that integration is installed.
+NAVIGATE = "browser_mod.navigate"
+
 # What a button key may ask Home Assistant to do. The panel offers exactly these.
 ACTIONS = {
     "light.toggle", "light.turn_on", "light.turn_off",
@@ -39,6 +45,7 @@ ACTIONS = {
     "cover.toggle", "cover.open_cover", "cover.close_cover",
     "media_player.media_play_pause", "media_player.volume_up", "media_player.volume_down",
     "script.turn_on", "scene.turn_on",
+    NAVIGATE,
 }
 
 # Messages to the deck (see parts/02-deck-app/deckd.c)

@@ -1,8 +1,9 @@
 # Setting up your Ulanzi deck
 
 An **Ulanzi D200** is a desk pad with fourteen clear keys over one screen. This turns it
-into a control deck for **Home Assistant**: press a key to switch a light, run a scene or
-change screen, and watch readings from your house on the keys themselves — a temperature
+into a control deck for **Home Assistant**: press a key to switch a light, run a scene,
+change screen or send a dashboard to a view, and watch readings from your house on the
+keys themselves — a temperature
 graph, a power dial, the time. You lay it out from a panel inside Home Assistant, with no
 YAML and nothing typed into a terminal.
 
@@ -228,6 +229,54 @@ Back in the same sidebar page. Pick a key, give it something to do, and press **
 device**. **Preview** lets you try a key in the browser before it ever reaches the deck.
 
 <a href="images/guide/fig-step5.png"><img src="images/guide/fig-step5.png" alt="The Ulanzi Deck panel: key settings on the left, a live preview of the fourteen keys on the right" width="100%"></a>
+
+<br>
+
+---
+
+<br>
+
+## Sending a dashboard to a view
+
+A key can move a screen as well as something in the house. **Dashboard: Go to
+view…** jumps a browser showing Home Assistant straight to any view of any
+dashboard — the deck as a row of tabs for the tablet on the wall, or for the Mac
+in front of you.
+
+<br>
+
+> **This one needs another integration.** Everything else in this guide works with
+> nothing but Ulanzi Deck. Jumping a dashboard needs
+> [**Browser Mod**](https://github.com/thomasloven/hass-browser_mod), which is in the
+> Marketplace alongside this one. It is the part that can reach into an open browser
+> and move it; nothing in Home Assistant can do that on its own. Without it the action
+> is simply not offered and nothing else changes.
+
+<br>
+
+Browser Mod's own install asks for **two restarts** — one after the download, one
+after you add the integration. Then two settings, once each:
+
+1. **Register the browser.** Open **Browser Mod** in the sidebar and turn **Register**
+   on. A browser that has not registered cannot be reached, and this is the only
+   setting on that page the deck needs — leave the camera ones alone.
+2. **Stop the connection dropping.** In your own **Profile settings**, turn
+   **Suspend background connections** off. Home Assistant otherwise closes a hidden
+   window's connection after five minutes, and a deck key pressed after that would
+   find nothing listening. Browser Mod's own warning calls this "Automatically close
+   connection", which is what the setting used to be called.
+
+<br>
+
+<p align="center"><img src="images/guide/fig-navigate.png" alt="A key set to Dashboard: Go to view, with a dashboard view and a screen to move chosen" width="520"></p>
+
+<br>
+
+Then it is two fields, the same as any other key. **Dashboard view** lists every view
+of every dashboard you have, by name, with the path it will use underneath — there is
+nothing to type and nothing to look up. **Screen to move** is which browser gets sent:
+one of them by name, or **All screens**, which moves every browser Browser Mod knows
+about at once.
 
 <br>
 
