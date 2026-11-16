@@ -74,10 +74,11 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
 /* One permanent line saying what every part is running. Grey means nothing to
    do; amber means that part is behind this release, and the bar above says how
    to fix it. Nothing to go looking for, and nothing to remember. */
-/* The deck, anything waiting to be updated, and the three version numbers are one
-   column, not three rows of the page. Spanning both columns put them below
-   whichever side was taller, so opening a section on the left shoved the version
-   line down the page away from the deck it describes. */
+/* The deck and the three version numbers are one column, not two rows of the
+   page. Spanning both columns put the numbers below whichever side was taller,
+   so opening a section on the left shoved them down the page, away from the
+   deck they describe. The update bar is not in here: it is the page's news,
+   not the deck's, and it keeps the full width. */
 .rightcol{display:flex;flex-direction:column;gap:14px;min-width:0}
 .verline{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:4px 10px;
   margin:0 2px;font-size:12.5px;color:var(--fg2)}
@@ -89,7 +90,7 @@ h1,h2{margin:0;font-weight:500;text-wrap:balance}
   padding-block:20px 40px;max-width:1240px;margin:0 auto;
   display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
 @media (max-width:960px){.wrap{grid-template-columns:minmax(0,1fr)}}
-.updbar{display:flex;align-items:center;gap:14px;padding:16px 18px;
+.updbar{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:16px 18px;
   border-radius:12px;background:var(--card);box-shadow:0 2px 2px rgba(0,0,0,.06),0 1px 5px rgba(0,0,0,.08);
   border-left:4px solid var(--amber)}
 .updbar .mi.dl{font-size:22px;color:var(--amber);flex:0 0 auto}
@@ -602,6 +603,13 @@ const MARKUP=`
   </div>
 
 
+  <div class="verline" id="verLine" hidden>
+    <span class="vpart" id="vp-int"></span><span class="vsep">·</span>
+    <span class="vpart" id="vp-app"></span><span class="vsep">·</span>
+    <span class="vpart" id="vp-deck"></span>
+  </div>
+  </div>
+
   <div class="updbar" id="updBar" hidden>
     <span class="mi dl"></span>
     <span class="updtext">
@@ -609,12 +617,6 @@ const MARKUP=`
       <span id="updSub"></span>
     </span>
     <button class="btn" id="btn-update">Update now</button>
-  </div>
-  <div class="verline" id="verLine" hidden>
-    <span class="vpart" id="vp-int"></span><span class="vsep">·</span>
-    <span class="vpart" id="vp-app"></span><span class="vsep">·</span>
-    <span class="vpart" id="vp-deck"></span>
-  </div>
   </div>
 </div>
 
