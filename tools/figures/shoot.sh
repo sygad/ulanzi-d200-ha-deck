@@ -46,6 +46,6 @@ PY
 }
 
 echo "Drawing:"
-shoot register fig-navigate-register 1180 760
-shoot suspend  fig-navigate-suspend  1180 700
+shoot register fig-navigate-register 1180 820
+shoot suspend  fig-navigate-suspend  1180 760
 echo "Done."
