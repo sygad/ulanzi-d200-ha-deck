@@ -10,11 +10,21 @@ import ServiceManagement
 
 /// Where the app lives.
 ///
-/// An ordinary app with a menu bar item beside the clock. It was briefly a
-/// menu-bar-only app, which cost three separate faults: SwiftUI will not open
-/// a window for one at all, closing the last window ends it, and moving its
-/// Dock presence in and out at runtime made the window vanish when focus
-/// moved. Being ordinary is duller and it works.
+/// The menu bar beside the clock, and nothing in the Dock. It is a thing that
+/// carries USB traffic for as long as the Mac is on; it is not a document you
+/// open, so it does not sit in the Dock all day pretending to be one.
+///
+/// Menu-bar-only was tried once before and taken out again, because marking the
+/// app LSUIElement stopped SwiftUI opening its `Window` scene at all: 1.8
+/// launched to an empty screen, "Open Ulanzi Deck" opened nothing, and closing
+/// the last window of a menu bar app ended it. Three faults from one line of
+/// plist, in the most anxious minute of the install.
+///
+/// The plist line is back, but the window is no longer a SwiftUI scene. It is an
+/// NSWindow this delegate makes and keeps, which an accessory app is perfectly
+/// able to show. That is the one thing that failed before, so it is the one
+/// thing that changed. The Dock presence is never toggled at runtime either —
+/// that was its own separate fault, windows vanishing as focus moved.
 /// What this copy of the app is, for the window and the menu. Nobody should have
 /// to look in Get Info to find out which one they are running.
 let appVersion: String = {
@@ -33,10 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         // this app closed its own window at startup, so every launch afterwards
         // restored a closed window and it looked dead. It does not get to
         // remember, and the window is shown on purpose at every launch.
-        DispatchQueue.main.async { [weak self] in
-            for w in NSApp.windows { w.isRestorable = false }
-            self?.comeBack()
-        }
+        DispatchQueue.main.async { [weak self] in self?.comeBack() }
     }
 
     /// Closing the window puts it away; it does not stop the app carrying the
@@ -58,29 +65,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         return img
     }()
 
+    /// The one window, made once and kept.
+    ///
+    /// isReleasedWhenClosed is off because closing it only puts it away — the app
+    /// carries on carrying the deck's traffic, and the next Open hands back the
+    /// same window rather than a new one. macOS is not allowed to remember it
+    /// being closed: a version of this app restored a closed window at every
+    /// launch after the first and looked dead.
+    private var window: NSWindow?
+
     func comeBack() {
+        if window == nil {
+            let w = NSWindow(contentViewController:
+                NSHostingController(rootView: MainView(service: service)))
+            w.styleMask = [.titled, .closable, .miniaturizable]
+            w.title = "Ulanzi Deck"
+            w.isReleasedWhenClosed = false
+            w.isRestorable = false
+            w.center()
+            window = w
+        }
+        // An accessory app has to say so to come forward; without this the
+        // window opens behind whatever you were looking at.
         NSApp.activate(ignoringOtherApps: true)
-        NSApp.windows.first(where: { $0.canBecomeMain })?.makeKeyAndOrderFront(nil)
+        window?.makeKeyAndOrderFront(nil)
     }
 }
 
 @main
 struct UlanziDeckApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @Environment(\.openWindow) private var openWindow
 
+    // The menu bar item is the whole of the app's scenery. The window is not a
+    // scene any more; see AppDelegate for why.
     var body: some Scene {
-        Window("Ulanzi Deck", id: "main") {
-            MainView(service: delegate.service)
-        }
-        .windowResizability(.contentSize)
-        .commands { CommandGroup(replacing: .newItem) {} }
-
         MenuBarExtra {
-            MenuContents(service: delegate.service) {
-                openWindow(id: "main")
-                delegate.comeBack()
-            }
+            MenuContents(service: delegate.service) { delegate.comeBack() }
         } label: {
             MenuLabel(service: delegate.service)
         }

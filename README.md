@@ -211,7 +211,10 @@ It also puts itself in your **Applications** folder on that first run, so it dis
 the download folder — that is meant to happen. From then on it is an app like any other, with
 its icon in the menu bar beside the clock.
 
-The app stays in the menu bar beside the clock. Closing its window does not stop it; **Quit** is in that menu, along with the version it is running — listed as **Connector app**, the same name the panel uses for it.
+The app stays in the menu bar beside the clock, and **nowhere else** — it keeps no Dock
+icon, because it is a thing that carries USB traffic all day rather than a document you
+open. Closing its window does not stop it; **Quit** is in that menu, along with the
+version it is running — listed as **Connector app**, the same name the panel uses for it.
 
 <br>
 

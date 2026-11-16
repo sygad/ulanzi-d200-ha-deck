@@ -6,7 +6,8 @@ The Mac app the deck plugs into. The deck has no network, so this carries its me
 to Home Assistant and back.
 
 To a user it is an ordinary app: Home Assistant hands it over, it puts itself in
-Applications, and it lives in the menu bar by the clock with its version in its window
+Applications, and it lives in the menu bar by the clock — and only there, with no Dock
+icon — with its version in its window
 and Quit in its menu. Closing the window does not stop it. **Nothing on this page is
 part of setting one up** — [the setup guide](../../README.md) is. What follows is how
 it works and how to build it yourself.
