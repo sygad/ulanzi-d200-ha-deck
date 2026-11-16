@@ -6,6 +6,13 @@
 // A pretend Home Assistant: enough of `hass` for the panel to run on a desk.
 import "/ulanzi_deck_static/panel.js";
 const data = await (await fetch("data.json")).json();
+// A key that jumps to the music dashboard should look like one. The first key is
+// a ceiling light in the demo house, and a ceiling light opening a music view
+// would read as a mistake in the guide's figure. Done here, before the panel asks
+// for the pages, because it takes its own copy of them.
+if (new URLSearchParams(location.search).has("navigate")) {
+  Object.assign(data.pages[0].keys[0], {l: "Music", i: "music", c: "#4fc3f7"});
+}
 const blank = new URLSearchParams(location.search).has("blank");
 let draft = blank ? [{name: "Screen 1", icon: "", keys: Array(14).fill(null)}] : data.pages, published = null;
 let settings = {sleep: 20}, publishedSettings = null;
@@ -83,7 +90,7 @@ window.panel = el; window.hass = hass;
 
 // ?settings opens the deck settings dialog, so it can be screenshotted headless.
 const q = new URLSearchParams(location.search);
-if (q.has("settings") || q.has("connected") || q.has("navigate")) {
+if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear")) {
   // A settled deck: connected, everything on the same release, nothing to do.
   status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
             app_version: "4.10", bridge_version: "4.10", deck_firmware: "4.10",
@@ -114,6 +121,21 @@ if (q.has("settings") || q.has("connected") || q.has("navigate")) {
         d.open = d.querySelector("summary").textContent.includes("What it does");
       });
     }, 600);
+  }
+  // ?gear rings the settings button, for the figure that says where it is.
+  // The ring is the same vivid orange-red tools/figures uses, so every "look
+  // here" mark in the guide is the same mark.
+  if (q.has("gear")) {
+    const put = () => {
+      const b = el.shadowRoot && el.shadowRoot.getElementById("btn-settings");
+      if (!b) return setTimeout(put, 50);
+      const st = document.createElement("style");
+      st.textContent = "#btn-settings{position:relative}" +
+        "#btn-settings::after{content:'';position:absolute;inset:-7px;" +
+        "border:4px solid #ff3d00;border-radius:999px}";
+      el.shadowRoot.appendChild(st);
+    };
+    setTimeout(put, 300);
   }
   if (q.has("settings")) {
     const open = () => {
