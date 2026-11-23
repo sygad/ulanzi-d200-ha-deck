@@ -92,19 +92,40 @@ window.pushStatus = patch => { status = {...status, ...patch}; statusCb && statu
 
 // ?settings opens the deck settings dialog, so it can be screenshotted headless.
 const q = new URLSearchParams(location.search);
+// Ring one button: the single thing a step of the guide is about.
+function ring(id) {
+  const put = () => {
+    const b = el.shadowRoot && el.shadowRoot.getElementById(id);
+    if (!b) return setTimeout(put, 50);
+    const st = document.createElement("style");
+    st.textContent = "#" + id + "{position:relative}" +
+      "#" + id + "::after{content:'';position:absolute;inset:-7px;" +
+      "border:4px solid #ff3d00;border-radius:999px}";
+    el.shadowRoot.appendChild(st);
+  };
+  setTimeout(put, 300);
+}
+// ?allow: a wireless board has joined the network and is waiting to be let in.
+// This is step 5 of the wireless guide, with the Allow button ringed.
+if (q.has("allow")) {
+  status = {...status, bridge: "pending", bridge_kind: "board", deck: false,
+            pending: {bridge_id: "esp32-0123456789abcdef", name: "Ulanzi D200 Wireless"}};
+  statusCb && statusCb(status);
+  ring("btn-allow");
+}
 if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear") || q.has("behind") || q.has("board")) {
   // A settled deck: connected, everything on the same release, nothing to do.
   status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
-            app_version: "4.16", bridge_version: "4.16", deck_firmware: "4.16",
-            deckd_available: "4.16", latest_release: "4.16", on_disk_version: "4.16",
+            app_version: "4.17", bridge_version: "4.17", deck_firmware: "4.17",
+            deckd_available: "4.17", latest_release: "4.17", on_disk_version: "4.17",
             restart_pending: false};
   // ?board swaps the Mac for the wireless board, one release behind and able to
   // be sent its software; ?board=old is a board from before it could be.
   if (q.has("board")) {
     status = {...status, bridge_name: "Ulanzi D200 Wireless", bridge_kind: "board",
               bridge_updates: q.get("board") !== "old",
-              app_version: "4.17", bridge_version: "4.16", deck_firmware: "4.16",
-              deckd_available: "4.16", latest_release: "4.17", on_disk_version: "4.17"};
+              app_version: "4.18", bridge_version: "4.17", deck_firmware: "4.17",
+              deckd_available: "4.17", latest_release: "4.18", on_disk_version: "4.18"};
   }
   statusCb && statusCb(status);
   // ?navigate sets the first key to a dashboard jump, for the guide's figure.
@@ -141,18 +162,9 @@ if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear"
   // ?gear rings the settings button, for the figure that says where it is.
   // The ring is the same vivid orange-red tools/figures uses, so every "look
   // here" mark in the guide is the same mark.
-  if (q.has("gear")) {
-    const put = () => {
-      const b = el.shadowRoot && el.shadowRoot.getElementById("btn-settings");
-      if (!b) return setTimeout(put, 50);
-      const st = document.createElement("style");
-      st.textContent = "#btn-settings{position:relative}" +
-        "#btn-settings::after{content:'';position:absolute;inset:-7px;" +
-        "border:4px solid #ff3d00;border-radius:999px}";
-      el.shadowRoot.appendChild(st);
-    };
-    setTimeout(put, 300);
-  }
+  if (q.has("gear")) ring("btn-settings");
+  // ?board&ring rings Update now, for the figure of a board being updated.
+  if (q.has("board") && q.has("ring")) ring("btn-update");
   if (q.has("settings")) {
     const open = () => {
       const b = el.shadowRoot && el.shadowRoot.getElementById("btn-settings");

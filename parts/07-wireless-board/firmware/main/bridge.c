@@ -74,7 +74,8 @@ static void ping(void)
     uint32_t now = (uint32_t)t;
     int32_t tz = clock_tz_offset(now);
     struct tm lt;
-    localtime_r(&t, &lt);
+    time_t local = t + tz;                           /* the date where the deck is, whoever supplied the zone */
+    gmtime_r(&local, &lt);
     char date[24];
     int dl = snprintf(date, sizeof date, "%s %d %s", wd[lt.tm_wday], lt.tm_mday, mo[lt.tm_mon]);
     m[0] = 1;
@@ -189,7 +190,13 @@ static void self_update(void)
 static volatile bool setup_requested;
 void bridge_request_setup(void) { setup_requested = true; }
 
-static bool deck_alive(void) { return dlink && now_ms() - last_status_ms < 6000; }
+/* While a message from Home Assistant is part way to the deck, nothing else can be
+ * said to it: no ping goes out, so no status comes back. A whole layout crosses in a
+ * third of a second, but a message that stalls on the Wi-Fi half way holds the line
+ * for as long as it stalls. Silence then says nothing about the deck, so it is not
+ * counted against it. If Home Assistant never finishes, its link times out and lets go. */
+static volatile bool line_held;
+static bool deck_alive(void) { return dlink && (line_held || now_ms() - last_status_ms < 6000); }
 
 static void reconcile(void)
 {
@@ -239,6 +246,9 @@ static void control(const char *text)
             ha_pending = true;
         } else if (!strcmp(t->valuestring, "setup_deck")) {
             setup_requested = true;
+        } else if (!strcmp(t->valuestring, "clock")) {
+            const cJSON *off = cJSON_GetObjectItem(o, "utc_offset");
+            if (cJSON_IsNumber(off)) clock_zone_from_ha((int32_t)off->valuedouble);
         } else if (!strcmp(t->valuestring, "update_now")) {
             ws_json("{\"type\":\"want_app\"}");
         } else if (!strcmp(t->valuestring, "app_at")) {
@@ -270,7 +280,7 @@ static void on_ws(void *arg, esp_event_base_t base, int32_t id, void *data)
     case WEBSOCKET_EVENT_CLOSED:
         if (ha_ready) say("ha: link lost");
         ws_up = false; ha_ready = false; ha_pending = false;
-        if (mid_binary) { mid_binary = false; link_poison = true; xSemaphoreGive(link_lock); }
+        if (mid_binary) { mid_binary = false; line_held = false; link_poison = true; xSemaphoreGive(link_lock); }
         break;
     case WEBSOCKET_EVENT_DATA:
         if (e->op_code == 1) {                                  /* text: for us */
@@ -282,19 +292,27 @@ static void on_ws(void *arg, esp_event_base_t base, int32_t id, void *data)
                 }
             }
         } else if (e->op_code == 2) {                           /* binary: for the deck, untouched */
+            static int64_t began;
             if (e->payload_offset == 0) {
                 uint32_t n = e->payload_len;
                 uint8_t len[4] = { n, n >> 8, n >> 16, n >> 24 };
                 xSemaphoreTake(link_lock, portMAX_DELAY);
                 mid_binary = true;
+                line_held = true;
                 n_to_deck++;
+                began = now_ms();
                 link_write(len, 4);
             }
             if (mid_binary) {
                 if (e->data_len) link_write(e->data_ptr, e->data_len);
                 if (e->payload_offset + e->data_len >= e->payload_len) {
                     mid_binary = false;
+                    last_status_ms = now_ms();          /* the deck gets a full spell to answer the next ping */
+                    line_held = false;
                     xSemaphoreGive(link_lock);
+                    if (e->payload_len > 20000)
+                        say("bridge: sent the deck %d bytes in %d.%d s", (int)e->payload_len,
+                            (int)((now_ms() - began) / 1000), (int)((now_ms() - began) % 1000 / 100));
                 }
             }
         }
@@ -397,7 +415,15 @@ static void bridge_task(void *arg)
                 dlink = NULL; link_poison = false; have = 0;
                 xSemaphoreGive(link_lock);
             }
-            if (deck_setup(force)) vTaskDelay(pdMS_TO_TICKS(1500));
+            if (deck_setup(force)) {
+                /* The deck app has been replaced. To Home Assistant that is a deck that went
+                 * and came back: it has to hear both, because the new app holds none of the
+                 * pictures the old one was sent, and "came back" is its cue to send them
+                 * again and to take down the notice it put up. Without this the gap is too
+                 * short to be noticed and Home Assistant goes on believing nothing changed. */
+                reconcile();
+                vTaskDelay(pdMS_TO_TICKS(1500));
+            }
             else if (setup_unsure) { checked = false; reconcile(); vTaskDelay(pdMS_TO_TICKS(2000)); continue; }
             last_try = -10000;
         }
@@ -408,6 +434,7 @@ static void bridge_task(void *arg)
                 if (s) {
                     xSemaphoreTake(link_lock, portMAX_DELAY);
                     dlink = s; link_poison = false; have = 0;
+                    last_status_ms = -100000;           /* whatever was said on the old link is not this app speaking */
                     xSemaphoreGive(link_lock);
                     say("bridge: link to the deck app open");
                     ping();
@@ -438,13 +465,24 @@ static void bridge_task(void *arg)
 
 void bridge_status(char *out, int max)
 {
+    char clk[60] = "not known";
+    if (clock_known()) {
+        time_t t = time(NULL);
+        int32_t tz = clock_tz_offset((uint32_t)t);
+        time_t local = t + tz;
+        struct tm lt;
+        gmtime_r(&local, &lt);
+        int a = tz < 0 ? -tz : tz;
+        snprintf(clk, sizeof clk, "%02d:%02d UTC%c%d:%02d %s", lt.tm_hour, lt.tm_min, tz < 0 ? '-' : '+', a / 3600, a % 3600 / 60,
+                 clock_zone_known() ? "(zone from Home Assistant)" : "(board's own zone)");
+    }
     snprintf(out, max,
              "wifi %s%s%s, home assistant %s, deck %s, link %s, clock %s, to deck %u, from deck %u, running from %s, memory free %u (lowest %u)",
              net_online() ? "joined " : net_setup_mode() ? "setup mode" : "not joined", net_online() ? net_ip() : "", "",
              ha_ready ? "ready" : ha_pending ? "waiting to be allowed" : ws_up ? "connected" : "not connected",
              adb_ready() ? "debug port open" : adb_attached() ? "attached" : "not attached",
              dlink ? (deck_alive() ? "open and answering" : "open, silent") : "closed",
-             clock_known() ? "known" : "not known", (unsigned)n_to_deck, (unsigned)n_from_deck,
+             clk, (unsigned)n_to_deck, (unsigned)n_from_deck,
              esp_ota_get_running_partition()->label,
              (unsigned)esp_get_free_heap_size(), (unsigned)esp_get_minimum_free_heap_size());
 }

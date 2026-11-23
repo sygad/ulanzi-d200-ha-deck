@@ -96,6 +96,10 @@ the only time the board needs one.
 
 <br>
 
+<p align="center"><img src="images/guide/fig-wireless-install.png" alt="The install page: four short steps and an Install button" width="520"></p>
+
+<br>
+
 ---
 
 <br>
@@ -127,6 +131,12 @@ Setup**. It has no password, and it goes away as soon as the board has joined yo
    something like `http://192.168.1.10:8123`.
 5. Press **Save and connect**.
 
+<br>
+
+<p align="center"><img src="images/guide/fig-wireless-setup-page.png" alt="The board's setup page on a phone: a Wi-Fi network, its password, the Home Assistant address, and a Save and connect button" width="320"></p>
+
+<br>
+
 The board restarts and joins your Wi-Fi. If it can't, because the password was wrong or
 the network is out of reach, it offers **Ulanzi Deck Setup** again after a minute, and you
 start this step again.
@@ -147,6 +157,12 @@ will offer you the connector app; that is the other route, and you don't need it
 At the top of the Ulanzi Deck page the status now reads
 **"Ulanzi D200 Wireless" wants to connect**, with an **Allow** button beside it. Press
 **Allow**.
+
+<br>
+
+<img src="images/guide/fig-wireless-allow.png" alt="The top of the Ulanzi Deck panel: Ulanzi D200 Wireless wants to connect, with the Allow button ringed" width="100%">
+
+<br>
 
 Home Assistant asks this once. It is how it knows the board is yours and not something
 else on your network claiming to be a deck.
@@ -182,7 +198,7 @@ Here is all of what it does.
 **What it does**
 
 - ✅ &nbsp;Holds the deck's USB cable and passes messages between the deck and your Home Assistant.
-- ✅ &nbsp;Tells the deck the time, which it reads from your Home Assistant.
+- ✅ &nbsp;Tells the deck the time, which it reads from your Home Assistant. A clock key on the deck follows the time zone your Home Assistant is set to, and changes with it when the clocks go forward or back.
 - ✅ &nbsp;Copies the deck software across: the first time, and again whenever the board carries a newer one. Ulanzi's own copy is kept the first time.
 - ✅ &nbsp;Shows where it stands on a page of its own. Open the board's address on your network in a browser.
 
@@ -246,6 +262,24 @@ three are, exactly as it does on the other route.
 3. **Deck software** — nothing to do. The board carries the deck software that matches it,
    and copies it across by itself as soon as it has restarted.
 
+<br>
+
+<a href="images/guide/fig-wireless-update.png"><img src="images/guide/fig-wireless-update.png" alt="The Ulanzi Deck panel offering Board software, with the Update now button ringed" width="100%"></a>
+
+<br>
+<br>
+
+While it happens, the deck's bottom-right key shows an amber **Updating the board** in
+place of whatever you put there. The keys stop answering for a few seconds, and this is
+how you know that is meant to happen. It goes back to your own key by itself when the
+update is done.
+
+<br>
+
+<a href="images/guide/fig-updating.png"><img src="images/guide/fig-updating.png" alt="The deck during an update: the bottom-right key shows an amber download icon and Updating the board" width="100%"></a>
+
+<br>
+
 **A board from before 4.16 can't be told from the panel.** The panel says so and offers the
 install page instead: plug the board's **COM** socket into a computer and press **Install** on
 [the same page as step 2](https://sygad.github.io/ulanzi-d200-ha-deck/docs/flash/) once more. It keeps your Wi-Fi details,
@@ -266,8 +300,6 @@ and from then on its updates come from the panel.
   and I would like to hear about it.
 - **The BOOT button has not been tried.** Holding it for five seconds is meant to bring the
   setup network back. It is written and not yet pressed.
-- **The clock keeps UK time.** The board has no setting for a time zone yet, so a clock key
-  on the deck follows UK time wherever you are.
 - **The Home Assistant address has to be numbers.** A name such as `homeassistant.local` has
   not been tried and I don't expect it to work.
 - **The first page of the panel only knows the Mac route.** Until something connects, the

@@ -558,6 +558,24 @@ def render_key(key: dict | None, n: int, live: dict | None = None):
 # ---------------------------------------------------------------- packing
 
 
+# The colour of a notice. Amber, because it has to stand out from keys that may
+# be any colour or none, and because amber already means "something is being
+# brought up to date" everywhere else: it is the panel's --amber for a part that
+# is behind, and the deck's own marker for a link that is half there.
+NOTICE_COLOUR = "#ffa000"
+
+
+def notice(label: str, icon: str = "progress-download") -> bytes:
+    """The picture the deck shows on its wide key while something is being updated.
+
+    Drawn exactly as a key is, so it looks like part of the deck: an icon and a
+    line of words, side by side, both in NOTICE_COLOUR. The deck puts it over
+    whatever the wide key was, a clock included, and takes it down by itself.
+    """
+    key = {"type": "button", "l": label, "i": icon, "c": NOTICE_COLOUR, "layout": "h"}
+    return rle_encode(render_key(key, WIDE)[0])
+
+
 def rle_encode(img: Image.Image) -> bytes:
     """u16 width, u16 height, then runs. See rle_decode() in parts/02-deck-app/deckd.c."""
     img = img.convert("RGB")

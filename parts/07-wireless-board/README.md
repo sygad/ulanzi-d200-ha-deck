@@ -63,7 +63,12 @@ To Home Assistant it is one more bridge, called **Ulanzi D200 Wireless**.
   Holding the **BOOT** button for five seconds brings that network back on purpose.
 - **The time comes from Home Assistant.** The board has no clock either. It asks Home
   Assistant for a page and reads the date off the reply, so nothing outside your network
-  is contacted. The time zone is fixed to the UK's for now.
+  is contacted.
+- **So does the time zone.** A Mac knows what zone it is in; a board knows none. Home
+  Assistant tells the board its own, as a number of seconds east of UTC, when it lets the
+  board in and again within a minute of it changing. The board keeps the last one it was
+  told, so after a power cut the deck's clock is right before Home Assistant has spoken.
+  A board that has never been told uses UK time.
 - **A secret of its own.** As with the connector app, it proves itself to Home Assistant
   with a secret it made up on first start, and Home Assistant keeps only a fingerprint.
   Someone has to press **Allow** in the panel the first time.
@@ -166,6 +171,7 @@ port's name from `tools/.port`, a file you make yourself.
 | The deck's data channel is out of reach | It asks for 1024-byte packets, and the ESP32-S3's host code stops well short of that. Hence the debug port |
 | The first try at the debug port always fails | The board sees the deck, is refused the port, and sees the deck arrive a second time about a second later. That second time works. The firmware waits for it |
 | A clean goodbye was final | The WebSocket library reconnects after an error but not after the other end closes politely, which is what Home Assistant does when it restarts. It has to be told to (`enable_close_reconnect`) |
+| A replaced deck app looked like nothing had happened | The board swaps the deck's software in under two seconds, too short for anything to count as the deck going away. But the new app holds none of the pictures the old one was sent, so Home Assistant has to be told the deck went and came back, or it never sends them again |
 | A cut-off answer looked like a new deck | Asking the deck what it runs, on a connection that drops mid-answer, gives an empty reply. Every question now ends with a marker, and no marker means ask again |
 | Opening the serial port restarts the board | That is how these boards are wired. `tools/hub.py` opens it once and keeps it open |
 | Other boards on the same computer | Another project's flashing tool wrote to this board because it was the only serial port. Always name the port |

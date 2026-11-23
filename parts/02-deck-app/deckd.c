@@ -31,7 +31,7 @@ typedef short i16;
 typedef int i32;
 
 #define FW_MAJOR 4
-#define FW_MINOR 16
+#define FW_MINOR 17
 /* The same two numbers as words, so --version and the log can never drift from
    what the status message reports. They used to be typed out by hand, and said
    1.2 for every release after it. */
@@ -178,6 +178,18 @@ static int layok, nscreens, cur;
 static u32 layout_id;
 
 static struct { u8 *p; u32 len, maplen; } live[MAXSCREENS][NKEYS];
+
+/* A notice: one picture that takes the wide key over, whatever that key is,
+   while something is being updated. It is the one thing on the screen that has
+   to outlast the link, because an update is exactly when the link goes away:
+   the board restarts, and then this program is replaced and started again. So
+   it is kept in a file in /tmp as well, which is memory and is gone at a real
+   power-up. It ends when the host says the screen is its own again (a layout,
+   or CLEAR), or by itself after two minutes so that it can never be left up. */
+#define NOTICE_FILE "/tmp/deck-notice"
+#define NOTICE_MAX 65536
+static u8 notice[NOTICE_MAX];
+static u32 notice_len, notice_until;
 
 /* Key map: the key code at each position, in reading order, wide key last.
    Recorded on 13 Nov 2026 by pressing all fourteen in turn (bridge --keytest).
@@ -416,7 +428,7 @@ static void clear_screen(void)          /* between the keys the panel is always 
 
 static void draw_key(int k)
 {
-    int x0, y0, tw, th;
+    int x0, y0, tw, th, noticed;
     u32 npx, i;
     const u8 *img = 0, *kr = 0;
     u32 len = 0;
@@ -430,6 +442,8 @@ static void draw_key(int k)
         if (live[cur][k].p) { img = live[cur][k].p; len = live[cur][k].len; }
         else if (kr[4] & 1) { img = lay + r32(kr + 24); len = r32(kr + 28); }
     }
+    noticed = (k == WIDE && notice_len >= 4 && (int)r16(notice) == tw && (int)r16(notice + 2) == th);
+    if (noticed) { img = notice; len = notice_len; }
     if (img && len >= 4 && (int)r16(img) == tw && (int)r16(img + 2) == th)
         rle_decode(img + 4, len - 4, tile, npx);
     else
@@ -437,9 +451,11 @@ static void draw_key(int k)
 
     if (kr && (kr[4] & 3) == 3) {           /* a clock key: the time is ours to draw */
         u8 b[16]; u32 n = clock_text(kr, b), s = 0;
-        draw_text(tw, th, kr[5], b, n, kr[6], (i16)r16(kr + 8), (i16)r16(kr + 10), kr + 16);
-        if ((kr[4] & 16) && datelen)
-            draw_text(tw, th, kr[7], datestr, datelen, kr[19], (i16)r16(kr + 12), (i16)r16(kr + 14), kr + 20);
+        if (!noticed) {                     /* a notice has the key to itself: no time over it */
+            draw_text(tw, th, kr[5], b, n, kr[6], (i16)r16(kr + 8), (i16)r16(kr + 10), kr + 16);
+            if ((kr[4] & 16) && datelen)
+                draw_text(tw, th, kr[7], datestr, datelen, kr[19], (i16)r16(kr + 12), (i16)r16(kr + 14), kr + 20);
+        }
         local_secs(&s);
         clock_drawn[k] = (kr[4] & 8) ? s : s / 60;
     }
@@ -448,7 +464,7 @@ static void draw_key(int k)
             u32 p = tile[i], r = (p >> 16 & 255) + 0x38, g = (p >> 8 & 255) + 0x38, b = (p & 255) + 0x38;
             tile[i] = (r > 255 ? 255 : r) << 16 | (g > 255 ? 255 : g) << 8 | (b > 255 ? 255 : b);
         }
-    if (k == WIDE && !(linked() && ha_up) && tw >= 64 && th >= 64) {
+    if (k == WIDE && !noticed && !(linked() && ha_up) && tw >= 64 && th >= 64) {
         /* the "not connected" marker, in the top right of the wide key: red with
            no bridge, amber with a bridge but no Home Assistant behind it */
         u32 col = linked() ? 0xFFA000 : 0xFF2020;
@@ -460,6 +476,41 @@ static void draw_key(int k)
     blit(x0, y0, tw, th);
 }
 static void draw_all(void) { int k; for (k = 0; k < NKEYS; k++) draw_key(k); }
+
+/* ---------- the notice ---------- */
+static void notice_keep(void)               /* an empty file means there is none */
+{
+    long fd = s_open(NOTICE_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd < 0) return;
+    if (notice_len) s_write(fd, notice, notice_len);
+    s_close(fd);
+}
+static void notice_clear(void)
+{
+    if (!notice_len) return;
+    notice_len = 0;
+    notice_keep();
+    draw_key(WIDE);
+}
+static void notice_set(const u8 *b, u32 n)
+{
+    if (n < 4) { notice_clear(); return; }  /* nothing, or not a picture: take it down */
+    if (n > NOTICE_MAX) return;
+    memcpy(notice, b, n);
+    notice_len = n;
+    notice_until = now_ms() + 120000u;
+    notice_keep();
+    screen_on();                            /* it is there to be seen */
+    draw_key(WIDE);
+}
+static void notice_load(void)               /* at start: were we replaced in the middle of an update? */
+{
+    long fd = s_open(NOTICE_FILE, O_RDONLY, 0), n;
+    if (fd < 0) return;
+    n = s_read(fd, notice, NOTICE_MAX);
+    s_close(fd);
+    if (n >= 4) { notice_len = (u32)n; notice_until = now_ms() + 60000u; }
+}
 
 /* At power-up the panel is showing the bootloader's logo from a buffer of its
    own, and goes on showing it whatever is drawn to /dev/fb0. Unblanking the
@@ -534,6 +585,7 @@ static void layout_store(const u8 *b, u32 n)
 {
     long fd;
     if (!layout_valid(b, n)) { logs("layout rejected\n"); return; }
+    notice_len = 0; notice_keep();          /* the host has the screen back; draw_all below repaints */
     fd = s_open(DIR "/layout.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd >= 0) {
         u32 put = 0; long w;
@@ -719,7 +771,8 @@ static void on_message(const u8 *m, u32 n)
         else { bl_write(v); t_act = now_ms(); }
         break;
     }
-    case 6: live_clear(); draw_all(); break;
+    case 6: notice_clear(); live_clear(); draw_all(); break;
+    case 8: notice_set(b, n); break;        /* NOTICE: a picture for the wide key, or nothing to take it down */
     case 7: if (n >= NKEYS) { memcpy(keymap, b, NKEYS); keymap_save(); send_status(); } break;
     }
 }
@@ -795,6 +848,7 @@ static void tick(void)
     if ((shown == 0 && t - started >= 2000) || (shown == 1 && t - started >= 6000)) { shown++; show_fb(); }
     if (was_linked && !l) { ha_up = 0; live_clear(); memset(down, 0, sizeof down); draw_all(); }
     was_linked = l;
+    if (notice_len && (i32)(notice_until - t) <= 0) notice_clear();
     marker = l ? (ha_up ? 2 : 1) : 0;       /* red, amber or nothing: redraw when it changes */
     if (marker != was_marker) { was_marker = marker; draw_key(WIDE); }
     for (k = 0; k < NKEYS; k++)
@@ -834,6 +888,7 @@ int cmain(long *sp)
 
     clear_screen();
     layout_load();
+    notice_load();
     draw_all();
     show_fb();
     evfd = s_open("/dev/input/event0", O_RDONLY | O_NONBLOCK, 0);

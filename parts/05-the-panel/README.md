@@ -31,12 +31,12 @@ pickers and switches as the card editor.
 | Try a key before sending it | **Preview**, at the right of the screen tabs. Keys then do what they say |
 | Put it on the deck | **Send to device**, top right. It reads "Sent" when there is nothing waiting |
 | Set the brightness | The slider under the gear. The deck changes as you drag |
-| Get the connector app | **Get the connector app**, on the card shown until a Mac is connected |
+| Get the connector app | **Get the connector app**, on the card shown until a Mac or a wireless board is connected |
 | See what is up to date | The line under the panel, always on screen. Grey means nothing to do; amber means that part is behind |
-| Update any of the three | **Update now** in the amber bar above that line. It carries one job at a time, in the order the parts depend on each other |
+| Update any of the three | **Update now** in the amber bar above that line. It carries one job at a time, in the order the parts depend on each other. With a wireless board ([Part 7](../07-wireless-board/README.md)) the middle part reads **Board software** instead of Connector app, and is updated the same way |
 | See all three at once | The gear, under **Versions**. A part whose turn it is not has no button and says what it is waiting for |
-| Pair a Mac that has no key | **Allow**, which appears in the top bar. A Mac set up from the download
-  arrives with a key and never asks |
+| Pair a Mac that has no key, or a wireless board | **Allow**, which appears in the top bar. A Mac set up from the download
+  arrives with a key and never asks; a board always asks, once |
 
 Every change is saved as you make it. Nothing reaches the deck until **Send to device**,
 the screen-off time included.
@@ -58,7 +58,7 @@ light key really does switch the light.
 ### Turning the screen off
 
 The deck's panel is lit for as long as it has power, which is as long as the Mac is
-on, so it turns itself off after a spell with nothing happening — 20 minutes unless
+on, or for ever on a wireless board, so it turns itself off after a spell with nothing happening — 20 minutes unless
 you say otherwise, and **Never** if you would rather it stayed lit. Any key brings it
 back, and that first press does nothing else, so waking the deck cannot switch a light
 on by accident.

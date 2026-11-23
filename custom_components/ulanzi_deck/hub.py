@@ -54,6 +54,7 @@ from .const import (
     MSG_LAYOUT,
     MSG_STATUS,
     MSG_TILE,
+    MSG_NOTICE,
     NKEYS,
 )
 
@@ -133,6 +134,7 @@ class _Bridge:
         # which words the panel uses.
         self.kind = "mac"
         self.updates = False         # a board that can be sent its own software says so
+        self.zone_sent: int | None = None   # the time zone a board was last told, seconds east of UTC
         self.allowed = False
 
     @property
@@ -144,6 +146,9 @@ class _Bridge:
     def where(self) -> str:
         return "the board" if self.kind == "board" else "this Mac"
 
+
+# The first deck software that understands a notice. Older ones ignore it.
+NOTICE_FROM = "4.17"
 
 # The wireless board's software, carried inside the integration (see
 # read_board_software). The installer page in docs/flash offers this same file.
@@ -244,6 +249,8 @@ class DeckHub:
             self.hass, self._check_releases, timedelta(hours=1))
         self._unsub_disk = async_track_time_interval(
             self.hass, self._check_on_disk, timedelta(minutes=1))
+        self._unsub_zone = async_track_time_interval(
+            self.hass, self._zone_tick, timedelta(minutes=1))
         # The shop's own update entity, watched so a Refresh there shows here at
         # once rather than whenever we next get to ask GitHub.
         self._read_shop()
@@ -258,7 +265,7 @@ class DeckHub:
         self._notify()
 
     async def async_stop(self) -> None:
-        for name in ("_unsub_rel", "_unsub_disk", "_unsub_shop"):
+        for name in ("_unsub_rel", "_unsub_disk", "_unsub_shop", "_unsub_zone"):
             if getattr(self, name, None):
                 getattr(self, name)()
                 setattr(self, name, None)
@@ -569,6 +576,11 @@ class DeckHub:
             "line": str(obj.get("line") or "")[:200],
         }
         self._notify()
+        if state == "failed":
+            # Nothing is going to restart and bring the keys back, so the notice
+            # has to be taken down by hand or it sits there for two minutes
+            # saying something that is no longer true.
+            self.hass.async_create_task(self._notice(None))
 
     # ------------------------------------------------------------ keeping the Mac current
     #
@@ -627,8 +639,25 @@ class DeckHub:
         # software already had this check; the app did not, and an app that
         # relaunched unchanged looked exactly like one that had not been asked.
         self._mac_was = bridge.version
+        await self._notice("Updating the board" if bridge.kind == "board" else "Updating")
         await bridge.ws.send_json({"type": "update_now"})
         return True
+
+    # While something is being updated the keys stop answering for a few
+    # seconds and the deck may restart, which looks exactly like a fault to
+    # anybody not watching the panel. So the deck is given one picture to put
+    # on its wide key for the duration. The deck keeps it through the link
+    # dropping and through being replaced itself, and takes it down when it is
+    # sent its keys again, or after two minutes whatever happens.
+
+    async def _notice(self, words: str | None) -> None:
+        """Put a notice on the deck's wide key, or take it down with None."""
+        if not self.deck_online or _cmp_ver(str(self.firmware or "0"), NOTICE_FROM) < 0:
+            return      # a deck older than this would ignore it; nothing is lost
+        picture = b""
+        if words:
+            picture = await self.hass.async_add_executor_job(render.notice, words)
+        await self._send(bytes([MSG_NOTICE]) + picture)
 
     async def _check_releases(self, _now: Any = None) -> None:
         """Ask GitHub what the newest release is, so the panel can say so.
@@ -735,6 +764,7 @@ class DeckHub:
         if self._pending is bridge:
             self._pending = None
         await bridge.ws.send_json({"type": "ready", "app_version": self.app_version})
+        await self._tell_zone(bridge)
         was = getattr(self, "_mac_was", "")
         if was:
             self._mac_was = ""
@@ -748,6 +778,29 @@ class DeckHub:
             elif bridge.version:
                 self.job = None
         self._notify()
+
+    # The deck has no clock and neither has the board, so the board reads the
+    # time off this server. The time zone it cannot read off anything: a Mac
+    # knows its own, a board knows none. So a board is told this server's, when
+    # it is let in and again whenever it changes, which in most places is twice
+    # a year at an hour nobody is watching.
+
+    async def _tell_zone(self, bridge: _Bridge) -> None:
+        if bridge.kind != "board":
+            return
+        offset = dt_util.now().utcoffset()
+        seconds = int(offset.total_seconds()) if offset is not None else 0
+        if bridge.zone_sent == seconds:
+            return
+        try:
+            await bridge.ws.send_json({"type": "clock", "utc_offset": seconds})
+        except (ConnectionError, RuntimeError):
+            return
+        bridge.zone_sent = seconds
+
+    async def _zone_tick(self, _now: Any = None) -> None:
+        if self._bridge:
+            await self._tell_zone(self._bridge)
 
     async def async_allow(self, bridge_id: str) -> bool:
         """The admin pressed Allow in the panel."""
@@ -801,6 +854,9 @@ class DeckHub:
                     + " and " + self.on_disk_version + " is waiting. Restart first.")
         mac = self._bridge.version if self._bridge else ""
         if part == "app":
+            if self._bridge and self._bridge.kind == "board" and not self._bridge.updates:
+                return ("This board is too old to be told from here. Plug its COM socket into "
+                        "a computer and use the install page once; after that it updates from here.")
             return ""
         if part == "deck":
             if not self._bridge:
@@ -818,6 +874,7 @@ class DeckHub:
         bridge = self._bridge
         if not bridge:
             return False
+        await self._notice("Updating the deck")
         await bridge.ws.send_json({"type": "setup_deck"})
         return True
 

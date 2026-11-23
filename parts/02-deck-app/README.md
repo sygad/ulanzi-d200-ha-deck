@@ -15,7 +15,7 @@ is given.
 
 | | |
 |---|---|
-| **Built from** | One C file with no libraries at all, not even the C library. 25 KB when built |
+| **Built from** | One C file with no libraries at all, not even the C library. 27 KB when built |
 | **Files in this folder** | `deckd` (ready to install) · `deckd.c` (the source) · `build.sh` (rebuilds it) · `install.sh` (puts it on the deck) · `default-layout.bin` (the starter screen) |
 | **Also needs** | `adb` on the Mac, to put it on a deck by hand. The `lld` linker only if you rebuild it |
 | **Reads** | The fourteen keys; messages from the bridge, which is the connector app or the wireless board |
@@ -32,7 +32,12 @@ is given.
 | **Shows when it is cut off** | A dot at the top right of the wide key: red for no bridge, amber for a bridge with no Home Assistant behind it |
 | **Does nothing while cut off** | With no bridge the keys are drawn but dead, and presses are dropped rather than saved up |
 | **Lights a key while pressed** | The whole key brightens for as long as it is held down |
+| **Says when it is being updated** | Home Assistant can hand it one picture, a notice, to put over the wide key while the deck, the connector app or the board is updated. It is the only thing on the screen that outlasts the link, because an update is exactly when the link goes: it is kept in `/tmp`, so the app shows it again if it is itself the thing being replaced. It comes down when the keys are sent again, or after two minutes whatever happens |
 | **Turns the screen off** | After a spell with nothing happening it sets the backlight to zero. Any key brings it back, and that press does nothing else. How long comes from the layout, so the deck keeps it over a power cut |
+
+![A deck in the middle of an update: the wide key shows an amber notice](../../images/guide/fig-updating.png)
+
+*The notice, on the demo house's first screen. Everything else on the deck carries on as it was.*
 
 ## Settings I chose
 

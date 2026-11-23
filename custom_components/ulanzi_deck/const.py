@@ -61,6 +61,7 @@ ACTIONS = {
 MSG_LAYOUT = 0x02
 MSG_TILE = 0x03
 MSG_CLEAR = 0x06
+MSG_NOTICE = 0x08      # a picture that takes the wide key over during an update
 # Messages from the deck
 MSG_STATUS = 0x81
 MSG_KEY = 0x82

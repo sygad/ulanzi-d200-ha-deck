@@ -24,3 +24,5 @@ const char *net_ip(void);
 bool clock_known(void);
 void clock_from_http_date(const char *date);   /* "Sun, 22 Nov 2026 17:30:00 GMT" */
 int32_t clock_tz_offset(uint32_t now);         /* seconds east of UTC, at that moment */
+void clock_zone_from_ha(int32_t seconds_east); /* Home Assistant saying what its time zone is */
+bool clock_zone_known(void);                   /* it has, at some point; otherwise the board's own zone is used */

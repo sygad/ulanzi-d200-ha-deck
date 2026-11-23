@@ -83,10 +83,23 @@ echo "Drawn (no real screen behind them):"
 grab "http://127.0.0.1:$DRAWN/?register" fig-navigate-register 1180 820; trim fig-navigate-register
 grab "http://127.0.0.1:$DRAWN/?suspend"  fig-navigate-suspend  1180 760; trim fig-navigate-suspend
 grab "http://127.0.0.1:$DRAWN/?wireless" fig-wireless-what-you-need 1180 700; trim fig-wireless-what-you-need
+grab "http://127.0.0.1:$DRAWN/?setup"    fig-wireless-setup-page 1180 900; trim fig-wireless-setup-page
+
+# The install page is the real one, served from the repo so its own files load.
+python3 -m http.server 8793 --bind 127.0.0.1 --directory "$ROOT" >/dev/null 2>&1 &
+C=$!
+trap 'kill $A $B $C 2>/dev/null || true; rm -rf "$TMP"' EXIT
+until curl -s -o /dev/null "http://127.0.0.1:8793/docs/flash/"; do :; done
+echo "The install page:"
+grab "http://127.0.0.1:8793/docs/flash/" fig-wireless-install 820 900; trim fig-wireless-install
+# The deck in the middle of an update is drawn by the renderer itself.
+python3 "$ROOT/tools/notice_figure.py"
 
 echo "From the panel harness:"
 grab "http://127.0.0.1:$PANEL/?navigate" fig-navigate 1280 980; trim fig-navigate bottom
 grab "http://127.0.0.1:$PANEL/?gear"     fig-settings-gear 1280 900; cut fig-settings-gear 1180 0 2560 244
+grab "http://127.0.0.1:$PANEL/?allow"    fig-wireless-allow 1280 900; cut fig-wireless-allow 1180 0 2560 244
+grab "http://127.0.0.1:$PANEL/?board&ring" fig-wireless-update 1280 900; trim fig-wireless-update bottom
 grab "http://127.0.0.1:$PANEL/?settings" fig-settings 1460 1200
 python3 -I - "$TMP/fig-settings.png" "$OUT/fig-settings.png" <<'PY'
 # The dialog with the dimmed page still around it. Cropped flush to its own edge
@@ -115,4 +128,5 @@ cp "$OUT/fig-navigate-suspend.png"  "$DOCS/navigate-suspend.png"
 cp "$OUT/fig-navigate.png"          "$DOCS/navigate.png"
 cp "$OUT/fig-settings-gear.png"     "$DOCS/settings-gear.png"
 cp "$OUT/fig-settings.png"          "$DOCS/deck-settings.png"
+cp "$OUT/fig-updating.png"          "$DOCS/updating.png"
 echo "Copied into docs/."

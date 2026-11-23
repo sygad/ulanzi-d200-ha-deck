@@ -63,6 +63,7 @@ All numbers are little-endian.
 | 5 | Backlight | Brightness, 0 to 255 (1) |
 | 6 | Clear | Nothing. Forget every tile and redraw from the layout |
 | 7 | Key map | Fourteen key codes, in reading order. The deck stores them |
+| 8 | Notice | A picture for the wide key, or nothing. With a picture, the deck puts it over whatever the wide key was, a clock included, and keeps it there through the link dropping and through being restarted. It comes down on a Layout or a Clear, on a Notice with no picture, or by itself after two minutes. Used while something is being updated. From deck software 4.17; older ones ignore it |
 
 The bridge sends a ping every two seconds. A deck that stops hearing them shows its
 red dot.
@@ -108,6 +109,7 @@ The bridge connects to `/api/ulanzi_deck/bridge` on Home Assistant.
 | HA → bridge | Text: `{"type": "ready", "app_version"}` | Allowed. `app_version` is the release this integration belongs to |
 | Bridge → HA | Text: `{"type": "deck", "status"}` | A deck is plugged in and answering. `status` is its status message, base64 |
 | Bridge → HA | Text: `{"type": "deck_gone"}` | The deck has gone |
+| HA → bridge | Text: `{"type": "clock", "utc_offset"}` | To the wireless board only: this server's time zone, as seconds east of UTC. Sent when the board is let in and whenever it changes. A Mac is not sent it, because it knows its own |
 | HA → bridge | Text: `{"type": "update_now"}` | Fetch and install a newer app, or for the board, newer board software |
 | Bridge → HA | Text: `{"type": "want_app"}` | Asking where to fetch it from |
 | HA → bridge | Text: `{"type": "app_at", "token"}` | A one-time address on this server to fetch it from. A Mac is handed the app as a zip there; a board is handed its own software |

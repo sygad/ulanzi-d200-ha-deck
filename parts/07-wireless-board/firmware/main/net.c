@@ -34,6 +34,12 @@ config_t cfg;
 #define TZ_DEFAULT "GMT0BST,M3.5.0/1,M10.5.0"
 
 static volatile bool online, setup_mode, time_ok;
+/* The time zone, as Home Assistant last gave it: seconds east of UTC. Kept in
+ * NVS too, so a board that restarts shows the right time before Home Assistant
+ * has had a chance to say it again. Until it has ever been told, the board
+ * falls back to its own built-in zone (cfg.tz). */
+static volatile bool zone_told;
+static volatile int32_t zone_off;
 static char ip_text[20];
 static httpd_handle_t server;
 
@@ -61,6 +67,8 @@ void cfg_load(void)
     get(h, "tz", cfg.tz, sizeof cfg.tz);
     get(h, "id", cfg.id, sizeof cfg.id);
     get(h, "secret", cfg.secret, sizeof cfg.secret);
+    int32_t off;
+    if (nvs_get_i32(h, "utcoff", &off) == ESP_OK) { zone_off = off; zone_told = true; }
     nvs_close(h);
     if (!cfg.tz[0]) strcpy(cfg.tz, TZ_DEFAULT);
     if (!cfg.id[0] || !cfg.secret[0]) {         /* first start: decide who we are, once */
@@ -116,8 +124,27 @@ void clock_from_http_date(const char *date)
     time_ok = true;
 }
 
+void clock_zone_from_ha(int32_t seconds_east)
+{
+    if (seconds_east < -14 * 3600 || seconds_east > 14 * 3600) return;     /* not a time zone */
+    if (zone_told && zone_off == seconds_east) return;
+    zone_off = seconds_east;
+    zone_told = true;
+    nvs_handle_t h;
+    if (nvs_open("deck", NVS_READWRITE, &h) == ESP_OK) {
+        nvs_set_i32(h, "utcoff", seconds_east);
+        nvs_commit(h);
+        nvs_close(h);
+    }
+    int a = seconds_east < 0 ? -seconds_east : seconds_east;
+    say("clock: Home Assistant's time zone is UTC%c%d:%02d", seconds_east < 0 ? '-' : '+', a / 3600, a % 3600 / 60);
+}
+
+bool clock_zone_known(void) { return zone_told; }
+
 int32_t clock_tz_offset(uint32_t now)
 {
+    if (zone_told) return zone_off;
     time_t t = now;
     struct tm lt;
     localtime_r(&t, &lt);
@@ -193,8 +220,11 @@ static esp_err_t page_get(httpd_req_t *req)
     free(aps);
     httpd_resp_sendstr_chunk(req, "</select><label>Wi-Fi password</label>"
                                   "<input name=pass type=password autocomplete=off>"
-                                  "<label>Home Assistant address</label><input name=url value=\"");
-    html_escape(esc, sizeof esc, cfg.url[0] ? cfg.url : "http://homeassistant.local:8123");
+                                  "<label>Home Assistant address</label>"
+                                  /* An address in numbers: this board cannot look a .local name up, so
+                                   * the box is not filled in with one it could never reach. */
+                                  "<input name=url placeholder=\"http://192.168.1.10:8123\" value=\"");
+    html_escape(esc, sizeof esc, cfg.url);
     httpd_resp_sendstr_chunk(req, esc);
     httpd_resp_sendstr_chunk(req, "\"><button>Save and connect</button></form>"
                                   "<p>The board restarts and joins your Wi-Fi. This setup network then goes away.</p>"

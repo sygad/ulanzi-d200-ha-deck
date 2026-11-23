@@ -397,6 +397,17 @@ next — never a list of them, and always in the order they have to happen:
 3. **Deck software** — the connector app copies it across, so it can only install the version
    that app is carrying. That is why it comes last. The deck restarts, which takes a few seconds.
 
+**The deck says so while it happens.** During an update the bottom-right key shows an amber
+**Updating** in place of whatever you put there. The keys stop answering for a few seconds
+and the deck may restart, and this is how you know it is meant to. It goes back to your own
+key by itself when the update is done.
+
+<br>
+
+<a href="images/guide/fig-updating.png"><img src="images/guide/fig-updating.png" alt="The deck during an update: the bottom-right key shows an amber download icon and the word Updating" width="100%"></a>
+
+<br>
+
 The app's update is fetched by your Home Assistant and handed to the Mac over the connection
 the Mac is already on, so macOS does not ask about it again — the warning and the two Open
 Anyways happen once in the life of the app.

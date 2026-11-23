@@ -12,7 +12,7 @@ changes, and carries out what a press asks for.
 |---|---|
 | **Built from** | A custom integration in Python. Pictures are drawn with Pillow, which Home Assistant already has |
 | **Files** | Not in this folder: in [`custom_components/ulanzi_deck/`](../../custom_components/ulanzi_deck) at the top of the repo, where Home Assistant and HACS look for it |
-| **Also needs** | The connector app ([Part 3](../03-mac-bridge/README.md)) to reach the deck |
+| **Also needs** | Something to reach the deck through: the connector app on a Mac ([Part 3](../03-mac-bridge/README.md)) or the wireless board ([Part 7](../07-wireless-board/README.md)) |
 | **Reads** | Whatever entities your keys point at; their history, for graph keys |
 | **Gives you** | A sidebar panel, two entities, and an event on every key press |
 
@@ -21,6 +21,21 @@ builds a zip holding the published app, a pairing file carrying this server's ad
 and a key for that Mac, and a page explaining what macOS is about to do. When a newer app exists it says so in an amber bar above the version line under the
 panel, and **Update now** tells the Mac to fetch it from here. Only one part can be
 updated at a time, in the order they depend on each other. Home Assistant downloads it, pinned to the version this integration goes with, and passes it on; the Mac never talks to anywhere but your server.
+
+**With a wireless board** it does the same job differently in three places:
+
+- **It carries the board's software**, in `custom_components/ulanzi_deck/board/`. The Mac's
+  app is too big to ship inside an integration and is fetched from its release; the board's
+  is not, so **Update now** hands it straight over and nothing is fetched from anywhere.
+- **It tells the board the time zone.** A Mac knows its own. A board knows none, so it is
+  sent this server's when it is let in and again within a minute of it changing.
+- **The panel says Board software** where it says Connector app, and sends a board too old
+  to be updated from here to the install page instead.
+
+**During any update it puts a notice on the deck.** Before it tells the Mac, the board or
+the deck to update, it draws one picture, an amber **Updating**, and sends it to the deck's
+wide key ([the formats](../../shared/README.md#the-messages)). The deck keeps it up through
+the restarts that follow. If the update fails, the notice is taken down at once.
 
 ## How it works
 
