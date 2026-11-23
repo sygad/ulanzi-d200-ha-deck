@@ -103,14 +103,14 @@ The bridge connects to `/api/ulanzi_deck/bridge` on Home Assistant.
 
 | Direction | Message | Meaning |
 |---|---|---|
-| Bridge → HA | Text: `{"type": "hello", "bridge_id", "secret", "name", "version", "deckd"}` | Who the bridge is, which release of the app it is, and which release of the deck software it carries. Always first |
+| Bridge → HA | Text: `{"type": "hello", "bridge_id", "secret", "name", "version", "deckd"}` | Who the bridge is, which release of the app it is, and which release of the deck software it carries. Always first. The wireless board adds `"kind": "board"`, and `"updates": true` once it can be sent its own software |
 | HA → bridge | Text: `{"type": "pending"}` | Not allowed yet. Wait for someone to press Allow |
 | HA → bridge | Text: `{"type": "ready", "app_version"}` | Allowed. `app_version` is the release this integration belongs to |
 | Bridge → HA | Text: `{"type": "deck", "status"}` | A deck is plugged in and answering. `status` is its status message, base64 |
 | Bridge → HA | Text: `{"type": "deck_gone"}` | The deck has gone |
-| HA → bridge | Text: `{"type": "update_now"}` | Fetch and install a newer app. The wireless board does not act on this yet |
+| HA → bridge | Text: `{"type": "update_now"}` | Fetch and install a newer app, or for the board, newer board software |
 | Bridge → HA | Text: `{"type": "want_app"}` | Asking where to fetch it from |
-| HA → bridge | Text: `{"type": "app_at", "token"}` | A one-time address on this server to fetch it from |
+| HA → bridge | Text: `{"type": "app_at", "token"}` | A one-time address on this server to fetch it from. A Mac is handed the app as a zip there; a board is handed its own software |
 | HA → bridge | Text: `{"type": "setup_deck"}` | Put the deck software this app carries onto the deck |
 | Bridge → HA | Text: `{"type": "job", "what", "state", "line"}` | How that is going. `state` is `running`, `done` or `failed`; `line` is one line to show |
 | Either way | Binary | One deck message, exactly as in the tables above |

@@ -401,9 +401,9 @@ The app's update is fetched by your Home Assistant and handed to the Mac over th
 the Mac is already on, so macOS does not ask about it again — the warning and the two Open
 Anyways happen once in the life of the app.
 
-**On the wireless route** the board takes the connector app's place in that list, and it
-is updated from a web page rather than from the panel:
-[the wireless guide](WIRELESS.md#keeping-it-up-to-date) has the steps.
+**On the wireless route** the board takes the connector app's place in that list. The
+panel calls it **Board software**, and **Update now** sends it across your Wi-Fi the same
+way: [the wireless guide](WIRELESS.md#keeping-it-up-to-date) has the detail.
 
 ## How it is built
 

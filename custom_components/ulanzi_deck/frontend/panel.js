@@ -1574,6 +1574,17 @@ let lastStatus=null;
    and says what it is waiting for. */
 const WAITING=["", "after the integration", "after the connector app"];
 
+/* What the deck is plugged into is either a Mac running the connector app or
+   the wireless board. They carry the same messages and take the same place in
+   the order above; only the words differ, and where an update comes from. A
+   board from 4.16 on says, when it connects, that Home Assistant can send it
+   its software. An older one cannot be told, and is updated from the install
+   page instead. */
+const FLASH_PAGE="https://sygad.github.io/ulanzi-d200-ha-deck/docs/flash/";
+const isBoard=st=>!!st&&st.bridge_kind==="board";
+const hostPart=st=>isBoard(st)?"Board software":"Connector app";
+const boardCanBeTold=st=>!!st&&!!st.bridge_updates;   // the board says so itself when it connects
+
 function vrow(id,have,want,label,action,waitingFor){
   const row=$("#"+id), val=row.querySelector(".vval"), btn=row.querySelector(".vbtn");
   const behind=have&&want&&cmpVer(want,have)>0;
@@ -1589,19 +1600,22 @@ function vrow(id,have,want,label,action,waitingFor){
 function showVersions(){
   const st=lastStatus||{};
   const ps=parts(st);
-  const macOld=st.bridge_version&&cmpVer(st.bridge_version,"3.5")<0;
+  const board=isBoard(st);
+  const macOld=!board&&st.bridge_version&&cmpVer(st.bridge_version,"3.5")<0;
+  const boardOld=board&&!boardCanBeTold(st);
+  $("#v-app").querySelector(".vname").textContent=hostPart(st);
   // Only the first part that is behind may be acted on. A restart owed on the
   // integration counts as the integration still being behind.
   let turn=ps.findIndex(p=>p.old);
   if(st.restart_pending)turn=0;
-  const wait=i=>(i>turn&&turn>=0)?WAITING[i]:"";
+  const wait=i=>(i>turn&&turn>=0)?(board&&i===2?"after the board":WAITING[i]):"";
 
   vrow("v-int", ps[0].have, ps[0].want,
        st.restart_pending?"Restart":"Marketplace",
        st.restart_pending?restartHa:()=>window.open("/marketplace","_blank"),
        wait(0));
-  vrow("v-app", ps[1].have, ps[1].want, "Update",
-       macOld?null:()=>ask("ulanzi_deck/update_app"),
+  vrow("v-app", ps[1].have, ps[1].want, boardOld?"Install page":"Update",
+       macOld?null:boardOld?()=>window.open(FLASH_PAGE,"_blank"):()=>ask("ulanzi_deck/update_app"),
        wait(1));
   vrow("v-deck", ps[2].have, ps[2].want, "Update",
        ()=>ask("ulanzi_deck/update_deck"),
@@ -1609,6 +1623,12 @@ function showVersions(){
 
   $("#v-note").textContent = macOld
     ? "This Mac is too old to be told from here: open the connector app on it and press Update."
+    : boardOld
+    ? "This board is too old to be told from here: plug its COM socket into a computer and use the install page. After that, updates come from this panel."
+    : board
+    ? "All three carry the same number, and they go in order: Home Assistant hands over the "
+      + "board's software, and the board carries the deck software, which it puts on the deck "
+      + "by itself. Updating one out of turn puts the old version back, so only the next one can be pressed."
     : "All three carry the same number, and they go in order: Home Assistant hands over the "
       + "connector app, and the connector app carries the deck software. Updating one out of "
       + "turn puts the old version back, so only the next one can be pressed.";
@@ -1740,7 +1760,8 @@ function showStatus(st){
   text.textContent=st.deck?"Deck connected"
     :st.pending?"\u201c"+st.pending.name+"\u201d wants to connect"
     // "Bridge" was this app's old name and appears nowhere else any more.
-    :st.bridge==="connected"?"Mac connected, no deck":"No Mac connected";
+    :st.bridge==="connected"?(isBoard(st)?"Board connected, no deck":"Mac connected, no deck")
+    :"No Mac or board connected";
   allow.hidden=!st.pending;
   // Until a Mac is connected there is nothing worth configuring, so the setup
   // card is the whole page rather than one card beside the editor.
@@ -1764,7 +1785,7 @@ function parts(st){
     : (run && st.latest_release && cmpVer(st.latest_release,run)>0 ? st.latest_release : "");
   return [
     {el:"vp-int",  name:"Integration",   have:run,              want:intWant},
-    {el:"vp-app",  name:"Connector app", have:st.bridge_version||"", want:run},
+    {el:"vp-app",  name:hostPart(st),    have:st.bridge_version||"", want:run},
     {el:"vp-deck", name:"Deck software", have:st.deck_firmware||"",  want:st.deckd_available||""},
   ].map(p=>({...p, old: !!(p.have && p.want && cmpVer(p.want,p.have)>0)}));
 }
@@ -1812,6 +1833,10 @@ function paintVersions(st){
   // Something the Mac is doing right now outranks anything waiting to be done:
   // it is the answer to the button that was just pressed.
   const doing=st.job;
+  // A job is either the deck being set up or the thing it is plugged into
+  // updating itself, and each has its own words and its own Try again.
+  const board=isBoard(st), host=board?"board":"connector app";
+  const hostJob=!!doing&&doing.what==="update_app";
   const job =
     refusedNote
       ? {icon:"alert-circle-outline", title:refusedNote.title,
@@ -1819,14 +1844,16 @@ function paintVersions(st){
          act:()=>{refusedNote=null; if(lastStatus) paintVersions(lastStatus);}}
     :
     doing && doing.state==="running"
-      ? {icon:"progress-download", title:"Setting up the deck", sub:doing.line||"Working\u2026", act:null}
+      ? {icon:"progress-download", title:hostJob?"Updating the "+host:"Setting up the deck",
+         sub:doing.line||"Working\u2026", act:null}
     : doing && doing.state==="failed"
-      ? {icon:"alert-circle-outline", title:"The deck software could not be installed",
+      ? {icon:"alert-circle-outline",
+         title:hostJob?"The "+host+" could not be updated":"The deck software could not be installed",
          sub:doing.line||"", label:"Try again",
-         act:()=>ask("ulanzi_deck/update_deck")}
+         act:()=>ask(hostJob?"ulanzi_deck/update_app":"ulanzi_deck/update_deck")}
     : doing && doing.state==="done"
-      ? {icon:"check-circle-outline", title:"Deck software installed",
-         sub:doing.line||"The deck is restarting\u2026", act:null}
+      ? {icon:"check-circle-outline", title:hostJob?"The "+host+" has its new software":"Deck software installed",
+         sub:doing.line||(hostJob?"It is restarting\u2026":"The deck is restarting\u2026"), act:null}
     : st.restart_pending
       ? {icon:"restart", title:"Integration "+(st.on_disk_version||"")+" is downloaded",
          sub:"Home Assistant is still running "+run+". Restart to finish.",
@@ -1835,6 +1862,14 @@ function paintVersions(st){
       ? (nudgeShop(st), {icon:"tray-arrow-down", title:"Integration "+ps[0].want+" is ready in the Marketplace",
          sub:"Running "+run+". Download it there, then restart.",
          label:"Open Marketplace", act:()=>window.open("/marketplace","_blank")})
+    : ps[1].old && board
+      ? {icon:"tray-arrow-down", title:"Board software "+ps[1].want+" is ready to install",
+         sub:boardCanBeTold(st)
+           ? "Running "+mac+" on "+(st.bridge_name||"the board")+". It takes about half a minute and the board restarts."
+           : "Running "+mac+" on "+(st.bridge_name||"the board")+
+             ". This board is too old to be told from here: plug its COM socket into a computer and use the install page.",
+         label:boardCanBeTold(st)?"Update now":"Open the install page",
+         act:boardCanBeTold(st)?()=>ask("ulanzi_deck/update_app"):()=>window.open(FLASH_PAGE,"_blank")}
     : ps[1].old
       ? {icon:"tray-arrow-down", title:"Connector app "+ps[1].want+" is ready to install",
          sub:macCanBeTold

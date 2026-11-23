@@ -9,8 +9,10 @@
   ESP32-S3 board. It is done from this page, over the board's COM socket, by ESP Web
   Tools. Nothing is installed on the computer and nothing is typed.
 
-  The four .bin files beside this page are the board software, as built from
-  parts/07-wireless-board/firmware. manifest.json says where on the board each goes.
+  The board software is built from parts/07-wireless-board/firmware. Three small
+  pieces of it sit beside this page; the main one is the copy the integration
+  carries, in custom_components/ulanzi_deck/board, so that there is only ever one
+  of it. manifest.json says where on the board each goes.
   The colours are the guide's own, copied from docs/index.html.
 -->
 <script type="module" src="https://unpkg.com/esp-web-tools@10.5.2/dist/web/install-button.js?module"></script>
@@ -76,7 +78,7 @@ a{color:var(--accent)}
       <span slot="not-allowed" class="cant">This page has to be opened over https for the browser
         to allow it.</span>
     </esp-web-install-button>
-    <p class="note">Ulanzi D200 Wireless, version 4.15. For an ESP32-S3 board with 16 MB of memory.</p>
+    <p class="note">Ulanzi D200 Wireless, version 4.16. For an ESP32-S3 board with 16 MB of memory.</p>
   </div>
 
   <p class="lede">Installing again later, to get a newer version, keeps the Wi-Fi details the board

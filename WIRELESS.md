@@ -25,7 +25,7 @@ is listed at the end, and is worth reading before you buy anything.
 | **Soldering** | None | One blob of solder across two pads |
 | **Software to install** | The connector app, on the Mac | The board's software, once, from a web page |
 | **Works with the computer off** | No | Yes |
-| **Updates** | From the panel in Home Assistant | The board: from the same web page. The deck: by itself |
+| **Updates** | From the panel in Home Assistant | From the panel in Home Assistant |
 
 <br>
 
@@ -196,7 +196,8 @@ Here is all of what it does.
 
 - Your Wi-Fi password is kept on the board so it can rejoin after a power cut. It is not encrypted there.
 - The setup network in step 4 has no password. It exists only while the board has no Wi-Fi of its own to join.
-- The board will take new software, and run a command on the deck, for anyone on your network who has the board's own key. That key never leaves the board except down the cable in its COM socket. It is there for working on the project, and [Part 7](parts/07-wireless-board/README.md) describes it.
+- The board fetches new software for itself from one place only, your Home Assistant, and only when you press **Update now** in the panel.
+- The board will also take new software, and run a command on the deck, for anyone on your network who has the board's own key. That key never leaves the board except down the cable in its COM socket. It is there for working on the project, and [Part 7](parts/07-wireless-board/README.md) describes it.
 
 Every line of it is published in [Part 7](parts/07-wireless-board/README.md), and you can
 build it yourself instead of using the web page.
@@ -234,12 +235,21 @@ is answering.
 There are three parts on this route: the **integration** inside Home Assistant, the
 **board's software**, and the **deck software** on the deck itself.
 
+They are released together and carry the same number, and the panel shows where all
+three are, exactly as it does on the other route.
+
 1. **Integration** — from the Marketplace, as in [the main guide](README.md#keeping-it-up-to-date).
-2. **The board** — plug its **COM** socket into a computer and press **Install** on
-   [the same page as step 2](https://sygad.github.io/ulanzi-d200-ha-deck/docs/flash/) again. It keeps
-   your Wi-Fi details. The deck can stay plugged into the board while you do it.
+2. **The board** — the panel then says **Board software … is ready to install**. Press
+   **Update now**. Home Assistant sends the board its new software over your Wi-Fi; the
+   integration carries it, so nothing is fetched from the internet. It takes about half a
+   minute and the board restarts by itself. Nothing is unplugged.
 3. **Deck software** — nothing to do. The board carries the deck software that matches it,
-   and copies it across by itself the next time the deck is plugged in.
+   and copies it across by itself as soon as it has restarted.
+
+**A board from before 4.16 can't be told from the panel.** The panel says so and offers the
+install page instead: plug the board's **COM** socket into a computer and press **Install** on
+[the same page as step 2](https://sygad.github.io/ulanzi-d200-ha-deck/docs/flash/) once more. It keeps your Wi-Fi details,
+and from then on its updates come from the panel.
 
 <br>
 
@@ -260,9 +270,11 @@ There are three parts on this route: the **integration** inside Home Assistant, 
   on the deck follows UK time wherever you are.
 - **The Home Assistant address has to be numbers.** A name such as `homeassistant.local` has
   not been tried and I don't expect it to work.
-- **The panel still talks about a Mac.** Before the board connects it reads "No Mac connected"
-  and offers the connector app. When a newer release is out it will offer to update the
-  "connector app"; for a board that button does nothing. Update the board from the web page.
+- **The first page of the panel only knows the Mac route.** Until something connects, the
+  panel offers the connector app and nothing else. Step 5 above says to leave that button;
+  once the board has connected, the panel calls it a board throughout.
+- **A Home Assistant reached over https has not been tried.** The board fetches its updates
+  from the address you gave it in step 4, and I have only run that with an `http://` address.
 - **A rare restart.** Once, while I was unplugging and plugging the deck to test it, the board
   crashed and restarted by itself. It was carrying the deck again a few seconds later, and
   I have not been able to make it happen again. The board now keeps a record of any crash

@@ -159,6 +159,11 @@ static void console_task(void *arg)
         } else if (!strcmp(line, "SETUPDECK")) {
             bridge_request_setup();
             printf("OK\n");
+        } else if (!strncmp(line, "UPDATEFROM ", 11)) {
+            /* fetch board software from an address and restart into it; for trying the update path */
+            static char why[160];
+            if (board_update_from(line + 11, why, sizeof why)) printf("ERR %s\n", why);
+            else { printf("OK\n"); vTaskDelay(pdMS_TO_TICKS(500)); esp_restart(); }
         } else if (!strcmp(line, "CRASH")) {
             abort();                                    /* on purpose, to prove the crash record works */
         } else if (!strcmp(line, "CLEARCRASH")) {

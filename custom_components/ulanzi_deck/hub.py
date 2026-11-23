@@ -128,7 +128,26 @@ class _Bridge:
         self.digest = digest
         self.version = ""            # which connector app it is
         self.deckd = ""              # the deck software it carries
+        # "mac" for the connector app, "board" for the wireless board. They speak
+        # the same messages; this only decides what an update hands over and
+        # which words the panel uses.
+        self.kind = "mac"
+        self.updates = False         # a board that can be sent its own software says so
         self.allowed = False
+
+    @property
+    def what(self) -> str:
+        """What a person would call the thing that needs updating."""
+        return "board" if self.kind == "board" else "connector app"
+
+    @property
+    def where(self) -> str:
+        return "the board" if self.kind == "board" else "this Mac"
+
+
+# The wireless board's software, carried inside the integration (see
+# read_board_software). The installer page in docs/flash offers this same file.
+BOARD_SOFTWARE = Path(__file__).parent / "board" / "ulanzi-d200-wireless.bin"
 
 
 def _cmp_ver(a: str, b: str) -> int:
@@ -282,6 +301,8 @@ class DeckHub:
             "bridge": "connected" if self._bridge else "pending" if self._pending else "none",
             "bridge_name": self._bridge.name if self._bridge else None,
             "bridge_version": self._bridge.version if self._bridge else None,
+            "bridge_kind": self.bridge_kind,
+            "bridge_updates": bool(self._bridge and self._bridge.updates),
             "app_version": self.app_version,
             "latest_release": self.latest_release,
             # so the panel can ask the Marketplace to look again before it sends
@@ -491,6 +512,8 @@ class DeckHub:
                          hashlib.sha256(secret.encode()).hexdigest())
         bridge.version = str(hello.get("version") or "")[:20]
         bridge.deckd = str(hello.get("deckd") or "")[:20]
+        bridge.kind = "board" if hello.get("kind") == "board" else "mac"
+        bridge.updates = hello.get("updates") is True
         known = self.data["bridges"].get(bridge_id)
         try:
             if known and hmac.compare_digest(known.get("hash", ""), bridge.digest):
@@ -553,6 +576,24 @@ class DeckHub:
     # that knows a newer one exists. It says so when a bridge is admitted, and
     # hands over a one-time address to fetch it from — this server, not the
     # internet, which is the only address the app has ever been told to trust.
+
+    @property
+    def bridge_kind(self) -> str | None:
+        """What the deck is plugged into: "mac", "board", or None with nothing connected."""
+        bridge = self._bridge or self._pending
+        return bridge.kind if bridge else None
+
+    def read_board_software(self) -> bytes | None:
+        """The wireless board's software, which this integration carries.
+
+        Unlike the Mac's app it is small enough to ship inside the integration,
+        so it is always the version that goes with this release and handing it
+        over needs nothing from the internet. Blocking: call it in an executor.
+        """
+        try:
+            return BOARD_SOFTWARE.read_bytes()
+        except OSError:
+            return None
 
     @property
     def app_version(self) -> str:
@@ -700,7 +741,7 @@ class DeckHub:
             if bridge.version == was:
                 self.job = {
                     "what": "update_app", "state": "failed",
-                    "line": ("The connector app restarted still running " + was
+                    "line": ("The " + bridge.what + " restarted still running " + was
                              + ". The download it was given was not "
                              + self.app_version + ", so nothing changed."),
                 }
@@ -763,8 +804,11 @@ class DeckHub:
             return ""
         if part == "deck":
             if not self._bridge:
-                return "No Mac is connected."
+                return "Nothing is connected for the deck to plug into."
             if mac and _cmp_ver(self.running_version, mac) > 0:
+                if self._bridge.kind == "board":
+                    return ("The board is on " + mac + ", so it is still carrying that "
+                            + "version of the deck software. Update the board first.")
                 return ("The connector app on this Mac is " + mac + ", so it is still "
                         + "carrying that version of the deck software. Update it first.")
         return ""
@@ -824,8 +868,8 @@ class DeckHub:
                 self.job = {
                     "what": "setup_deck", "state": "failed",
                     "line": ("The deck restarted still running " + str(self.firmware)
-                             + ", so the copy on this Mac is not "
-                             + str(want) + " after all. Update the connector app first; "
+                             + ", so the copy on " + self._bridge.where + " is not "
+                             + str(want) + " after all. Update the " + self._bridge.what + " first; "
                              + "if it is already current, this release needs reporting."),
                 }
             else:

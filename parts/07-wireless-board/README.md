@@ -20,7 +20,7 @@ got it.
 |---|---|
 | **Built from** | An ESP32-S3 board with two USB-C sockets (mine: a diymore ESP32-S3 DevKitC-1 N16R8). Seven C files, about 1,700 lines, on ESP-IDF 5.5 |
 | **Files in this folder** | `firmware/` (the source, an ESP-IDF project) · `firmware/tools/` (three small Python helpers for working on it) |
-| **Also needs** | Nothing, to use it: [the web page](https://sygad.github.io/ulanzi-d200-ha-deck/docs/flash/) puts a built copy on the board. To build it: ESP-IDF 5.5 |
+| **Also needs** | Nothing, to use it: [the web page](https://sygad.github.io/ulanzi-d200-ha-deck/docs/flash/) puts a built copy on the board, and Home Assistant keeps it up to date after that. To build it: ESP-IDF 5.5 |
 | **Reads** | The deck, over USB; Home Assistant, over Wi-Fi |
 | **Tested on** | One board and one deck |
 
@@ -70,6 +70,12 @@ To Home Assistant it is one more bridge, called **Ulanzi D200 Wireless**.
 - **It keeps looking.** If Home Assistant closes the connection, or restarts, the board
   reconnects after five seconds. If it sees no deck, it switches its USB socket off and on
   every eight seconds until one appears.
+- **Its updates come from Home Assistant.** The integration carries the board's software
+  ([Part 4](../04-home-assistant/README.md)). When the panel's **Update now** is pressed, Home
+  Assistant tells the board, the board asks where to fetch it, and is given a one-time
+  address on that same Home Assistant: the conversation the connector app has, word for
+  word. The board checks the first byte before it stores anything, so being handed the
+  Mac's app by an older integration is refused with a plain message.
 - **Two copies of itself.** The board's memory holds two slots for its software. A new
   version goes into the other slot and is only kept once it has joined Wi-Fi. If it
   hasn't by the time the board next restarts, the board goes back to the one that worked.
@@ -125,6 +131,12 @@ The deck software the board carries is `firmware/main/deck/deckd`, a copy of
 [Part 2](../02-deck-app/README.md)'s `deckd`, with the starter screen beside it. If you
 rebuild the deck software, copy it there before building the board's.
 
+The built board software that everyone else gets is one file,
+`custom_components/ulanzi_deck/board/ulanzi-d200-wireless.bin`: `build/ulanzi_esp32.bin`
+from this build, copied there. The integration hands that file to a board that asks, and
+the web page installs the same one. `tools/check-release.sh` opens it and checks what
+version it and the deck software inside it really are.
+
 ### The serial console
 
 The COM socket is also a command line, at 115200. Each command is one line; replies
@@ -143,6 +155,7 @@ port's name from `tools/.port`, a file you make yourself.
 | `SETUPDECK` | Installs the deck software again |
 | `FORGET` | Forgets the Wi-Fi details and offers the setup network |
 | `REBOOT` | Restarts the board |
+| `UPDATEFROM <address>` | Fetches board software from an address and restarts into it, for trying the update path by hand |
 | `CRASH` | Crashes the board on purpose, to check the crash record works |
 | `CLEARCRASH` | Clears the crash record |
 

@@ -322,7 +322,7 @@ def _app_zip_url(hub: Any) -> str:
 
 
 class AppUpdateView(HomeAssistantView):
-    """The app fetching its own update.
+    """The app, or the wireless board, fetching its own update.
 
     Not behind Home Assistant's login, because the app has no user: it proves
     itself with the one-time address it was handed down the bridge connection,
@@ -340,6 +340,15 @@ class AppUpdateView(HomeAssistantView):
         hub = hass.data.get(DOMAIN)
         if hub is None or not hub.spend_download_token(token):
             return web.Response(status=404)
+
+        # A wireless board asks at the same address and is handed its own
+        # software instead of the Mac's. That is carried inside this
+        # integration, so nothing is fetched from anywhere to answer it.
+        if getattr(hub, "bridge_kind", None) == "board":
+            body = await hass.async_add_executor_job(hub.read_board_software)
+            if not body:
+                return web.Response(status=404)
+            return web.Response(body=body, content_type="application/octet-stream")
 
         session = async_get_clientsession(hass)
         try:

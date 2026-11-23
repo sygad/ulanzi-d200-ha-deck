@@ -92,12 +92,20 @@ window.pushStatus = patch => { status = {...status, ...patch}; statusCb && statu
 
 // ?settings opens the deck settings dialog, so it can be screenshotted headless.
 const q = new URLSearchParams(location.search);
-if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear") || q.has("behind")) {
+if (q.has("settings") || q.has("connected") || q.has("navigate") || q.has("gear") || q.has("behind") || q.has("board")) {
   // A settled deck: connected, everything on the same release, nothing to do.
   status = {...status, bridge: "connected", bridge_name: "Desk Mac", pending: null, deck: true,
-            app_version: "4.15", bridge_version: "4.15", deck_firmware: "4.15",
-            deckd_available: "4.15", latest_release: "4.15", on_disk_version: "4.15",
+            app_version: "4.16", bridge_version: "4.16", deck_firmware: "4.16",
+            deckd_available: "4.16", latest_release: "4.16", on_disk_version: "4.16",
             restart_pending: false};
+  // ?board swaps the Mac for the wireless board, one release behind and able to
+  // be sent its software; ?board=old is a board from before it could be.
+  if (q.has("board")) {
+    status = {...status, bridge_name: "Ulanzi D200 Wireless", bridge_kind: "board",
+              bridge_updates: q.get("board") !== "old",
+              app_version: "4.17", bridge_version: "4.16", deck_firmware: "4.16",
+              deckd_available: "4.16", latest_release: "4.17", on_disk_version: "4.17"};
+  }
   statusCb && statusCb(status);
   // ?navigate sets the first key to a dashboard jump, for the guide's figure.
   if (q.has("navigate")) {

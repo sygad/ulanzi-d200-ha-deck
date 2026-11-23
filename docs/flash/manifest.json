@@ -1,6 +1,6 @@
 {
   "name": "Ulanzi D200 Wireless",
-  "version": "4.15",
+  "version": "4.16",
   "new_install_prompt_erase": true,
   "new_install_improv_wait_time": 0,
   "builds": [
@@ -10,7 +10,7 @@
         { "path": "bootloader.bin", "offset": 0 },
         { "path": "partition-table.bin", "offset": 32768 },
         { "path": "ota-data.bin", "offset": 61440 },
-        { "path": "ulanzi-d200-wireless.bin", "offset": 131072 }
+        { "path": "../../custom_components/ulanzi_deck/board/ulanzi-d200-wireless.bin", "offset": 131072 }
       ]
     }
   ]

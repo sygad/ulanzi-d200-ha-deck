@@ -110,15 +110,24 @@ BOARD_FW=$(sed -n 's/^#define FW_VERSION "\([^"]*\)".*/\1/p' "$BOARD/main/bridge
 same "the board's software is on the same version"    "$BOARD_FW"  "$MANIFEST"
 same "the deck binary the board carries is that build" \
      "$(md5 -q "$BOARD/main/deck/deckd" 2>/dev/null || echo missing)"  "$FRESH"
+# One copy of the built board software: the one the integration carries and hands
+# to a board that asks. The installer page points at that same file.
+BOARD_BIN="$ROOT/custom_components/ulanzi_deck/board/ulanzi-d200-wireless.bin"
+[ -f "$BOARD_BIN" ] || bad "the integration carries the board's software" "no file at $BOARD_BIN"
+if grep -q "custom_components/ulanzi_deck/board/ulanzi-d200-wireless.bin" "$ROOT/docs/flash/manifest.json"; then
+  ok "the installer page offers that same file"
+else
+  bad "the installer page offers that same file" "docs/flash/manifest.json points somewhere else"
+fi
 FLASH_V=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$ROOT/docs/flash/manifest.json")
 same "the installer page offers the same version"     "$FLASH_V"   "$MANIFEST"
 # the built board software says its version in its first log line; look for it in the bytes
-if strings -a "$ROOT/docs/flash/ulanzi-d200-wireless.bin" | grep -q "workbench ready, firmware $MANIFEST"; then
-  ok "the installer's board software is that version"
+if strings -a "$BOARD_BIN" | grep -q "workbench ready, firmware $MANIFEST"; then
+  ok "the board software it carries is that version"
 else
-  bad "the installer's board software is that version" "no \"firmware $MANIFEST\" in the built file"
+  bad "the board software it carries is that version" "no \"firmware $MANIFEST\" in the built file"
 fi
-if strings -a "$ROOT/docs/flash/ulanzi-d200-wireless.bin" | grep -q "deckd $MANIFEST starting"; then
+if strings -a "$BOARD_BIN" | grep -q "deckd $MANIFEST starting"; then
   ok "and carries a deck binary of that version"
 else
   bad "and carries a deck binary of that version" "no \"deckd $MANIFEST\" in the built file"

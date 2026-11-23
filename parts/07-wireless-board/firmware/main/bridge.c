@@ -98,15 +98,92 @@ static void say_hello(void)
     char j[400];
     snprintf(j, sizeof j,
              "{\"type\":\"hello\",\"bridge_id\":\"%s\",\"secret\":\"%s\",\"name\":\"Ulanzi D200 Wireless\","
-             "\"version\":\"" FW_VERSION "\",\"deckd\":\"" FW_VERSION "\"}", cfg.id, cfg.secret);
+             "\"kind\":\"board\",\"updates\":true,\"version\":\"" FW_VERSION "\",\"deckd\":\"" FW_VERSION "\"}", cfg.id, cfg.secret);
     ws_json(j);
 }
 
-void bridge_job(const char *state, const char *line)
+static void job(const char *what, const char *state, const char *line)
 {
-    char j[420];
-    snprintf(j, sizeof j, "{\"type\":\"job\",\"what\":\"setup_deck\",\"state\":\"%s\",\"line\":\"%s\"}", state, line);
+    char j[440];
+    snprintf(j, sizeof j, "{\"type\":\"job\",\"what\":\"%s\",\"state\":\"%s\",\"line\":\"%s\"}", what, state, line);
     ws_json(j);
+}
+
+void bridge_job(const char *state, const char *line) { job("setup_deck", state, line); }
+
+/* ---------- this board's own software, fetched when Home Assistant says there is a newer one ----------
+ *
+ * The same conversation the Mac connector app has: Home Assistant says update_now,
+ * the board asks where from (want_app), and is given a one-time address on that
+ * same Home Assistant (app_at). Nothing is fetched from anywhere else.
+ */
+static volatile bool update_due;
+static char update_token[100];
+
+int board_update_from(const char *url, char *why, int max)
+{
+    esp_http_client_config_t hc = { .url = url, .timeout_ms = 20000, .buffer_size = 4096 };
+    esp_http_client_handle_t c = esp_http_client_init(&hc);
+    char *buf = malloc(4096);
+    const esp_partition_t *part = esp_ota_get_next_update_partition(NULL);
+    esp_ota_handle_t h = 0;
+    bool begun = false;
+    int total = 0, idle = 0, ok = -1;
+
+    if (!c || !buf || !part) { snprintf(why, max, "The board could not start an update."); goto out; }
+    if (esp_http_client_open(c, 0) != ESP_OK) { snprintf(why, max, "The board could not reach Home Assistant to fetch it."); goto out; }
+    esp_http_client_fetch_headers(c);
+    int status = esp_http_client_get_status_code(c);
+    if (status != 200) { snprintf(why, max, "Home Assistant would not hand it over (answer %d).", status); goto out; }
+    for (;;) {
+        int n = esp_http_client_read(c, buf, 4096);
+        if (n < 0) { snprintf(why, max, "The download stopped part way."); goto out; }
+        if (n == 0) {
+            if (esp_http_client_is_complete_data_received(c)) break;
+            if (++idle > 20) { snprintf(why, max, "The download stopped part way."); goto out; }
+            continue;
+        }
+        idle = 0;
+        if (!begun) {
+            /* An integration older than this board answers with the Mac's app, a zip. Say so
+             * rather than let it fail later as "not valid". Board software starts with 0xE9. */
+            if ((uint8_t)buf[0] != 0xE9) {
+                snprintf(why, max, "Home Assistant sent something that is not board software. Update the integration first.");
+                goto out;
+            }
+            if (esp_ota_begin(part, OTA_SIZE_UNKNOWN, &h) != ESP_OK) { snprintf(why, max, "The board could not start an update."); goto out; }
+            begun = true;
+        }
+        if (esp_ota_write(h, buf, n) != ESP_OK) { snprintf(why, max, "The board could not store the download."); goto out; }
+        total += n;
+    }
+    if (!begun) { snprintf(why, max, "Home Assistant sent nothing."); goto out; }
+    begun = false;
+    if (esp_ota_end(h) != ESP_OK) { snprintf(why, max, "What arrived was damaged, so the board kept what it had."); goto out; }
+    if (esp_ota_set_boot_partition(part) != ESP_OK) { snprintf(why, max, "The board could not switch to the new software."); goto out; }
+    say("update: fetched %d bytes, ready to restart into it", total);
+    ok = 0;
+out:
+    if (begun) esp_ota_abort(h);
+    if (c) { esp_http_client_close(c); esp_http_client_cleanup(c); }
+    free(buf);
+    if (ok) say("update: %s", why);
+    return ok;
+}
+
+static void self_update(void)
+{
+    static char url[sizeof cfg.url + 160], why[160];
+    size_t n = strlen(cfg.url);
+    while (n && cfg.url[n - 1] == '/') n--;
+    snprintf(url, sizeof url, "%.*s/api/ulanzi_deck/companion-app/%s", (int)n, cfg.url, update_token);
+    update_token[0] = 0;
+    say("update: Home Assistant has newer software for this board; fetching it");
+    job("update_app", "running", "Fetching the board's new software\u2026");
+    if (board_update_from(url, why, sizeof why)) { job("update_app", "failed", why); return; }
+    job("update_app", "done", "The board is restarting\u2026");
+    vTaskDelay(pdMS_TO_TICKS(1500));
+    esp_restart();
 }
 
 static volatile bool setup_requested;
@@ -162,6 +239,14 @@ static void control(const char *text)
             ha_pending = true;
         } else if (!strcmp(t->valuestring, "setup_deck")) {
             setup_requested = true;
+        } else if (!strcmp(t->valuestring, "update_now")) {
+            ws_json("{\"type\":\"want_app\"}");
+        } else if (!strcmp(t->valuestring, "app_at")) {
+            const cJSON *tok = cJSON_GetObjectItem(o, "token");
+            if (cJSON_IsString(tok) && strlen(tok->valuestring) < sizeof update_token) {
+                strcpy(update_token, tok->valuestring);
+                update_due = true;                      /* done by the bridge task, not in here */
+            }
         } else if (!strcmp(t->valuestring, "ready")) {
             ha_pending = false;
             ha_ready = true;
@@ -292,6 +377,7 @@ static void bridge_task(void *arg)
             ws = NULL;
         }
         if (ws_hello_due) { ws_hello_due = false; say_hello(); }
+        if (update_due) { update_due = false; self_update(); }
 
         if (dlink && (link_poison || !adb_ready())) {
             xSemaphoreTake(link_lock, portMAX_DELAY);
