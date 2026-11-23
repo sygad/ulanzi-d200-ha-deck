@@ -82,6 +82,7 @@ PY
 echo "Drawn (no real screen behind them):"
 grab "http://127.0.0.1:$DRAWN/?register" fig-navigate-register 1180 820; trim fig-navigate-register
 grab "http://127.0.0.1:$DRAWN/?suspend"  fig-navigate-suspend  1180 760; trim fig-navigate-suspend
+grab "http://127.0.0.1:$DRAWN/?wireless" fig-wireless-what-you-need 1180 700; trim fig-wireless-what-you-need
 
 echo "From the panel harness:"
 grab "http://127.0.0.1:$PANEL/?navigate" fig-navigate 1280 980; trim fig-navigate bottom

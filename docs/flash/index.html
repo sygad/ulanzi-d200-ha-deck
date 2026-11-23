@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulanzi Deck: put the software on the board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<!--
+  The wireless route's one step that needs a computer: putting the software on the
+  ESP32-S3 board. It is done from this page, over the board's COM socket, by ESP Web
+  Tools. Nothing is installed on the computer and nothing is typed.
+
+  The four .bin files beside this page are the board software, as built from
+  parts/07-wireless-board/firmware. manifest.json says where on the board each goes.
+  The colours are the guide's own, copied from docs/index.html.
+-->
+<script type="module" src="https://unpkg.com/esp-web-tools@10.5.2/dist/web/install-button.js?module"></script>
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --sunk:#f2f1ee;
+  --ink:#1b1b19; --ink-soft:#5e5d58; --ink-faint:#908f88;
+  --line:#e2e0da; --hair:#edebe5;
+  --accent:#1668b8; --accent-soft:#e8f0f9; --no:#a85040;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#161618; --panel:#1f1f22; --sunk:#1a1a1d;
+  --ink:#edebe5; --ink-soft:#a6a49c; --ink-faint:#76746d;
+  --line:#323237; --hair:#2a2a2e;
+  --accent:#74b3ec; --accent-soft:#17283a; --no:#d98e7e; color-scheme:dark;
+}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;margin:0}
+.wrap{max-width:720px;margin:0 auto;padding:40px 16px 64px;display:flex;flex-direction:column;gap:26px}
+h1{font-size:clamp(27px,5vw,35px);font-weight:600;letter-spacing:-.022em;margin:0;text-wrap:balance}
+.lede{color:var(--ink-soft);margin:0;max-width:62ch;font-size:16px;line-height:1.55}
+.lede strong{color:var(--ink);font-weight:600}
+ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:0;counter-reset:n}
+ol li{counter-increment:n;display:flex;gap:14px;padding:18px 0;border-top:1px solid var(--hair);
+  color:var(--ink-soft);font-size:16px;line-height:1.55}
+ol li::before{content:counter(n);flex:0 0 18px;font-size:19px;font-weight:600;color:var(--ink);line-height:1.3}
+ol li strong{color:var(--ink);font-weight:600}
+.go{display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:22px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line)}
+.go button{font:inherit;font-size:16px;font-weight:600;color:#fff;background:var(--accent);border:0;
+  border-radius:9px;padding:12px 26px;cursor:pointer}
+.go .cant{color:var(--no);font-size:15px;line-height:1.5}
+.note{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.01em;line-height:1.6;margin:0}
+a{color:var(--accent)}
+</style>
+<body><main class="wrap">
+
+  <h1>Put the software on the board</h1>
+  <p class="lede">This is the one step of the wireless route that needs a computer, and it is done once.
+    Any computer will do: nothing is installed on it and nothing is typed. When it is finished the
+    board never needs that computer again.</p>
+
+  <ol>
+    <li><span>Open this page in <strong>Chrome</strong> or <strong>Edge</strong>, on a computer.
+      Safari, Firefox and phones cannot talk to a board over USB, so the button below will say so.</span></li>
+    <li><span>Plug a USB cable from the computer into the socket on the board marked <strong>COM</strong>.
+      Leave the socket marked USB empty for now. It has to be a cable that carries data;
+      some cables only charge.</span></li>
+    <li><span>Press <strong>Install</strong>. The browser lists what is plugged in: pick the board
+      and press Connect. Then follow what it says and leave it alone until it reports that it has finished.</span></li>
+    <li><span>Unplug the board and go back to
+      <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/WIRELESS.md">the guide</a>.</span></li>
+  </ol>
+
+  <div class="go">
+    <esp-web-install-button manifest="manifest.json">
+      <button slot="activate">Install</button>
+      <span slot="unsupported" class="cant">This browser cannot reach a board over USB.
+        Open this page in Chrome or Edge on a computer.</span>
+      <span slot="not-allowed" class="cant">This page has to be opened over https for the browser
+        to allow it.</span>
+    </esp-web-install-button>
+    <p class="note">Ulanzi D200 Wireless, version 4.15. For an ESP32-S3 board with 16 MB of memory.</p>
+  </div>
+
+  <p class="lede">Installing again later, to get a newer version, keeps the Wi-Fi details the board
+    already has, unless you tick the box that offers to erase it first.</p>
+
+</main></body>
+</html>

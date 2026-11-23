@@ -515,6 +515,7 @@ class DeckHub:
                         await self._deck_arrived(base64.b64decode(obj.get("status") or ""))
                     elif obj.get("type") == "deck_gone":
                         self._deck_left()
+                        self._notify()
                     elif obj.get("type") == "job":
                         self._job_update(obj)
                     elif obj.get("type") == "want_app":

@@ -1,0 +1,12 @@
+build/
+managed_components/
+sdkconfig
+sdkconfig.old
+__pycache__/
+# This board's own details: its port, its address, its key, and what it has said.
+tools/.port
+tools/.ip
+tools/.key
+tools/serial.log
+tools/hub.out
+tools/hub.sock

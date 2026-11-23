@@ -8,7 +8,9 @@
  *   - draws the cached layout from /userdata/deck/layout.bin the moment it starts,
  *     before any host is talking to it
  *   - reads the key matrix from /dev/input/event0
- *   - talks to the Mac bridge over the 1024-byte HID gadget, /dev/hidg0
+ *   - talks to its host one of two ways: the Mac bridge over the 1024-byte HID
+ *     gadget, /dev/hidg0; or a host that reaches it through the debug port and
+ *     connects to 127.0.0.1:5210 (an ESP32, which cannot take 1024-byte packets)
  *   - ticks clock keys by itself once the bridge has told it the time
  *     (the deck has no real-time clock and no network)
  *   - turns the screen off after a while with nothing happening, and brings it
@@ -29,7 +31,7 @@ typedef short i16;
 typedef int i32;
 
 #define FW_MAJOR 4
-#define FW_MINOR 14
+#define FW_MINOR 15
 /* The same two numbers as words, so --version and the log can never drift from
    what the status message reports. They used to be typed out by hand, and said
    1.2 for every release after it. */
@@ -68,6 +70,11 @@ static long sys(long n, long a, long b, long c, long d, long e, long f)
 #define SYS_poll 168
 #define SYS_mmap2 192
 #define SYS_clock_gettime 263
+#define SYS_socket 281
+#define SYS_bind 282
+#define SYS_listen 284
+#define SYS_setsockopt 294
+#define SYS_accept4 366
 
 #define O_RDONLY 0
 #define O_WRONLY 1
@@ -185,6 +192,9 @@ static u8 hist[16];
 static int nhist;
 
 static int hidfd = -1, evfd = -1;
+static int lsfd = -1, cfd = -1;         /* the stream link: listening socket, and the host on it */
+static u8 sbuf[BUFMAX + 4];             /* bytes from that host, not yet a whole message */
+static u32 sgot;
 static u32 last_ping, have_ping, ha_up;
 static u32 host_unix, host_mono;        /* time, as the bridge last told us */
 static i32 host_tz;
@@ -541,12 +551,65 @@ static void layout_store(const u8 *b, u32 n)
     draw_all();
 }
 
-/* ---------- HID link ---------- */
+/* ---------- the stream link ----------
+   A host that cannot use the HID channel comes in through the debug port
+   instead: adbd connects it to this socket ("tcp:5210"). The messages are the
+   same ones; here each is a 4-byte length and then the message, because a
+   stream has no reports to mark where one ends. */
+#define LINK_PORT 5210
+static void link_drop(void)
+{
+    if (cfd >= 0) { s_close(cfd); logs("stream host gone\n"); }
+    cfd = -1; sgot = 0;
+}
+static void link_listen(void)
+{
+    static const u8 addr[16] = { 2, 0, LINK_PORT >> 8, LINK_PORT & 255, 127, 0, 0, 1 };
+    u32 one = 1;
+    long fd = sys(SYS_socket, 2 /* AF_INET */, 1 | O_NONBLOCK /* STREAM */, 0, 0, 0, 0);
+    if (fd < 0) { logs("stream: no socket\n"); return; }
+    sys(SYS_setsockopt, fd, 1 /* SOL_SOCKET */, 2 /* SO_REUSEADDR */, (long)&one, 4, 0);
+    if (sys(SYS_bind, fd, (long)addr, 16, 0, 0, 0) < 0 || sys(SYS_listen, fd, 1, 0, 0, 0, 0) < 0) {
+        logs("stream: cannot listen\n"); s_close(fd); return;
+    }
+    lsfd = fd;
+    logs("stream link listening\n");
+}
+static void link_accept(void)
+{
+    long fd = sys(SYS_accept4, lsfd, 0, 0, O_NONBLOCK, 0, 0);
+    if (fd < 0) return;
+    link_drop();                            /* the newest host wins */
+    cfd = fd;
+    logs("stream host connected\n");
+}
+static void link_send(u8 type, const u8 *body, u32 n)
+{
+    u8 f[5 + 1020]; u32 put = 0, tries = 0; long w;
+    f[0] = (u8)(n + 1); f[1] = (u8)((n + 1) >> 8); f[2] = 0; f[3] = 0;
+    f[4] = type;
+    memcpy(f + 5, body, n);
+    while (put < n + 5) {
+        w = s_write(cfd, f + put, n + 5 - put);
+        if (w > 0) { put += w; continue; }
+        if (w == -11 /* EAGAIN */ && tries++ < 50) {
+            struct pollfd p; p.fd = cfd; p.events = POLLOUT; p.revents = 0;
+            s_poll(&p, 1, 20);
+            continue;
+        }
+        link_drop();
+        return;
+    }
+}
+
+/* ---------- to the host, whichever way it came ---------- */
 static void hid_send(u8 type, const u8 *body, u32 n)
 {
     static u8 rep[1024];
     struct pollfd p;
-    if (hidfd < 0 || n > 1020) return;
+    if (n > 1020) return;
+    if (cfd >= 0) { link_send(type, body, n); return; }
+    if (hidfd < 0) return;
     memset(rep, 0, sizeof rep);
     rep[0] = 3;                             /* first and last fragment */
     rep[1] = (u8)(n + 1); rep[2] = (u8)((n + 1) >> 8);
@@ -675,6 +738,25 @@ static void hid_report(const u8 *r, u32 got)
     if (fl & 2) { rxlive = 0; on_message(rxbuf, rxlen); }
 }
 
+static void link_read(void)
+{
+    long n;
+    while (cfd >= 0 && (n = s_read(cfd, sbuf + sgot, sizeof sbuf - sgot)) != -11 /* EAGAIN */) {
+        u32 at = 0;
+        if (n <= 0) { link_drop(); return; }
+        sgot += n;
+        while (sgot - at >= 4) {
+            u32 len = r32(sbuf + at);
+            if (len > BUFMAX) { link_drop(); return; }
+            if (sgot - at < 4 + len) break;
+            on_message(sbuf + at + 4, len);
+            if (cfd < 0) return;            /* answering it found the host gone */
+            at += 4 + len;
+        }
+        if (at) { memmove(sbuf, sbuf + at, sgot - at); sgot -= at; }
+    }
+}
+
 static void on_key(u32 code, u32 value)
 {
     int k; u8 b[2];
@@ -756,9 +838,10 @@ int cmain(long *sp)
     show_fb();
     evfd = s_open("/dev/input/event0", O_RDONLY | O_NONBLOCK, 0);
     if (evfd < 0) logs("cannot open /dev/input/event0\n");
+    link_listen();
 
     for (;;) {
-        struct pollfd p[2];
+        struct pollfd p[4];
         long n; int i;
         if (hidfd < 0 && now_ms() - hid_retry > 500) {      /* the gadget may come up after us */
             hid_retry = now_ms();
@@ -767,7 +850,9 @@ int cmain(long *sp)
         }
         p[0].fd = evfd; p[0].events = POLLIN; p[0].revents = 0;
         p[1].fd = hidfd; p[1].events = POLLIN; p[1].revents = 0;
-        s_poll(p, 2, 100);
+        p[2].fd = lsfd; p[2].events = POLLIN; p[2].revents = 0;
+        p[3].fd = cfd; p[3].events = POLLIN; p[3].revents = 0;
+        s_poll(p, 4, 100);
         if (p[0].revents & POLLIN)
             while ((n = s_read(evfd, ev, sizeof ev)) >= 16)
                 for (i = 0; i + 16 <= n; i += 16)
@@ -775,6 +860,8 @@ int cmain(long *sp)
         if (hidfd >= 0 && (p[1].revents & POLLIN))
             while ((n = s_read(hidfd, rep, sizeof rep)) > 0) hid_report(rep, (u32)n);
         if (hidfd >= 0 && (p[1].revents & (POLLERR | POLLHUP))) { s_close(hidfd); hidfd = -1; }
+        if (p[2].revents & POLLIN) link_accept();
+        else if (cfd >= 0 && p[3].fd == cfd && (p[3].revents & (POLLIN | POLLERR | POLLHUP))) link_read();
         tick();
     }
 }

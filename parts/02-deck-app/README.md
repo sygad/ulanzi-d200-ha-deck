@@ -15,10 +15,10 @@ is given.
 
 | | |
 |---|---|
-| **Built from** | One C file with no libraries at all, not even the C library. 23 KB when built |
+| **Built from** | One C file with no libraries at all, not even the C library. 25 KB when built |
 | **Files in this folder** | `deckd` (ready to install) · `deckd.c` (the source) · `build.sh` (rebuilds it) · `install.sh` (puts it on the deck) · `default-layout.bin` (the starter screen) |
-| **Also needs** | `adb` on the Mac. The `lld` linker only if you rebuild it |
-| **Reads** | The fourteen keys; messages from the bridge |
+| **Also needs** | `adb` on the Mac, to put it on a deck by hand. The `lld` linker only if you rebuild it |
+| **Reads** | The fourteen keys; messages from the bridge, which is the connector app or the wireless board |
 | **Shows** | Whatever layout it was last sent |
 
 ## What it does
@@ -43,6 +43,12 @@ is given.
 - **The layout is kept on the deck**, in `/userdata/deck/layout.bin`. Readings are
   not: they are held in memory and dropped when the link goes, so the deck never
   shows a stale number as if it were live.
+- **Two ways in, one set of messages.** The connector app uses the deck's USB data
+  channel. The wireless board ([Part 7](../07-wireless-board/README.md)) can't, so the app
+  also listens on port 5210 of the deck's own loopback address, which the board reaches
+  through the debug port. The messages are identical either way
+  ([the formats](../../shared/README.md#deck--board-a-stream)). Nothing outside the deck can
+  reach that port except down the USB cable.
 - **Home Assistant draws, the deck shows.** The one exception is the time on a clock
   key, which the deck draws from letter shapes Home Assistant sends with the layout.
 

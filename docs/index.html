@@ -159,8 +159,10 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
   <header style="display:flex;flex-direction:column;gap:11px">
     <h1>Setting up your Ulanzi deck</h1>
     <p class="lede">An <strong>Ulanzi D200</strong> is a desk pad with fourteen clear keys over one screen. This turns it into a control deck for <strong>Home Assistant</strong>: press a key to switch a light, run a scene, change screen or send a dashboard to a view, and watch readings from your house on the keys themselves &mdash; a temperature graph, a power dial, the time. You lay it out from a panel inside Home Assistant, with no YAML and nothing typed into a terminal.</p>
+    <p class="lede"><strong>You need</strong> an Ulanzi D200, <strong>Home Assistant 2026.11 or newer</strong>, and something for the deck to plug into. The deck has no network of any kind, so whatever holds its USB cable has to carry its messages to Home Assistant. This page uses <strong>a Mac</strong> that the deck plugs into and leaves plugged in, running a small connector app; there is no Windows or Linux version.</p>
+    <p class="lede"><strong>No computer to leave on?</strong> The deck can plug into a small ESP32-S3 board on a phone charger instead, which joins your Wi-Fi. It takes a board to buy and one blob of solder: <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/WIRELESS.md">the wireless guide</a> has it.</p>
+    <p class="lede">Either way the deck has to let a computer in over USB, which mine did with nothing asked for &mdash; whether every D200 does, I don't know. <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/01-the-deck/README.md">Part 1</a> has the one command that tells you.</p>
     <p class="lede">Six steps, and only one of them happens outside Home Assistant.</p>
-    <p class="lede"><strong>You need</strong> an Ulanzi D200, <strong>a Mac</strong> the deck plugs into and leaves plugged in, and <strong>Home Assistant 2026.11 or newer</strong>. The Mac is not optional: the deck has no network of any kind, so something has to sit on the computer it is cabled to. There is no Windows or Linux version. The deck also has to let a computer in over USB, which mine did with nothing asked for &mdash; whether every D200 does, I don't know. <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/01-the-deck/README.md">Part 1</a> has the one command that tells you.</p>
   </header>
 
   <figure style="margin-top:4px">
@@ -544,7 +546,7 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
       <span class="num"></span>
       <div class="txt">
         <h3>How it is built</h3>
-        <p>Six pages, one per piece, for anyone who wants to see inside it or build their
+        <p>Seven pages, one per piece, for anyone who wants to see inside it or build their
            own. None of this is needed to set a deck up.</p>
         <p>
           <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/01-the-deck/README.md">Part 1 &middot; The deck</a> &mdash; what an Ulanzi D200 actually is, read off the hardware<br>
@@ -552,7 +554,8 @@ figcaption{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding
           <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/03-mac-bridge/README.md">Part 3 &middot; The connector app</a> &mdash; the Mac app the deck plugs into<br>
           <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/04-home-assistant/README.md">Part 4 &middot; The integration</a> &mdash; the part that does the thinking, inside Home Assistant<br>
           <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/05-the-panel/README.md">Part 5 &middot; The panel</a> &mdash; where you set the deck up<br>
-          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/06-lining-up-the-keys/README.md">Part 6 &middot; Lining up the keys</a> &mdash; how the key positions were measured
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/06-lining-up-the-keys/README.md">Part 6 &middot; Lining up the keys</a> &mdash; how the key positions were measured<br>
+          <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/parts/07-wireless-board/README.md">Part 7 &middot; The wireless board</a> &mdash; the ESP32-S3 board that takes the Mac's place
         </p>
         <p>The <a href="https://github.com/sygad/ulanzi-d200-ha-deck/blob/main/shared/README.md">message formats</a> both ends agree on are
            written down too.</p>

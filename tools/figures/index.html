@@ -11,6 +11,7 @@
 
       ?register   the Browser Mod panel, with Register ringed
       ?suspend    your own profile, with Suspend background connections ringed
+      ?wireless   the wireless route: Home Assistant, the board, the wall supply and the deck
 
   Render with tools/figures/shoot.sh.
 -->
@@ -94,6 +95,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line
 .field i{display:block;font-style:normal;font-size:10.5px;color:var(--ink-faint);line-height:1.4}
 .field b{display:block;font-weight:400;font-size:13px;font-family:var(--mono);letter-spacing:-.01em}
 .hint{margin:6px 0 0;font-size:11px;color:var(--ink-faint)}
+
+/* ---- the wiring figures: what joins to what, drawn the way docs/index.html draws its kit strip ---- */
+.wire{width:1140px;padding:8px 0 4px;color:var(--ink)}
+.wire h2{font-size:21px;font-weight:600;margin:0 0 18px;letter-spacing:.005em}
+.wire svg{display:block;width:100%;height:auto}
+.wire text{font-family:var(--sans)}
+.wire .nm{font-size:19px;font-weight:600}
+.wire .sub{font-size:16px;fill:var(--ink-soft)}
+.wire .lab{font-family:var(--mono);font-size:14px;fill:var(--ink-faint);letter-spacing:.03em}
+.wire .sock{font-family:var(--mono);font-size:13px;font-weight:500;fill:var(--ink)}
+.wire .lede{font-size:21px;color:var(--ink-soft);line-height:1.55;margin:22px 0 0;max-width:900px}
 </style></head>
 <body><div class="sheet">
 
@@ -192,6 +204,88 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line
       </div>
     </div>
   </div>
+</div>
+
+<!-- ============================ the wireless route: what joins to what ============================ -->
+<div class="wire" id="s-wireless" hidden>
+  <h2>What you need, and how it joins up</h2>
+  <svg viewBox="0 0 1140 410" role="img" aria-label="Home Assistant joined by Wi-Fi to an ESP32-S3 board. A wall supply plugs into the board's COM socket. The deck plugs into the board's USB socket.">
+    <g transform="translate(20,14) scale(1.5)" color="#1b1b19">
+          <rect x="6" y="6" width="108" height="66" rx="5" fill="none" stroke="currentColor" stroke-width="2.2" opacity=".5"/>
+          <rect x="12" y="12" width="96" height="54" rx="2" fill="var(--sunk)"/>
+          <rect x="12" y="12" width="26" height="54" fill="var(--accent)" opacity=".12"/>
+          <rect x="16" y="17" width="18" height="3" rx="1.5" fill="var(--accent)" opacity=".85"/>
+          <g fill="currentColor" opacity=".32">
+            <rect x="16" y="25" width="18" height="3" rx="1.5"/><rect x="16" y="32" width="18" height="3" rx="1.5"/>
+            <rect x="16" y="39" width="18" height="3" rx="1.5"/><rect x="16" y="46" width="18" height="3" rx="1.5"/>
+          </g>
+          <rect x="43" y="17" width="60" height="12" rx="2" fill="currentColor" opacity=".16"/>
+          <rect x="43" y="33" width="28" height="28" rx="2" fill="currentColor" opacity=".16"/>
+          <rect x="75" y="33" width="28" height="28" rx="2" fill="currentColor" opacity=".16"/>
+          <rect x="52" y="72" width="16" height="10" fill="currentColor" opacity=".4"/>
+          <rect x="36" y="82" width="48" height="4" rx="2" fill="currentColor" opacity=".5"/>
+        </g>
+    <text class="nm" x="110" y="196" text-anchor="middle">Home Assistant</text>
+    <text class="sub" x="110" y="224" text-anchor="middle">Runs where it already runs</text>
+
+    <line x1="216" y1="82" x2="440" y2="82" stroke="#908f88" stroke-width="2" stroke-dasharray="7 6"/>
+    <text class="lab" x="328" y="108" text-anchor="middle">your Wi-Fi</text>
+
+    <g color="#1b1b19">
+          <rect x="455" y="34" width="230" height="104" rx="8" fill="#2f8f5b" opacity=".16"/>
+          <rect x="455" y="34" width="230" height="104" rx="8" fill="none" stroke="currentColor" stroke-width="2.6" opacity=".5"/>
+          <rect x="530" y="50" width="80" height="52" rx="4" fill="currentColor" opacity=".3"/>
+          <rect x="540" y="59" width="60" height="34" rx="2" fill="currentColor" opacity=".25"/>
+          <g fill="currentColor" opacity=".35">
+            <circle cx="470" cy="46" r="2.6"/><circle cx="484" cy="46" r="2.6"/><circle cx="498" cy="46" r="2.6"/><circle cx="512" cy="46" r="2.6"/>
+            <circle cx="628" cy="46" r="2.6"/><circle cx="642" cy="46" r="2.6"/><circle cx="656" cy="46" r="2.6"/><circle cx="670" cy="46" r="2.6"/>
+          </g>
+          <rect x="483" y="120" width="44" height="26" rx="5" fill="var(--bg)" stroke="currentColor" stroke-width="2.4" opacity=".75"/>
+          <rect x="613" y="120" width="44" height="26" rx="5" fill="var(--bg)" stroke="currentColor" stroke-width="2.4" opacity=".75"/>
+          <text class="sock" x="505" y="112" text-anchor="middle">COM</text>
+          <text class="sock" x="635" y="112" text-anchor="middle">USB</text>
+        </g>
+    <text class="nm" x="570" y="20" text-anchor="middle">ESP32-S3 board</text>
+
+    <path d="M505 146V262" fill="none" stroke="#5e5d58" stroke-width="3" stroke-linecap="round"/>
+    <text class="lab" x="490" y="212" text-anchor="end">USB cable</text>
+    <g color="#1b1b19">
+          <rect x="465" y="262" width="80" height="62" rx="9" fill="currentColor" opacity=".2"/>
+          <rect x="465" y="262" width="80" height="62" rx="9" fill="none" stroke="currentColor" stroke-width="2.4" opacity=".5"/>
+          <rect x="489" y="324" width="8" height="18" rx="2" fill="currentColor" opacity=".5"/>
+          <rect x="513" y="324" width="8" height="18" rx="2" fill="currentColor" opacity=".5"/>
+          <path d="M508 277l-9 15h8l-3 13 11-17h-8z" fill="var(--key)"/>
+        </g>
+    <text class="nm" x="505" y="372" text-anchor="middle">USB wall supply</text>
+    <text class="sub" x="505" y="400" text-anchor="middle">Powers the board and the deck</text>
+
+    <path d="M635 146V168Q635 182 649 182H870Q884 182 884 168V92Q884 78 898 78H922" fill="none" stroke="#5e5d58" stroke-width="3" stroke-linecap="round"/>
+    <text class="lab" x="760" y="208" text-anchor="middle">USB cable</text>
+
+    <g transform="translate(910,6) scale(1.5)" color="#1b1b19">
+          <rect x="8" y="18" width="104" height="60" rx="9" fill="currentColor" opacity=".22"/>
+          <rect x="11" y="21" width="98" height="54" rx="7" fill="var(--screen)"/>
+          <g fill="var(--key)">
+            <rect x="16" y="26" width="16" height="12" rx="2.5"/>
+            <rect x="35" y="26" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="54" y="26" width="16" height="12" rx="2.5"/>
+            <rect x="73" y="26" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="92" y="26" width="12" height="12" rx="2.5" opacity=".35"/>
+            <rect x="16" y="41" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="35" y="41" width="16" height="12" rx="2.5"/>
+            <rect x="54" y="41" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="73" y="41" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="92" y="41" width="12" height="12" rx="2.5"/>
+            <rect x="16" y="56" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="35" y="56" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="54" y="56" width="16" height="12" rx="2.5" opacity=".35"/>
+            <rect x="73" y="56" width="31" height="12" rx="2.5"/>
+          </g>
+        </g>
+    <text class="nm" x="1000" y="196" text-anchor="middle">Ulanzi D200</text>
+    <text class="sub" x="1000" y="224" text-anchor="middle">Plugs into the board, not a computer</text>
+  </svg>
+  <p class="lede">The board does the job the computer did: it holds the deck's USB cable and carries its messages to Home Assistant over your Wi-Fi. Nothing else is plugged in.</p>
 </div>
 
 </div>

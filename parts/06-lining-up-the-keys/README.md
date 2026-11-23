@@ -1,4 +1,4 @@
-[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md)
+[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md) · [Part 7 →](../07-wireless-board/README.md)
 
 # Part 6 · Lining up the keys
 
@@ -145,4 +145,4 @@ positions.
 
 ---
 
-[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md)
+[← Part 5](../05-the-panel/README.md) · [All parts](../../README.md) · [Part 7 →](../07-wireless-board/README.md)

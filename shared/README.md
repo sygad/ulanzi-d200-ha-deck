@@ -30,8 +30,10 @@ for another computer.
 A press goes the other way: the deck says "screen 2, key 7, tapped", and the
 integration looks up what that key is for.
 
-The bridge ([Part 3](../parts/03-mac-bridge/README.md)) sits in the middle and passes
-messages along unread.
+The bridge sits in the middle and passes messages along unread. It is either the
+connector app on a Mac ([Part 3](../parts/03-mac-bridge/README.md)) or the wireless board
+([Part 7](../parts/07-wireless-board/README.md)); Home Assistant and the deck can't tell
+which.
 
 ---
 
@@ -76,6 +78,25 @@ red dot.
 The deck answers every ping with a status, and sends one whenever its screen or
 layout changes.
 
+### Deck ↔ board: a stream
+
+The wireless board can't use the data channel ([Part 7](../parts/07-wireless-board/README.md)
+says why), so the deck software also listens on TCP port 5210, on the deck's own
+loopback address only. The board reaches it through the deck's debug port, as the ADB
+service `tcp:5210`.
+
+The messages are the same ones, with the same types and bodies as the tables above. Only
+the wrapping differs: no 1024-byte reports and no flags, just each message with its
+length in front.
+
+| Bytes | Meaning |
+|---|---|
+| 0–3 | Length of the message that follows (little-endian) |
+| 4… | The message. Its first byte is its type |
+
+The deck serves one stream at a time. While one is open it sends everything there, and
+goes back to the data channel when it closes.
+
 ### Bridge ↔ Home Assistant: WebSocket
 
 The bridge connects to `/api/ulanzi_deck/bridge` on Home Assistant.
@@ -87,7 +108,7 @@ The bridge connects to `/api/ulanzi_deck/bridge` on Home Assistant.
 | HA → bridge | Text: `{"type": "ready", "app_version"}` | Allowed. `app_version` is the release this integration belongs to |
 | Bridge → HA | Text: `{"type": "deck", "status"}` | A deck is plugged in and answering. `status` is its status message, base64 |
 | Bridge → HA | Text: `{"type": "deck_gone"}` | The deck has gone |
-| HA → bridge | Text: `{"type": "update_now"}` | Fetch and install a newer app |
+| HA → bridge | Text: `{"type": "update_now"}` | Fetch and install a newer app. The wireless board does not act on this yet |
 | Bridge → HA | Text: `{"type": "want_app"}` | Asking where to fetch it from |
 | HA → bridge | Text: `{"type": "app_at", "token"}` | A one-time address on this server to fetch it from |
 | HA → bridge | Text: `{"type": "setup_deck"}` | Put the deck software this app carries onto the deck |

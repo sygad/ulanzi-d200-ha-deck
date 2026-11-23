@@ -37,8 +37,8 @@ Over USB it presents three things at once:
 
 | What | Used for |
 |---|---|
-| A data channel, 1024 bytes each way | Everything this project sends. No driver needed on a Mac |
-| A debug port (ADB) | Getting in to install the app |
+| A data channel, 1024 bytes each way | Everything the connector app sends. No driver needed on a Mac |
+| A debug port (ADB) | Getting in to install the app. Also how the wireless board talks to the deck ([Part 7](../07-wireless-board/README.md)) |
 | A keyboard | How the vendor's software types shortcuts. Not used here |
 
 ## Getting in

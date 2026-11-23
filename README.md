@@ -7,14 +7,21 @@ keys themselves — a temperature
 graph, a power dial, the time. You lay it out from a panel inside Home Assistant, with no
 YAML and nothing typed into a terminal.
 
-Six steps, and only one of them happens outside Home Assistant.
+**You need** an Ulanzi D200, **Home Assistant 2026.11 or newer**, and something for the
+deck to plug into. The deck has no network of any kind, so whatever holds its USB cable
+has to carry its messages to Home Assistant. There are two ways to give it that:
 
-**You need** an Ulanzi D200, **a Mac** the deck plugs into and leaves plugged in, and
-**Home Assistant 2026.11 or newer**. The Mac is not optional: the deck has no network of
-any kind, so something has to sit on the computer it is cabled to. There is no Windows or
-Linux version. The deck also has to let a computer in over USB, which mine did with nothing
-asked for — whether every D200 does, I don't know. [Part 1](parts/01-the-deck/README.md)
-has the one command that tells you.
+| | |
+|---|---|
+| **With a Mac** — this page | The deck plugs into a Mac that stays on, running a small connector app. Nothing to buy and nothing to solder. There is no Windows or Linux version |
+| **[With no computer →](WIRELESS.md)** | The deck plugs into a small ESP32-S3 board on a phone charger, and the board joins your Wi-Fi. A board to buy and one blob of solder. New, and so far run on one deck |
+
+Either way the deck has to let a computer in over USB, which mine did with nothing asked
+for — whether every D200 does, I don't know. [Part 1](parts/01-the-deck/README.md) has the
+one command that tells you.
+
+This page is the Mac route: six steps, and only one of them happens outside Home
+Assistant. Steps 1 to 4 are the same for both.
 
 <br>
 
@@ -40,6 +47,9 @@ nothing of yours is touched. Press **PREVIEW** and the keys answer.
 ## What you need, and how it joins up
 
 <img src="images/guide/fig-what-you-need.png" alt="Home Assistant, where it already runs, joined over the network to your Mac, which the deck plugs into over USB" width="100%">
+
+With the board instead of the Mac, the middle of that picture changes and the two ends
+don't: [the wireless guide](WIRELESS.md#what-you-need-and-how-it-joins-up) has its own.
 
 <br>
 
@@ -119,6 +129,11 @@ A new item appears down the left. Open it and press the one button on the page.
 <br>
 
 <img src="images/guide/fig-step3.png" alt="The Ulanzi Deck page in Home Assistant, offering to get the connector app" width="100%">
+
+<br>
+
+> **Using the board instead of a Mac?** That button is for the Mac route, so leave it.
+> Carry on in [the wireless guide](WIRELESS.md), which brings you back here at step 6.
 
 <br>
 
@@ -386,9 +401,13 @@ The app's update is fetched by your Home Assistant and handed to the Mac over th
 the Mac is already on, so macOS does not ask about it again — the warning and the two Open
 Anyways happen once in the life of the app.
 
+**On the wireless route** the board takes the connector app's place in that list, and it
+is updated from a web page rather than from the panel:
+[the wireless guide](WIRELESS.md#keeping-it-up-to-date) has the steps.
+
 ## How it is built
 
-Six pages, one per piece, for anyone who wants to see inside it or build their own.
+Seven pages, one per piece, for anyone who wants to see inside it or build their own.
 None of this is needed to set a deck up.
 
 | | |
@@ -399,6 +418,7 @@ None of this is needed to set a deck up.
 | [Part 4 · The integration](parts/04-home-assistant/README.md) | The part that does the thinking, inside Home Assistant |
 | [Part 5 · The panel](parts/05-the-panel/README.md) | Where you set the deck up |
 | [Part 6 · Lining up the keys](parts/06-lining-up-the-keys/README.md) | How the key positions were measured |
+| [Part 7 · The wireless board](parts/07-wireless-board/README.md) | The ESP32-S3 board that takes the Mac's place |
 
 The [message formats](shared/README.md) both ends agree on are written down too.
 
@@ -410,4 +430,4 @@ The [message formats](shared/README.md) both ends agree on are written down too.
 
 **Licence** — [MIT](LICENSE). Fonts and icons keep their own licences, listed in [NOTICE.md](NOTICE.md).
 
-**Credits** — **Roboto** by Google, Apache 2.0. **Material Design Icons** by [Pictogrammers](https://pictogrammers.com/library/mdi/). `adb`, carried inside the connector app, Apache 2.0. Ulanzi's own software is not included here. Not affiliated with Ulanzi or with Home Assistant.
+**Credits** — **Roboto** by Google, Apache 2.0. **Material Design Icons** by [Pictogrammers](https://pictogrammers.com/library/mdi/). `adb`, carried inside the connector app, Apache 2.0. The wireless board's software is built on [ESP-IDF](https://github.com/espressif/esp-idf) and Espressif's WebSocket client, and its installer page uses [ESP Web Tools](https://github.com/esphome/esp-web-tools); all three Apache 2.0. Ulanzi's own software is not included here. Not affiliated with Ulanzi or with Home Assistant.

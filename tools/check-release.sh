@@ -101,6 +101,29 @@ else
   rm -rf "$OUT"
 fi
 
+# ---------------------------------------------------------------- the wireless board
+# The board carries its own copy of the deck binary and says its own version to
+# Home Assistant, and the installer page carries a built copy of the board's
+# software. Each is one more place for a number to be left behind.
+BOARD="$ROOT/parts/07-wireless-board/firmware"
+BOARD_FW=$(sed -n 's/^#define FW_VERSION "\([^"]*\)".*/\1/p' "$BOARD/main/bridge.h" "$BOARD/main/bridge.c" 2>/dev/null | head -1)
+same "the board's software is on the same version"    "$BOARD_FW"  "$MANIFEST"
+same "the deck binary the board carries is that build" \
+     "$(md5 -q "$BOARD/main/deck/deckd" 2>/dev/null || echo missing)"  "$FRESH"
+FLASH_V=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$ROOT/docs/flash/manifest.json")
+same "the installer page offers the same version"     "$FLASH_V"   "$MANIFEST"
+# the built board software says its version in its first log line; look for it in the bytes
+if strings -a "$ROOT/docs/flash/ulanzi-d200-wireless.bin" | grep -q "workbench ready, firmware $MANIFEST"; then
+  ok "the installer's board software is that version"
+else
+  bad "the installer's board software is that version" "no \"firmware $MANIFEST\" in the built file"
+fi
+if strings -a "$ROOT/docs/flash/ulanzi-d200-wireless.bin" | grep -q "deckd $MANIFEST starting"; then
+  ok "and carries a deck binary of that version"
+else
+  bad "and carries a deck binary of that version" "no \"deckd $MANIFEST\" in the built file"
+fi
+
 echo
 [ "$FAIL" = 0 ] && echo "All checks passed. Safe to publish $MANIFEST." && exit 0
 echo "FAILED — do not publish." >&2
